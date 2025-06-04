@@ -1,7 +1,34 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import ProfileDropdown from './ProfileDropdown';
 
 const Header = () => {
+   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+   const dropdownRef = useRef<HTMLDivElement>(null);
+
+   const toggleDropdown = () => {
+      setIsDropdownOpen(!isDropdownOpen);
+   };
+
+   // Close dropdown when clicking outside
+   useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setIsDropdownOpen(false);
+         }
+      };
+
+      // Add event listener
+      document.addEventListener('mousedown', handleClickOutside);
+
+      // Clean up event listener on component unmount
+      return () => {
+         document.removeEventListener('mousedown', handleClickOutside);
+      };
+   }, [dropdownRef]); // Re-run effect if dropdownRef changes (though it shouldn't)
+
    return (
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md p-2 flex items-center justify-between z-10 h-14">
          {/* Left section: Search Bar and Facebook Logo */}
@@ -80,15 +107,25 @@ const Header = () => {
                </svg>
 
             </div>
-            {/* User Avatar */}
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full hover:bg-gray-200 cursor-pointer flex items-center justify-center overflow-hidden">
-               <Image
-                  src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
-                  alt="User avatar"
-                  width={36}
-                  height={36}
-                  className="rounded-full object-cover"
-               />
+            {/* User Avatar with Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+               <div
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full hover:bg-gray-200 cursor-pointer flex items-center justify-center overflow-hidden"
+                  onClick={toggleDropdown}
+               >
+                  <Image
+                     src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
+                     alt="User avatar"
+                     width={36}
+                     height={36}
+                     className="rounded-full object-cover"
+                  />
+               </div>
+
+               {/* Dropdown Menu */}
+               {isDropdownOpen && (
+                  <ProfileDropdown />
+               )}
             </div>
          </div>
       </header>
