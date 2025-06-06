@@ -29,14 +29,16 @@ export default function DashboardLayout({
     <>
         <div className="flex flex-col h-screen">
           <Header />
-          <div className="flex flex-1 overflow-hidden pt-14 md:pt-16 md:flex" style={{background: '#f3f4f6'}}>
-            <aside className="hidden md:block lg:w-64 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
+          <div className="flex flex-1 overflow-hidden md:flex" style={{background: '#f3f4f6'}}>
+            <aside className="hidden md:block lg:w-72 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
               <LeftSidebar />
             </aside>
-            <main className="flex-1 overflow-y-auto p-4">
-              {children}
+            <main className="flex-1 overflow-y-auto p-4 flex justify-center">
+              <div className="w-full max-w-2xl">
+                {children}
+              </div>
             </main>
-            <aside className="hidden lg:block w-80 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
+            <aside className="hidden lg:block lg:w-72 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
               <RightSidebar />
             </aside>
           </div>
