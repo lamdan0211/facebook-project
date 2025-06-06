@@ -1,7 +1,15 @@
+"use client";
 import PostCard from '@/components/profile/PostCard';
 import Image from 'next/image';
+import CreatePostModal from '@/components/modals/CreatePostModal';
+import React, { useState } from 'react';
 
 const ProfileContent = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
   // Placeholder post data with online image URLs for avatars and post images
   const posts = [
     {
@@ -38,24 +46,31 @@ const ProfileContent = () => {
              {/* Using online placeholder image URL */}
              <Image src="https://source.unsplash.com/random/100x100?current-user-avatar,sig=25" alt="Your Avatar" width={40} height={40} objectFit="cover" />
            </div>
-           <textarea
-             className="flex-1 p-2 bg-gray-100 rounded-full focus:outline-none focus:ring-blue-500 text-sm text-gray-700 placeholder-gray-500 resize-none overflow-hidden"
-             rows={1} // Adjusted rows for single line input initially
-             placeholder="What's on your mind, User Name?"
-             style={{ minHeight: '40px', paddingTop: '10px', paddingBottom: '10px' }} // Add some vertical padding
-           ></textarea>
+           <div
+             onClick={handleOpenModal}
+             className="flex-1 p-2 bg-gray-100 rounded-full text-sm text-gray-500 cursor-pointer hover:bg-gray-200"
+             style={{ minHeight: '40px', paddingTop: '10px', paddingBottom: '10px' }}
+           >
+             What's on your mind, User Name?
+           </div>
         </div>
         <div className="flex justify-around border-t border-gray-200 pt-3 -mx-4 px-4">
-           <button className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
-             <div className="w-5 h-5 mr-2 bg-red-500 rounded-full flex items-center justify-center text-white text-xs"></div> {/* Placeholder Live Video Icon */}
+           <button 
+             onClick={handleOpenModal}
+             className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+             <Image src="/images/icon-video.png" width={20} height={20} alt="Live Video"  className='gap-[10] flex mr-1'/>
              Live Video
            </button>
-           <button className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
-              <div className="w-5 h-5 mr-2 bg-green-500 rounded-full flex items-center justify-center text-white text-xs"></div> {/* Placeholder Photo/Video Icon */}
+           <button 
+             onClick={handleOpenModal}
+             className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+              <Image src="/images/icon-photo.png" width={20} height={20} alt="Photo/Video"  className='gap-[10] flex mr-1'/>
               Photo/Video
            </button>
-           <button className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
-              <div className="w-5 h-5 mr-2 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs"></div> {/* Placeholder Feeling/Activity Icon */}
+           <button 
+             onClick={handleOpenModal}
+             className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+              <Image src="/images/icon-flag.png" width={20} height={20} alt="Feeling/Activity"  className='gap-[10] flex mr-1'/>
               Feeling/Activity
            </button>
         </div>
@@ -68,6 +83,8 @@ const ProfileContent = () => {
           <PostCard key={index} {...post} />
         ))}
       </div>
+       {/* Create Post Modal */}
+       {isModalOpen && <CreatePostModal onClose={handleCloseModal} />} {/* Render modal conditionally */}
     </div>
   );
 };

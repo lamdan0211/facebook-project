@@ -53,7 +53,7 @@ const NotificationDropdown = () => {
                 alt={notif.user.name}
                 width={40}
                 height={40}
-                className="rounded-full object-cover"
+                className="rounded-full object-cover w-10 h-10"
               />
               {!notif.read && (
                 <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-blue-500"></span>

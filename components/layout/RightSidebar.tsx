@@ -35,7 +35,7 @@ const RightSidebar = () => {
                   alt={`${group.name} cover`}
                   width={56}
                   height={56}
-                  style={{ objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div>
@@ -60,13 +60,13 @@ const RightSidebar = () => {
           {contacts.map((contact) => (
             <li key={contact.name} className="flex items-center p-2 rounded-md hover:bg-gray-200 cursor-pointer text-gray-700 -ml-2 -mr-2">
               {/* Avatar with Online Status */}
-              <div className="relative mr-3">
+              <div className="relative mr-3 w-8 h-8">
                  <Image
                   src={contact.avatar}
                   alt={`${contact.name}'s avatar`}
                   width={32}
                   height={32}
-                  className="rounded-full"
+                  className="w-full h-full rounded-full object-cover"
                 />
                 {contact.isOnline && (
                   <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"></span>
@@ -77,10 +77,7 @@ const RightSidebar = () => {
           ))}
         </ul>
       </div>
-       {/* Optional: Footer links */}
-       {/* <div className="mt-4 text-xs text-gray-500">
-          Privacy · Terms · Advertising · Ad Choices · Cookies · More · © 2024 Facebook
-       </div> */}
+     
     </div>
   );
 };

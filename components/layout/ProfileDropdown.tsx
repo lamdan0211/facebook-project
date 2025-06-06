@@ -1,42 +1,21 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const ProfileDropdown = () => {
   return (
     <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg py-2 z-20">
       {/* Profile Link */}
-      <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-lg mx-2">
+      <Link href="/profile" className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-lg mx-2">
         <Image
           src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
           alt="User avatar"
           width={32}
           height={32}
-          className="rounded-full object-cover mr-2"
+          className="w-10 h-10 rounded-full object-cover mr-2"
         />
         <span className="font-semibold text-sm">Lam Dan</span>
-      </div>
-
-      {/* Horizontal line */}
-      <hr className="my-2 border-gray-200 mx-4" />
-
-      {/* Utility Link */}
-      <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-lg mx-2">
-        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-            {/* Placeholder Icon - Replace with actual icon if available */}
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-        </div>
-        <span className="text-sm">Hữu ích cho cuộc sống bạn</span>
-      </div>
-
-       {/* See all profiles button */}
-      <div className="px-4 py-2">
-          <button className="w-full bg-gray-200 text-gray-800 rounded-lg py-2 text-sm font-semibold hover:bg-gray-300">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block align-text-bottom mr-1">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-              See all profiles
-          </button>
-      </div>
+      </Link>
 
       {/* Horizontal line */}
       <hr className="my-2 border-gray-200 mx-4" />
@@ -59,22 +38,7 @@ const ProfileDropdown = () => {
              <span className="text-sm flex-1">Help & support</span>
              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
-         <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-             <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-                {/* Display Icon */}
-                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-             </div>
-            <span className="text-sm flex-1">Display & accessibility</span>
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-        </div>
-         <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
-                {/* Feedback Icon */}
-                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h10m-9 4h4m-1 4a3 3 0 11-6 0 3 3 0 016 0zm7 0a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            </div>
-             <span className="text-sm flex-1">Give feedback</span>
-             <span className="text-xs text-gray-500">CTRL B</span>
-        </div>
+     
          <div className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
                 {/* Log Out Icon */}
@@ -84,22 +48,6 @@ const ProfileDropdown = () => {
         </div>
       </div>
 
-       {/* Footer Links */}
-        <div className="text-xs text-gray-500 px-4 py-2 space-x-1">
-            <span>Privacy</span>
-            <span>•</span>
-            <span>Terms</span>
-            <span>•</span>
-            <span>Advertising</span>
-            <span>•</span>
-            <span>Ad choices</span>
-            <span>•</span>
-            <span>Cookies</span>
-            <span>•</span>
-            <span>More</span>
-            <span>•</span>
-            <span>Meta © 2025</span>
-        </div>
     </div>
   );
 };

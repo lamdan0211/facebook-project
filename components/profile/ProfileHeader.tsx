@@ -35,21 +35,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
         </div>
 
-        {/* User Name and Buttons */}
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{userName}</h1>
-          {/* Add user stats like friends count here */}
           <p className="text-gray-600 text-sm mt-1">X friends</p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex space-x-2 mt-4 md:mt-0 flex-wrap justify-center md:justify-start">
           <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm">
-            <div className="w-4 h-4 mr-1 bg-white"></div> {/* Placeholder Icon */}
-            <span>Add to Story</span>
+            
+            <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
           </button>
           <button className="flex items-center px-3 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 transition duration-300 text-sm">
-            <div className="w-4 h-4 mr-1 bg-gray-600"></div> {/* Placeholder Icon */}
+            <Image src="/images/icon-edit.png" width={16} height={16} alt="Edit Profile"  className='gap-[10] flex mr-2'/>
             <span>Edit Profile</span>
           </button>
         </div>

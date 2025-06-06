@@ -27,11 +27,9 @@ export default function DashboardLayout({
 }>) {
   return (
     <>
-      <html lang="en">
-      <body>
         <div className="flex flex-col h-screen">
           <Header />
-          <div className="flex flex-1 overflow-hidden pt-14 md:pt-16 md:flex">
+          <div className="flex flex-1 overflow-hidden pt-14 md:pt-16 md:flex" style={{background: '#f3f4f6'}}>
             <aside className="hidden md:block lg:w-64 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
               <LeftSidebar />
             </aside>
@@ -43,8 +41,8 @@ export default function DashboardLayout({
             </aside>
           </div>
         </div>
-      </body>
-    </html>
+      
+      
     </>
   );
 } 

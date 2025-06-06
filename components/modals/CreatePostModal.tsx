@@ -103,7 +103,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto relative">
         {/* Modal Header */}
         <div className="p-4 border-b flex items-center justify-between">

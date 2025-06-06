@@ -38,20 +38,22 @@ const Stories = () => {
   };
 
   useEffect(() => {
-    updateScrollStatus();
-    const container = scrollContainerRef.current;
-    if (container) {
+    // Only run this effect on the client side
+    if (typeof window !== 'undefined' && scrollContainerRef.current) {
+      updateScrollStatus();
+      const container = scrollContainerRef.current;
       container.addEventListener('scroll', updateScrollStatus);
       // Also update status on window resize
       window.addEventListener('resize', updateScrollStatus);
+
+      return () => {
+        if (container) {
+          container.removeEventListener('scroll', updateScrollStatus);
+          window.removeEventListener('resize', updateScrollStatus);
+        }
+      };
     }
-    return () => {
-      if (container) {
-        container.removeEventListener('scroll', updateScrollStatus);
-        window.removeEventListener('resize', updateScrollStatus);
-      }
-    };
-  }, []);
+  }, []); // Empty dependency array means this effect runs once after the initial render
 
   return (
     <div className="w-full max-w-xl mx-auto mt-4 relative group">

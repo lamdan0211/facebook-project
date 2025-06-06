@@ -35,26 +35,23 @@ const NewsFeed = () => {
   // In a real app, you would have a function here to handle submitting the new post
   const handlePostSubmit = (postContent: string) => {
      console.log('New post content:', postContent);
-     // Here you would typically send the postContent to your backend/API
-     // For this demo, we'll just log it and close the modal
      handleCloseModal();
-     // Optionally, add the new post to the dummy data displayed
   };
 
   // Placeholder handlers for the icons below the input
   const handleLiveVideoClick = () => {
     console.log('Live Video icon clicked');
-    handleOpenModal(); // Maybe open modal with video context?
+    handleOpenModal(); 
   };
 
   const handlePhotoVideoIconClick = () => {
     console.log('Photo/Video icon clicked');
-    handleOpenModal(); // Maybe open modal with photo context?
+    handleOpenModal(); 
   };
 
   const handleFeelingActivityIconClick = () => {
     console.log('Feeling/Activity icon clicked');
-    handleOpenModal(); // Maybe open modal with feeling context?
+    handleOpenModal(); 
   };
 
   return (

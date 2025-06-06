@@ -23,7 +23,7 @@ const Comment: React.FC<CommentProps> = ({
         alt={`${author.name}'s avatar`}
         width={28}
         height={28}
-        className="rounded-full"
+        className="rounded-full w-10 h-10 object-cover"
       />
       <div className="flex-1">
         <div className="bg-gray-100 p-2 rounded-xl">
