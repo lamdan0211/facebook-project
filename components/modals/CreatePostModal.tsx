@@ -234,32 +234,30 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
             <div className="flex items-center justify-between border rounded-lg px-3 py-1.5">
               <span className="text-sm font-medium text-gray-500 whitespace-nowrap">Add to your post</span>
               <div className="flex items-center space-x-1.5">
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full" onClick={handleFileSelect}>
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer" onClick={handleFileSelect}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#45BD62" className="w-6 h-6">
                     <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full" onClick={() => setShowTagPeopleModal(true)}>
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointers" onClick={() => setShowTagPeopleModal(true)}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1B74E4" className="w-6 h-6">
                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full" onClick={toggleEmojiPicker}>
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer" onClick={toggleEmojiPicker}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#EAB026" className="w-6 h-6">
                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6c-.54 0-.828.419-.936.634a1.96 1.96 0 00-.189.866c0 .298.059.605.189.866.108.215.395.634.936.634.54 0 .828-.419.936-.634.13-.26.189-.568.189-.866 0-.298-.059-.605-.189-.866-.108-.215-.395-.634-.936-.634zm4.314.634c.108-.215.395-.634.936-.634.54 0 .828.419.936.634.13.26.189.568.189.866 0 .298-.059.605-.189.866-.108.215-.395.634-.936.634-.54 0-.828-.419-.936-.634a1.96 1.96 0 01-.189-.866c0-.298.059-.605.189-.866zm2.023 6.828a.75.75 0 10-1.06-1.06 3.75 3.75 0 01-5.304 0 .75.75 0 00-1.06 1.06 5.25 5.25 0 007.424 0z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full">
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#F3425F" className="w-6 h-6">
                     <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full">
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer">
                   <span className="text-base font-bold text-[#6CD2FF]">GIF</span>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full">
-                  <span className="text-xl text-gray-500">•••</span>
-                </button>
+                
               </div>
             </div>
 
