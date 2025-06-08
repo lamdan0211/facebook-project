@@ -7,6 +7,7 @@ import { initialPosts as initialDummyPosts, moreDummyPosts } from '@/lib/dummyDa
 import { CommentData } from '@/lib/dummyData'; // Import CommentData for linter
 import Stories from '@/components/stories/Stories'; // Import Stories component
 import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected import path
+import Link from 'next/link';
 
 const NewsFeed = () => {
   // Use initial dummy posts from the data file
@@ -58,17 +59,19 @@ const NewsFeed = () => {
     <div className="space-y-4 max-w-xl mx-auto mt-4">
       {/* Create Post Section - Trigger Button */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-4">
-        <div className="flex items-center mb-4 cursor-pointer" onClick={handleOpenModal}> {/* Added onClick here */}
+        <div className="flex items-center mb-4 cursor-pointer"> {/* Added onClick here */}
           {/* User Avatar */}
-           <Image
-            src="https://images.pexels.com/photos/4056509/pexels-photo-4056509.jpeg"
-            alt="User avatar"
-            width={40}
-            height={40}
-            className="rounded-full mr-3 w-[40] h-[40] object-cover"
-          />
+           <Link href="/profile">
+            <Image
+              src="https://images.pexels.com/photos/4056509/pexels-photo-4056509.jpeg"
+              alt="User avatar"
+              width={40}
+              height={40}
+              className="rounded-full mr-3 w-[40] h-[40] object-cover"
+            />
+           </Link>
           {/* Placeholder Input field */}
-          <div className="flex-1 bg-gray-100 rounded-full py-2 px-4 text-gray-500 text-sm">
+          <div className="flex-1 bg-gray-100 rounded-full py-2 px-4 text-gray-500 text-sm"  onClick={handleOpenModal}>
             What's on your mind, Lam?
           </div>
         </div>
