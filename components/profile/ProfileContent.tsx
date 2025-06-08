@@ -4,36 +4,66 @@ import Image from 'next/image';
 import CreatePostModal from '@/components/modals/CreatePostModal';
 import React, { useState } from 'react';
 
+interface PostData {
+  author: {
+    name: string;
+    avatar: string;
+  };
+  timeAgo: string;
+  content: string;
+  imageUrl?: string;
+  reactions: {
+    like: number;
+    love: number;
+    haha: number;
+    wow: number;
+    sad: number;
+    angry: number;
+  };
+  comments: Array<{
+    author: {
+      name: string;
+      avatar: string;
+    };
+    content: string;
+    timeAgo: string;
+  }>;
+  shares: number;
+}
+
 const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [posts, setPosts] = useState<PostData[]>([
+    {
+      author: {
+        name: "John Doe",
+        avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+      },
+      timeAgo: "2 hours ago",
+      content: "Having a great time!",
+      imageUrl: "https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg",
+      reactions: { like: 10, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
+      comments: [
+        {
+          author: {
+            name: "Jane Smith",
+            avatar: "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg"
+          },
+          content: "Looks amazing!",
+          timeAgo: "1 hour ago"
+        }
+      ],
+      shares: 3
+    }
+  ]);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
-  // Placeholder post data with online image URLs for avatars and post images
-  const posts = [
-    {
-      avatarUrl: 'https://source.unsplash.com/random/100x100?avatar,sig=20', // Online placeholder avatar
-      userName: 'User Name 1',
-      postTime: '2 hours ago',
-      postContent: 'Đây là nội dung của bài viết đầu tiên với hình ảnh giả lập.',
-      postImageUrl: 'https://source.unsplash.com/random/600x400?post,sig=21', // Online placeholder post image
-    },
-    {
-      avatarUrl: 'https://source.unsplash.com/random/100x100?person,sig=22', // Online placeholder avatar
-      userName: 'User Name 2',
-      postTime: 'Yesterday',
-      postContent: 'Đây là nội dung của bài viết thứ hai. Nó dài hơn một chút để kiểm tra bố cục mà không có hình ảnh.',
-      // No image for this post
-    },
-    {
-      avatarUrl: 'https://source.unsplash.com/random/100x100?profile,sig=23', // Online placeholder avatar
-      userName: 'User Name 3',
-      postTime: '2 days ago',
-      postContent: 'Nội dung bài viết thứ ba với một hình ảnh giả lập khác.',
-      postImageUrl: 'https://source.unsplash.com/random/600x400?nature,sig=24', // Online placeholder post image
-    },
-  ];
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="w-full md:w-2/3 space-y-4">
@@ -80,7 +110,17 @@ const ProfileContent = () => {
       <div className="space-y-4">
         {/* Render PostCard components */}
         {posts.map((post, index) => (
-          <PostCard key={index} {...post} />
+          <PostCard 
+            key={index} 
+            avatarUrl={post.author.avatar}
+            userName={post.author.name}
+            postTime={post.timeAgo}
+            postContent={post.content}
+            postImageUrl={post.imageUrl}
+            reactions={post.reactions}
+            commentsCount={post.comments.length}
+            sharesCount={post.shares}
+          />
         ))}
       </div>
        {/* Create Post Modal */}
