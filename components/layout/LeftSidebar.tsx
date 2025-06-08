@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const LeftSidebar = () => {
   const menuItems = [
@@ -17,17 +18,17 @@ const LeftSidebar = () => {
   return (
     <div className="p-4 flex flex-col">
       {/* User Section */}
-      <div className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
+      <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
         {/* User Avatar */}
         <Image
-          src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg" // Keeping realistic user avatar
+          src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
           alt="User avatar"
           width={36}
           height={36}
           className="w-10 h-10 rounded-full object-cover mr-3r gap-[10]"
         />
         <span className="font-semibold text-gray-800">Lam Dan</span>
-      </div>
+      </Link>
 
       {/* Divider */}
       <hr className="border-t border-gray-300 my-2" />
