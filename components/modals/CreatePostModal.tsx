@@ -1,21 +1,39 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
+import EmojiPicker from 'emoji-picker-react';
 import TagPeopleModal from './TagPeopleModal';
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+
+interface Person {
+  id: string;
+  name: string;
+  avatar: string;
+}
 
 interface CreatePostModalProps {
   onClose: () => void;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
-  const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
-  const [selectedAudience, setSelectedAudience] = useState('Only me');
   const [postContent, setPostContent] = useState('');
-  const [isTagging, setIsTagging] = useState(false);
-  const [taggedPeople, setTaggedPeople] = useState<any[]>([]);
+  const [selectedAudience, setSelectedAudience] = useState('Only me');
+  const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showTagPeopleModal, setShowTagPeopleModal] = useState(false);
+  const [taggedPeople, setTaggedPeople] = useState<Person[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle post creation here
+    console.log('Post content:', postContent);
+    console.log('Selected audience:', selectedAudience);
+    console.log('Tagged people:', taggedPeople);
+    console.log('Selected files:', selectedFiles);
+    onClose();
+  };
 
   const toggleAudienceDropdown = () => {
     setIsAudienceDropdownOpen(!isAudienceDropdownOpen);
@@ -25,36 +43,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
   const selectAudience = (audience: string) => {
     setSelectedAudience(audience);
     setIsAudienceDropdownOpen(false);
-  };
-
-  const handleAddPhotoVideoClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      console.log('Selected files:', files);
-      // Here you would typically handle the file upload
-    }
-  };
-
-  const handlePostContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPostContent(event.target.value);
-  };
-
-  const handleTagPeopleClick = () => {
-    setIsTagging(true);
-  };
-
-  const handleTaggingDone = (people: any[]) => {
-    setTaggedPeople(people);
-    setIsTagging(false);
-    console.log('Tagged people:', people);
-  };
-
-  const handleCloseTagging = () => {
-    setIsTagging(false);
   };
 
   const handleEmojiClick = (emojiData: any) => {
@@ -68,43 +56,35 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
     setIsAudienceDropdownOpen(false);
   };
 
-  const handleFeelingActivityClick = () => {
-    console.log('Feeling/Activity clicked');
-    // Implement feeling/activity selection logic here
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
   };
 
-  const handleCheckInClick = () => {
-    console.log('Check In clicked');
-    // Implement check-in logic here
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(prev => [...prev, ...files]);
+    
+    // Create preview URLs for the selected files
+    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+    setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
   };
 
-  const handleGifClick = () => {
-    console.log('GIF clicked');
-    // Implement GIF selection logic here
+  const removeFile = (index: number) => {
+    URL.revokeObjectURL(previewUrls[index]);
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleMoreOptionsClick = () => {
-    console.log('More Options clicked');
-    // Implement more options logic here (e.g., Poll, Q&A)
+  const handleTagPeople = (people: Person[]) => {
+    setTaggedPeople(people);
+    setShowTagPeopleModal(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle post creation here
-    console.log('Post content:', postContent);
-    console.log('Selected audience:', selectedAudience);
-    onClose();
-  };
-
-  // Close dropdowns when clicking outside
+  // Clean up preview URLs when component unmounts
   React.useEffect(() => {
-    const handleClickOutside = () => {
-      setShowEmojiPicker(false);
-      setIsAudienceDropdownOpen(false);
+    return () => {
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
     };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   return (
@@ -190,16 +170,76 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
               className="w-full min-h-[120px] text-lg resize-none border-0 focus:outline-none focus:ring-0 p-0"
             />
 
+            {/* Tagged People Display */}
+            {taggedPeople.length > 0 && (
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {taggedPeople.map(person => (
+                    <div
+                      key={person.id}
+                      className="flex items-center bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-sm"
+                    >
+                      <span>{person.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setTaggedPeople(prev => prev.filter(p => p.id !== person.id))}
+                        className="ml-1 hover:bg-blue-100 rounded-full p-0.5"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Media Preview */}
+            {previewUrls.length > 0 && (
+              <div className="mb-4 border rounded-lg p-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="relative aspect-video">
+                      {selectedFiles[index].type.startsWith('image/') ? (
+                        <Image
+                          src={url}
+                          alt="Preview"
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                      ) : (
+                        <video
+                          src={url}
+                          className="w-full h-full object-cover rounded-lg"
+                          controls
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 rounded-full text-white"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Add to Post Options */}
             <div className="flex items-center justify-between border rounded-lg px-3 py-1.5">
               <span className="text-sm font-medium text-gray-500 whitespace-nowrap">Add to your post</span>
               <div className="flex items-center space-x-1.5">
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full">
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full" onClick={handleFileSelect}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#45BD62" className="w-6 h-6">
                     <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full">
+                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full" onClick={() => setShowTagPeopleModal(true)}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1B74E4" className="w-6 h-6">
                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                   </svg>
@@ -229,13 +269,23 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
                 <EmojiPicker onEmojiClick={handleEmojiClick} />
               </div>
             )}
+
+            {/* Hidden File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*,video/*"
+              multiple
+              onChange={handleFileChange}
+            />
           </div>
 
           {/* Post Button */}
           <div className="p-4">
             <button
               type="submit"
-              disabled={!postContent.trim()}
+              disabled={!postContent.trim() && selectedFiles.length === 0}
               className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Post
@@ -243,7 +293,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
           </div>
         </form>
 
-        {isTagging && <TagPeopleModal onClose={handleCloseTagging} onDone={handleTaggingDone} />}
+        {/* Tag People Modal */}
+        {showTagPeopleModal && (
+          <TagPeopleModal
+            onClose={() => setShowTagPeopleModal(false)}
+            onTagPeople={handleTagPeople}
+          />
+        )}
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userName,
 }) => {
   return (
-    <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200">
+    <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
       {/* Cover Photo */}
       <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative">
         <Image

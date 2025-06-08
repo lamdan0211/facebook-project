@@ -37,7 +37,7 @@ export default function ProfilePage() {
     <div className="bg-gray-100 min-h-screen py-4">
       <ProfileHeader {...userData} />
       <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-4">
-        <div className="flex flex-col md:flex-row mt-4 lg:mt-6 mx-auto max-w-[1000px]">
+        <div className="flex flex-col md:flex-row mt-4 lg:mt-6 mx-auto max-w-[1200px]">
           <ProfileSidebar />
           <ProfileContent />
         </div>
