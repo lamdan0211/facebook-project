@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Post from '@/components/posts/Post';
 import Image from 'next/image';
 import { initialPosts as initialDummyPosts, moreDummyPosts } from '@/lib/dummyData'; // Import dummy data
@@ -15,6 +15,7 @@ const NewsFeed = () => {
   const [loading, setLoading] = useState(false);
   // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const handleLoadMore = () => {
     setLoading(true);
@@ -54,6 +55,25 @@ const NewsFeed = () => {
     console.log('Feeling/Activity icon clicked');
     handleOpenModal(); 
   };
+
+  // Infinite scroll effect
+  useEffect(() => {
+    if (loading) return;
+    const observer = new window.IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 1 }
+    );
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [loading, posts]);
 
   return (
     <div className="space-y-4 max-w-xl mx-auto mt-4">
@@ -126,15 +146,9 @@ const NewsFeed = () => {
         ))}
       </div>
 
-      {/* Load More Button */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={handleLoadMore}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading ? 'Loading...' : 'Load More'}
-        </button>
+      {/* Infinite Scroll Loader */}
+      <div ref={loaderRef} className="h-8 flex items-center justify-center">
+        {loading && <span className="text-gray-500">Loading...</span>}
       </div>
 
       {/* Create Post Modal */}
