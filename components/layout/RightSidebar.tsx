@@ -22,30 +22,6 @@ const RightSidebar = () => {
 
   return (
     <div className="p-4 flex flex-col">
-      {/* Suggested Groups Section */}
-      <div className="mb-6">
-        <h3 className="text-base font-semibold text-gray-700 mb-3">Suggested Groups</h3>
-        <div className="space-y-3">
-           {suggestedGroups.map((group) => (
-            <div key={group.id} className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer -ml-2 -mr-2">
-              {/* Group Cover */}
-              <div className="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 mr-3">
-                 <Image
-                  src={group.cover}
-                  alt={`${group.name} cover`}
-                  width={56}
-                  height={56}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-800 text-sm">{group.name}</p>
-                <p className="text-xs text-gray-600">{group.members}</p>
-              </div>
-            </div>
-           ))}
-        </div>
-      </div>
 
       {/* Contacts Section */}
       <div>

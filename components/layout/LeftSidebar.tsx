@@ -5,14 +5,8 @@ import Link from 'next/link';
 const LeftSidebar = () => {
   const menuItems = [
     { name: 'Friends', icon: '👥' }, 
-    { name: 'Marketplace', icon: '🏪' }, 
-    { name: 'Groups', icon: '🏞️' }, 
     { name: 'Watch', icon: '📺' },
-    { name: 'Memories', icon: '⏰' }, 
     { name: 'Saved', icon: '🔖' }, 
-    { name: 'Pages', icon: '📄' },
-    { name: 'Events', icon: '📅' }, 
-    { name: 'See More', icon: '⬇️' }, 
   ];
 
   return (
