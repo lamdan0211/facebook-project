@@ -1,10 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
+import StoryViewerModal from '../modals/StoryViewerModal';
 
 const Stories = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
 
   // Placeholder for dummy data or fetched data
   const dummyStories = [
@@ -86,8 +89,15 @@ const Stories = () => {
         </div>
 
         {/* Individual Story Cards */}
-        {dummyStories.filter(story => !story.isAddStory).map(story => (
-          <div key={story.id} className="relative w-28 h-40 rounded-lg overflow-hidden shadow-md flex-shrink-0 cursor-pointer group">
+        {dummyStories.filter(story => !story.isAddStory).map((story, idx, arr) => (
+          <div
+            key={story.id}
+            className="relative w-28 h-40 rounded-lg overflow-hidden shadow-md flex-shrink-0 cursor-pointer group"
+            onClick={() => {
+              setCurrentStoryIndex(idx);
+              setViewerOpen(true);
+            }}
+          >
             <Image
               src={story.background}
               alt={`${story.user.name}'s story`}
@@ -121,6 +131,17 @@ const Stories = () => {
          >
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
          </div>
+      )}
+
+      {/* Story Viewer Modal */}
+      {viewerOpen && (
+        <StoryViewerModal
+          stories={dummyStories.filter(story => !story.isAddStory)}
+          currentIndex={currentStoryIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setCurrentStoryIndex(i => (i > 0 ? i - 1 : i))}
+          onNext={() => setCurrentStoryIndex(i => (i < dummyStories.filter(story => !story.isAddStory).length - 1 ? i + 1 : i))}
+        />
       )}
     </div>
   );

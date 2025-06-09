@@ -27,10 +27,7 @@ const RightSidebar = () => {
       <div>
         <h3 className="text-base font-semibold text-gray-700 mb-3 flex justify-between items-center">
           Contacts
-          {/* Options Icon */}
-          <div className="text-gray-500 cursor-pointer hover:bg-gray-200 rounded-full p-1">
-             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-          </div>
+         
         </h3>
         <ul className="space-y-2">
           {contacts.map((contact) => (

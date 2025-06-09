@@ -6,13 +6,14 @@
 
 // export default nextConfig;
 
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['images.pexels.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'randomuser.me', pathname: '/**' },
+    ],
   },
-  // ...các cấu hình khác (nếu có)
 };
-
 export default nextConfig;
