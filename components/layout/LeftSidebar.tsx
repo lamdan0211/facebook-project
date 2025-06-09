@@ -1,8 +1,11 @@
+"use client";
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const LeftSidebar = () => {
+  const { user } = useAuth();
   const menuItems = [
     { name: 'Friends', icon: '👥' }, 
     { name: 'Watch', icon: '📺' },
@@ -15,13 +18,13 @@ const LeftSidebar = () => {
       <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
         {/* User Avatar */}
         <Image
-          src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
+          src={user?.photoURL || "/default-avatar.png"}
           alt="User avatar"
           width={36}
           height={36}
           className="w-10 h-10 rounded-full object-cover mr-3r gap-[10]"
         />
-        <span className="font-semibold text-gray-800">Lam Dan</span>
+        <span className="font-semibold text-gray-800">{user?.displayName || user?.email || 'User'}</span>
       </Link>
 
       {/* Divider */}
