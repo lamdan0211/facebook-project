@@ -42,7 +42,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
     <div className="fixed inset-0 bg-gray-900/90 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
         {/* Modal Header */}
-        <div className="border-b px-4 py-3 flex items-center justify-between">
+        <div className="border-b border-b-[#dedede] px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-semibold">Share post</h1>
           <button
             onClick={onClose}
@@ -119,12 +119,12 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
                 value={shareText}
                 onChange={(e) => setShareText(e.target.value)}
                 placeholder="What's on your mind?"
-                className="w-full h-24 p-3 border rounded-lg resize-none focus:outline-none focus:border-blue-500"
+                className="w-full h-24 p-3 border border-[#dedede] rounded-lg resize-none focus:outline-none focus:border-blue-500"
               />
             </div>
 
             {/* Original Post Preview */}
-            <div className="border rounded-lg p-3 mb-4">
+            <div className="border border-[#dedede] rounded-lg p-3 mb-4">
               <div className="flex items-center mb-2">
                 <div className="w-8 h-8 rounded-full overflow-hidden mr-2">
                   <Image
@@ -179,7 +179,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
           </div>
 
           {/* Share Button */}
-          <div className="border-t px-4 py-3">
+          <div className="px-4 py-3">
             <button
               type="submit"
               className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200"

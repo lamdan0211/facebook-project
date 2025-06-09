@@ -166,7 +166,7 @@ const Post: React.FC<PostProps> = ({
           </span>
 
           {showReactionMenu && (
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-full shadow-lg flex items-center space-x-1 transition-opacity duration-200 opacity-100 pointer-events-auto group-hover:opacity-100">
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-full shadow-lg flex items-center space-x-1 transition-opacity duration-200 opacity-100 pointer-events-auto group-hover:opacity-100 z-50">
               <div className="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-full h-[10px]"></div>
               <span
                 className="text-xl cursor-pointer hover:scale-125 transition-transform duration-100"

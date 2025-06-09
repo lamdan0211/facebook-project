@@ -91,7 +91,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
         {/* Header */}
-        <div className="relative border-b px-4 py-3">
+        <div className="relative border-b px-4 py-3 border-b-[#dedede]">
           <h1 className="text-xl font-semibold text-center">Create post</h1>
           <button
             onClick={onClose}
@@ -231,7 +231,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
             )}
 
             {/* Add to Post Options */}
-            <div className="flex items-center justify-between border rounded-lg px-3 py-1.5">
+            <div className="flex items-center justify-between border border-[#dedede] rounded-lg px-3 py-1.5">
               <span className="text-sm font-medium text-gray-500 whitespace-nowrap">Add to your post</span>
               <div className="flex items-center space-x-1.5">
                 <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer" onClick={handleFileSelect}>
