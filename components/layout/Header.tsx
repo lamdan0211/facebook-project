@@ -6,6 +6,7 @@ import ProfileDropdown from './ProfileDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import UserDropdown from './UserDropdown';
 
 const Header = () => {
    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -97,25 +98,7 @@ const Header = () => {
                {isNotifOpen && <NotificationDropdown />}
             </div>
             {/* User Avatar with Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-               <div
-                  className="w-9 h-9 md:w-10 md:h-10 rounded-full hover:bg-gray-200 cursor-pointer flex items-center justify-center overflow-hidden"
-                  onClick={toggleDropdown}
-               >
-                  <Image
-                     src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
-                     alt="User avatar"
-                     width={36}
-                     height={36}
-                     className="w-full h-full object-cover "
-                  />
-               </div>
-
-               {/* Dropdown Menu */}
-               {isDropdownOpen && (
-                  <ProfileDropdown />
-               )}
-            </div>
+            <UserDropdown />
          </div>
       </header>
    );
