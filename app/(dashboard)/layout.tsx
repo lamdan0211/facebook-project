@@ -42,9 +42,7 @@ export default function DashboardLayout({
               <RightSidebar />
             </aside>
           </div>
-        </div>
-      
-      
+        </div>      
     </>
   );
 } 
