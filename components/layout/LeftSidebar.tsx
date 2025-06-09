@@ -16,7 +16,6 @@ const LeftSidebar = () => {
     <div className="p-4 flex flex-col">
       {/* User Section */}
       <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
-        {/* User Avatar */}
         <Image
           src={user?.photoURL || "/default-avatar.png"}
           alt="User avatar"
@@ -36,7 +35,6 @@ const LeftSidebar = () => {
           <li key={item.name} className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer text-gray-700 -ml-2 -mr-2">
             <div className="w-8 h-8 flex items-center justify-center mr-3 text-xl">
                {item.icon} 
-              
             </div>
             <span className="font-medium text-gray-800 text-sm">{item.name}</span>
           </li>
