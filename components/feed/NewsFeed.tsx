@@ -3,20 +3,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Post from '@/components/posts/Post';
 import Image from 'next/image';
-import { initialPosts as initialDummyPosts, moreDummyPosts } from '@/lib/dummyData'; // Import dummy data
+import { initialPosts as initialDummyPosts, moreDummyPosts, PostData } from '@/lib/dummyData'; // Import dummy data
 import { CommentData } from '@/lib/dummyData'; // Import CommentData for linter
 import Stories from '@/components/stories/Stories'; // Import Stories component
 import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected import path
 import Link from 'next/link';
+import { useAuth } from '../auth/AuthContext';
 
 const NewsFeed = () => {
   // Use initial dummy posts from the data file
+  const { user } = useAuth();
   const [posts, setPosts] = useState(initialDummyPosts);
   const [loading, setLoading] = useState(false);
   // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
-
+  const addNewPost  = (newPost:PostData)=> {
+    setPosts((prev) => [newPost, ...prev]);
+  };
   const handleLoadMore = () => {
     setLoading(true);
     // Simulate fetching more data
@@ -83,7 +87,7 @@ const NewsFeed = () => {
           {/* User Avatar */}
            <Link href="/profile">
             <Image
-              src="https://images.pexels.com/photos/4056509/pexels-photo-4056509.jpeg"
+              src={user?.photoURL || "/default-avatar.png"}
               alt="User avatar"
               width={40}
               height={40}
@@ -142,6 +146,7 @@ const NewsFeed = () => {
             reactions={post.reactions}
             comments={post.comments}
             shares={post.shares}
+            taggedPeople={post.taggedPeople}
           />
         ))}
       </div>
@@ -152,7 +157,7 @@ const NewsFeed = () => {
       </div>
 
       {/* Create Post Modal */}
-      {isModalOpen && <CreatePostModal onClose={handleCloseModal} />} {/* Render modal conditionally */}
+      {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={addNewPost} />} {/* Render modal conditionally */}
     </div>
   );
 };

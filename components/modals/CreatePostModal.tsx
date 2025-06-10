@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import EmojiPicker from 'emoji-picker-react';
 import TagPeopleModal from './TagPeopleModal';
+import { PostData } from '@/lib/dummyData';
+import { useAuth } from '../auth/AuthContext';
 
 interface Person {
   id: string;
@@ -11,9 +13,10 @@ interface Person {
 
 interface CreatePostModalProps {
   onClose: () => void;
+  addNew: (newPost: PostData) => void;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
+const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) => {
   const [postContent, setPostContent] = useState('');
   const [selectedAudience, setSelectedAudience] = useState('Only me');
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
@@ -22,7 +25,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
   const [taggedPeople, setTaggedPeople] = useState<Person[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,6 +36,25 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
     console.log('Tagged people:', taggedPeople);
     console.log('Selected files:', selectedFiles);
     onClose();
+    addNew({
+      author: {
+        name: user?.displayName || 'User',
+        avatar: user?.photoURL || "/default-avatar.png",
+      },
+     timeAgo: 'Just now',
+     content: postContent,
+     imageUrl:  selectedFiles.length > 0? URL.createObjectURL(selectedFiles[0]) : '',
+     reactions: {
+       like: 0,
+       love: 0,
+       haha: 0,
+       wow: 0,
+       sad: 0,
+       angry: 0,
+     },
+     comments: [], // You can replace this with a more specific type
+     shares: 0,
+   })
   };
 
   const toggleAudienceDropdown = () => {
@@ -109,7 +131,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden mr-2">
                 <Image
-                  src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
+                  src={user?.photoURL || "/default-avatar.png"}
                   alt="Your Avatar"
                   width={40}
                   height={40}
@@ -117,7 +139,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose }) => {
                 />
               </div>
               <div>
-                <p className="font-semibold text-sm">Lam Dan</p>
+                <p className="font-semibold text-sm">{user?.displayName || "User"}</p>
                 <div className="relative">
                   <button
                     type="button"

@@ -45,7 +45,7 @@ const Header = () => {
          {/* Left section: Search Bar and Facebook Logo */}
          <div className="flex items-center flex-grow-0 mr-4">
             {/* Facebook Logo (Circular Blue) */}
-            <Link href="/" className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-2xl min-w-[40px] mr-2">
+            <Link href="/dashboard" className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-2xl min-w-[40px] mr-2">
                f
             </Link>
             {/* Search Bar */}

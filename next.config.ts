@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
     domains: [
       'images.pexels.com',
       'lh3.googleusercontent.com',
-      'source.unsplash.com'
+      'source.unsplash.com',
+      'i.pravatar.cc',
+      'firebasestorage.googleapis.com',
+      'images.remotePatterns',
     ],
   },
 };

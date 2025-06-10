@@ -156,25 +156,19 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
             <div className="flex items-center space-x-2 mb-4">
               <button
                 type="button"
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
+                className="flex items-center space-x-2 px-5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
               >
                 <span className="text-base">👥</span>
-                <span className="text-xs whitespace-nowrap">Share to News Feed</span>
+                <span className="text-md whitespace-nowrap">Share to News Feed</span>
               </button>
               <button
                 type="button"
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
+                className="flex items-center space-x-2 px-5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
               >
                 <span className="text-base">💬</span>
-                <span className="text-xs whitespace-nowrap">Share to Story</span>
+                <span className="text-md whitespace-nowrap">Share to Story</span>
               </button>
-              <button
-                type="button"
-                className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                <span className="text-base">✉️</span>
-                <span className="text-xs whitespace-nowrap">Send in Messenger</span>
-              </button>
+             
             </div>
           </div>
 

@@ -13,7 +13,7 @@ const GoogleSignInButton = () => {
       // Đăng nhập thành công
       console.log('Đăng nhập thành công:', result.user);
       // Chuyển hướng đến trang chủ sau khi đăng nhập
-      router.push('/');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
     }

@@ -49,7 +49,6 @@ const LoginForm = () => {
                 </div>
               </div>
               <GoogleSignInButton />
-              <hr className="my-4" />
               <div className="text-center">
                 <button
                   type="button"

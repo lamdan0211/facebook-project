@@ -27,6 +27,7 @@ export interface PostData {
   };
   comments: CommentData[];
   shares: number;
+  taggedPeople?: { name: string; avatar: string }[];
 }
 
 export const initialPosts: PostData[] = [
@@ -41,6 +42,11 @@ export const initialPosts: PostData[] = [
        { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Thanks!', timeAgo: '30 seconds ago' },
     ],
     shares: 100,
+    taggedPeople: [
+      { name: 'Thành Minh', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' },
+      { name: 'Quý Phú', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
+      { name: 'Lan Anh', avatar: 'https://randomuser.me/api/portraits/women/13.jpg' },
+    ],
   },
   {
     author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
@@ -52,6 +58,9 @@ export const initialPosts: PostData[] = [
       { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Where is this?', timeAgo: '50 mins ago' },
     ],
     shares: 20,
+    taggedPeople: [
+      { name: 'Nguyễn Nguyên', avatar: 'https://randomuser.me/api/portraits/men/14.jpg' },
+    ],
   },
    {
     author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },

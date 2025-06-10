@@ -225,8 +225,6 @@ const PostCard: React.FC<PostCardProps> = ({
               />
               <div className="flex space-x-2 ml-2 text-gray-500">
                 <button type="button" className="hover:text-gray-700">😊</button>
-                <button type="button" className="hover:text-gray-700">GIF</button>
-                <button type="button" className="hover:text-gray-700">🏞️</button>
               </div>
             </div>
           </form>

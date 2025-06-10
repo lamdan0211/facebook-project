@@ -3,6 +3,8 @@ import Image from 'next/image';
 import CommentList from './CommentList';
 import { CommentData } from '@/lib/dummyData';
 import SharePostModal from '../modals/SharePostModal';
+import { useAuth } from '../auth/AuthContext';
+import TagPeopleModal from '../modals/TagPeopleModal';
 
 export interface PostProps {
   author: {
@@ -22,6 +24,10 @@ export interface PostProps {
   };
   comments: CommentData[];
   shares: number;
+  taggedPeople?: Array<{
+    name: string;
+    avatar: string;
+  }>;
 }
 
 const Post: React.FC<PostProps> = ({
@@ -32,6 +38,7 @@ const Post: React.FC<PostProps> = ({
   reactions,
   comments,
   shares,
+  taggedPeople,
 }) => {
   const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
   const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
@@ -40,6 +47,9 @@ const Post: React.FC<PostProps> = ({
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [allComments, setAllComments] = useState(comments);
+  const { user } = useAuth();
+  const [showTaggedPeopleModal, setShowTaggedPeopleModal] = useState(false);
 
   const handleReaction = (reactionType: string) => {
     if (userReaction === reactionType) {
@@ -59,6 +69,16 @@ const Post: React.FC<PostProps> = ({
     if (commentText.trim()) {
       // Handle comment submission here
       console.log('Comment submitted:', commentText);
+      // console.log(comments);
+      const newComment: CommentData = {
+        author: {
+          name: user?.displayName || 'User',
+          avatar: user?.photoURL || "/default-avatar.png",
+        },
+        content: commentText,
+        timeAgo: 'Just now',
+      };
+      setAllComments(prev => [newComment,...prev]);
       setCommentText('');
     }
   };
@@ -85,7 +105,8 @@ const Post: React.FC<PostProps> = ({
   const reactionButtonProps = getReactionButtonProps();
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
+      {/* Nút X close góc phải */}
       <div className="flex items-center mb-3">
         <Image
           src={author.avatar}
@@ -95,15 +116,42 @@ const Post: React.FC<PostProps> = ({
           className="w-10 h-10 rounded-full object-cover mr-3"
         />
         <div>
-          <p className="font-semibold text-gray-800 text-sm">{author.name}</p>
-          <p className="text-xs text-gray-500 flex items-center">
+          <div className="flex items-center gap-1">
+            <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+            {/* Tag people display */}
+            {taggedPeople && taggedPeople.length > 0 && (
+              <span className="text-xs text-gray-500">
+                is with {taggedPeople.slice(0,2).map((p, i) => (
+                  <span key={p.name} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
+                ))}
+                {taggedPeople.length > 2 && (
+                  <>
+                    {' '} and <span className="font-semibold text-blue-600 cursor-pointer" onClick={() => setShowTaggedPeopleModal(true)}>{taggedPeople.length - 2} others</span>
+                  </>
+                )}
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-gray-500 flex items-center">
             {timeAgo}
             <span className="mx-1">•</span>
             <span>🌍</span>
-          </p>
+          </span>
         </div>
-        <div className="ml-auto text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full p-1">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+        {/* Group more (3 dots) và close (X) vào 1 flex container */}
+        <div className="flex items-center gap-1 ml-auto">
+          <div className="text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full p-1">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+          </div>
+          <button
+            className="p-1 hover:bg-gray-100 rounded-full"
+            onClick={() => alert('Close clicked!')}
+            aria-label="Close post"
+          >
+            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -240,8 +288,6 @@ const Post: React.FC<PostProps> = ({
               />
               <div className="flex space-x-2 ml-2 text-gray-500">
                 <button type="button" className="hover:text-gray-700">😊</button>
-                <button type="button" className="hover:text-gray-700">GIF</button>
-                <button type="button" className="hover:text-gray-700">🏞️</button>
               </div>
             </div>
           </form>
@@ -249,7 +295,7 @@ const Post: React.FC<PostProps> = ({
       )}
 
       {/* Comments List */}
-      <CommentList comments={comments} />
+      <CommentList comments={allComments} />
 
       {/* Share Modal */}
       {showShareModal && (
@@ -258,6 +304,13 @@ const Post: React.FC<PostProps> = ({
           author={author}
           content={content}
           imageUrl={imageUrl}
+        />
+      )}
+
+      {showTaggedPeopleModal && (
+        <TagPeopleModal
+          onClose={() => setShowTaggedPeopleModal(false)}
+          onTagPeople={() => {}} // No-op, just for display
         />
       )}
     </div>
