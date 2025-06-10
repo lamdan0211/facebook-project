@@ -355,8 +355,8 @@ const Post: React.FC<PostProps> = ({
           <form onSubmit={handleCommentSubmit} className="flex items-center">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
               <Image
-                src={author.avatar}
-                alt="User avatar"
+                src={user?.photoURL || "/default-avatar.png"}
+                alt="user"
                 width={40}
                 height={40}
                 className="object-cover"
