@@ -12,7 +12,7 @@ const GoogleSignInButton = () => {
       const result = await signInWithPopup(auth, googleProvider);
       // Đăng nhập thành công
       console.log('Đăng nhập thành công:', result.user);
-      // Chuyển hướng đến trang chủ sau khi đăng nhập
+      // Chuyển hướng đến dashboard sau khi đăng nhập
       router.push('/dashboard');
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);

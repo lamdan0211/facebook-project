@@ -17,6 +17,7 @@ export interface PostData {
   timeAgo: string;
   content: string;
   imageUrl?: string;
+  images?: string[];
   reactions: {
     like: number;
     love: number;
@@ -159,6 +160,60 @@ export const initialPosts: PostData[] = [
     reactions: { like: 21, love: 7, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 2,
+  },
+  {
+    author: { name: 'Multi Photo User', avatar: 'https://randomuser.me/api/portraits/men/31.jpg' },
+    timeAgo: 'Just now',
+    content: 'Check out my trip photos!',
+    images: [
+      'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg',
+      'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg',
+    ],
+    reactions: { like: 10, love: 2, haha: 0, wow: 1, sad: 0, angry: 0 },
+    comments: [],
+    shares: 1,
+  },
+  {
+    author: { name: 'Gallery Girl', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
+    timeAgo: '10 mins ago',
+    content: '3 photos from the party!',
+    images: [
+      'https://images.pexels.com/photos/230325/pexels-photo-230325.jpeg',
+      'https://images.pexels.com/photos/302902/pexels-photo-302902.jpeg',
+      'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg',
+    ],
+    reactions: { like: 8, love: 1, haha: 1, wow: 0, sad: 0, angry: 0 },
+    comments: [],
+    shares: 0,
+  },
+  {
+    author: { name: 'Quad Squad', avatar: 'https://randomuser.me/api/portraits/men/33.jpg' },
+    timeAgo: '30 mins ago',
+    content: '4 friends, 4 photos!',
+    images: [
+      'https://images.pexels.com/photos/799137/pexels-photo-799137.jpeg',
+      'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+      'https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg',
+      'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+    ],
+    reactions: { like: 12, love: 3, haha: 0, wow: 2, sad: 0, angry: 0 },
+    comments: [],
+    shares: 2,
+  },
+  {
+    author: { name: 'Photo Bomb', avatar: 'https://randomuser.me/api/portraits/women/34.jpg' },
+    timeAgo: '1 hour ago',
+    content: 'So many memories!',
+    images: [
+      'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg',
+      'https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg',
+      'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+      'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg',
+      'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg',
+    ],
+    reactions: { like: 20, love: 5, haha: 1, wow: 1, sad: 0, angry: 0 },
+    comments: [],
+    shares: 3,
   },
 ];
 

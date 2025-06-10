@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import CommentList from './CommentList';
 import { CommentData } from '@/lib/dummyData';
@@ -14,6 +14,7 @@ export interface PostProps {
   timeAgo: string;
   content: string;
   imageUrl?: string;
+  images?: string[];
   reactions: {
     like: number;
     love: number;
@@ -28,6 +29,7 @@ export interface PostProps {
     name: string;
     avatar: string;
   }>;
+  onDelete?: () => void;
 }
 
 const Post: React.FC<PostProps> = ({
@@ -35,10 +37,12 @@ const Post: React.FC<PostProps> = ({
   timeAgo,
   content,
   imageUrl,
+  images,
   reactions,
   comments,
   shares,
   taggedPeople,
+  onDelete,
 }) => {
   const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
   const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
@@ -50,6 +54,25 @@ const Post: React.FC<PostProps> = ({
   const [allComments, setAllComments] = useState(comments);
   const { user } = useAuth();
   const [showTaggedPeopleModal, setShowTaggedPeopleModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const moreBtnRef = useRef<HTMLDivElement>(null);
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (moreBtnRef.current && !moreBtnRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   const handleReaction = (reactionType: string) => {
     if (userReaction === reactionType) {
@@ -140,12 +163,34 @@ const Post: React.FC<PostProps> = ({
         </div>
         {/* Group more (3 dots) và close (X) vào 1 flex container */}
         <div className="flex items-center gap-1 ml-auto">
-          <div className="text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full p-1">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+          <div
+            className="text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full p-1 relative"
+            ref={moreBtnRef}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={() => setShowDropdown((v) => !v)}
+            >
+              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+            </svg>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => setShowDropdown(false)}>
+                  <span className="text-lg mr-3">🔖</span>
+                  <span>
+                    <span className="font-semibold">Save Post</span>
+                    <div className="text-xs text-gray-500 whitespace-nowrap">Add this to your saved items.</div>
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
           <button
             className="p-1 hover:bg-gray-100 rounded-full"
-            onClick={() => alert('Close clicked!')}
+            onClick={onDelete}
             aria-label="Close post"
           >
             <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +202,46 @@ const Post: React.FC<PostProps> = ({
 
       <div className="mb-3">
         <p className="text-gray-800 text-sm mb-2">{content}</p>
-        {imageUrl && (
+        {/* Multi-image layout */}
+        {images && images.length > 1 ? (
+          <div className={`grid gap-1 rounded-lg overflow-hidden ${images.length === 2 ? 'grid-cols-2' : images.length === 3 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2 grid-rows-2'}`} style={{height: images.length > 2 ? 300 : 200}}>
+            {/* 2 images: 2 columns */}
+            {images.length === 2 && images.map((img, i) => (
+              <div key={i} className="relative w-full h-full aspect-square">
+                <Image src={img} alt={`Post image ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+              </div>
+            ))}
+            {/* 3 images: 1 big left, 2 right */}
+            {images.length === 3 && (
+              <>
+                <div className="relative row-span-2 col-span-1">
+                  <Image src={images[0]} alt="Post image 1" fill style={{objectFit:'cover'}} className="" />
+                </div>
+                <div className="relative col-span-1 row-span-1">
+                  <Image src={images[1]} alt="Post image 2" fill style={{objectFit:'cover'}} className="" />
+                </div>
+                <div className="relative col-span-1 row-span-1">
+                  <Image src={images[2]} alt="Post image 3" fill style={{objectFit:'cover'}} className="" />
+                </div>
+              </>
+            )}
+            {/* 4+ images: 2x2 grid, overlay số còn lại */}
+            {images.length >= 4 && (
+              <>
+                {images.slice(0,4).map((img, i) => (
+                  <div key={i} className="relative w-full h-full aspect-square">
+                    <Image src={img} alt={`Post image ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+                    {i === 3 && images.length > 4 && (
+                      <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">+{images.length-4}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        ) : imageUrl && (
           <div className="relative w-full" style={{ paddingBottom: '60%' }}>
             <Image
               src={imageUrl}

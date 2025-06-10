@@ -9,8 +9,10 @@ import Stories from '@/components/stories/Stories'; // Import Stories component
 import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected import path
 import Link from 'next/link';
 import { useAuth } from '../auth/AuthContext';
+import useRequireAuth from '@/lib/useRequireAuth';
 
 const NewsFeed = () => {
+  useRequireAuth();
   // Use initial dummy posts from the data file
   const { user } = useAuth();
   const [posts, setPosts] = useState(initialDummyPosts);
@@ -58,6 +60,10 @@ const NewsFeed = () => {
   const handleFeelingActivityIconClick = () => {
     console.log('Feeling/Activity icon clicked');
     handleOpenModal(); 
+  };
+
+  const handleDeletePost = (index: number) => {
+    setPosts((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Infinite scroll effect
@@ -143,10 +149,12 @@ const NewsFeed = () => {
             timeAgo={post.timeAgo}
             content={post.content}
             imageUrl={post.imageUrl}
+            images={post.images}
             reactions={post.reactions}
             comments={post.comments}
             shares={post.shares}
             taggedPeople={post.taggedPeople}
+            onDelete={() => handleDeletePost(index)}
           />
         ))}
       </div>

@@ -1,9 +1,22 @@
+"use client";
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import GoogleSignInButton from './GoogleSignInButton';
+import { useAuth } from '@/components/auth/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const LoginForm = () => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace('/dashboard');
+    }
+  }, [user, loading, router]);
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-6xl w-full flex">
