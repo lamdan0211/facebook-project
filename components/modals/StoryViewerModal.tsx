@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSwipeable } from 'react-swipeable';
 
@@ -27,6 +27,32 @@ const reactions = [
 ];
 
 const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentIndex, onClose, onPrev, onNext }) => {
+  const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Progress bar animation
+  useEffect(() => {
+    if (isPaused) return;
+
+    const duration = 5000; // 5 seconds per story
+    const interval = 50; // Update every 50ms
+    const steps = duration / interval;
+    const increment = 100 / steps;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          onNext();
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [currentIndex, isPaused, onNext]);
+
   const handlers = useSwipeable({
     onSwipedLeft: () => onNext(),
     onSwipedRight: () => onPrev(),
@@ -42,7 +68,28 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         className="relative w-full max-w-md mx-4 bg-black rounded-xl shadow-xl flex flex-col items-center justify-center"
         {...handlers}
         onClick={e => e.stopPropagation()}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
+        {/* Progress bars */}
+        <div className="absolute top-4 left-4 right-4 flex gap-2 z-20">
+          {stories.map((_, index) => (
+            <div
+              key={index}
+              className="h-1 flex-1 bg-gray-600 rounded-full overflow-hidden"
+            >
+              <div
+                className={`h-full bg-white transition-all duration-100 ${
+                  index === currentIndex ? 'animate-progress' : ''
+                }`}
+                style={{
+                  width: index === currentIndex ? `${progress}%` : index < currentIndex ? '100%' : '0%'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
         {/* Close button */}
         <button
           onClick={onClose}
@@ -52,6 +99,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+
         {/* Header: avatar, name, time */}
         <div className="flex items-center gap-3 absolute left-4 top-4 z-10">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500">
@@ -62,6 +110,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
             <div className="text-xs opacity-80">8h ago</div>
           </div>
         </div>
+
         {/* Story image */}
         <div className="w-full h-[420px] flex items-center justify-center relative">
           <Image
@@ -73,33 +122,38 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
             sizes="(max-width: 768px) 100vw, 400px"
           />
         </div>
+
         {/* Navigation arrows */}
-        {currentIndex > 0 && (
-          <button
-            onClick={onPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10"
-          >
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
-        {currentIndex < stories.length - 1 && (
-          <button
-            onClick={onNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-500/50 hover:bg-white/40 text-white rounded-full p-2 z-10"
-          >
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={onPrev}
+          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity ${
+            currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={currentIndex === 0}
+        >
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={onNext}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity ${
+            currentIndex === stories.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={currentIndex === stories.length - 1}
+        >
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
         {/* Reactions */}
         <div className="flex justify-center gap-2 mt-4 mb-2">
           {reactions.map(r => (
             <button key={r.label} className="text-2xl hover:scale-125 transition-transform" title={r.label}>{r.emoji}</button>
           ))}
         </div>
+
         {/* Reply input */}
         <div className="w-full px-4 pb-4">
           <input
