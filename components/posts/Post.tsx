@@ -433,7 +433,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       {/* Edit Modal */}
       {showEditModal && user && user.displayName === author.name && (
         <EditPostModal
-          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
+          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople: taggedPeople?.map(p => ({name: p.name, avatar: author.avatar})) }}
           onClose={() => setShowEditModal(false)}
           onEdit={(updatedPost) => {
             if (typeof index === 'number') updatePost(index, updatedPost);
