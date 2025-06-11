@@ -39,6 +39,28 @@ export interface PostData {
   isSaved?: boolean;
 }
 
+export interface WatchVideoData {
+  id: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  timeAgo: string;
+  title: string;
+  videoUrl: string;
+  thumbnail: string;
+  reactions: {
+    like: number;
+    love: number;
+    haha: number;
+    wow: number;
+    sad: number;
+    angry: number;
+  };
+  comments: CommentData[];
+  shares: number;
+}
+
 export const initialPosts: PostData[] = [
   {
     author: { name: ' Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
@@ -398,4 +420,49 @@ export const moreDummyPosts: PostData[] = [
       shares: 1,
       isSaved: false,
     },
+];
+
+export const watchVideos: WatchVideoData[] = [
+  {
+    id: '1',
+    author: {
+      name: 'Tom Russo',
+      avatar: 'https://i.pravatar.cc/150?img=5',
+    },
+    timeAgo: '10 mins ago',
+    title: 'Amazing Guitar Solo!',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+    thumbnail: 'https://images.pexels.com/photos/164936/pexels-photo-164936.jpeg',
+    reactions: {
+      like: 120,
+      love: 45,
+      haha: 12,
+      wow: 8,
+      sad: 2,
+      angry: 1,
+    },
+    comments: [],
+    shares: 3,
+  },
+  {
+    id: '2',
+    author: {
+      name: 'Anna Becklund',
+      avatar: 'https://i.pravatar.cc/150?img=6',
+    },
+    timeAgo: '30 mins ago',
+    title: 'Funny Cat Compilation',
+    videoUrl: 'https://www.w3schools.com/html/movie.mp4',
+    thumbnail: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg',
+    reactions: {
+      like: 200,
+      love: 60,
+      haha: 50,
+      wow: 10,
+      sad: 1,
+      angry: 0,
+    },
+    comments: [],
+    shares: 5,
+  },
 ]; 
