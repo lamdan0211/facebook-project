@@ -3,59 +3,23 @@ import PostCard from '@/components/profile/PostCard';
 import Image from 'next/image';
 import CreatePostModal from '@/components/modals/CreatePostModal';
 import React, { useState } from 'react';
-
-interface PostData {
-  author: {
-    name: string;
-    avatar: string;
-  };
-  timeAgo: string;
-  content: string;
-  imageUrl?: string;
-  reactions: {
-    like: number;
-    love: number;
-    haha: number;
-    wow: number;
-    sad: number;
-    angry: number;
-  };
-  comments: Array<{
-    author: {
-      name: string;
-      avatar: string;
-    };
-    content: string;
-    timeAgo: string;
-  }>;
-  shares: number;
-}
+import { PostData } from '@/lib/dummyData';
+import { PostContext } from '@/context/PostContext';
+import { useContext } from 'react';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [posts, setPosts] = useState<PostData[]>([
-    {
-      author: {
-        name: "John Doe",
-        avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
-      },
-      timeAgo: "2 hours ago",
-      content: "Having a great time!",
-      imageUrl: "https://images.pexels.com/photos/2486168/pexels-photo-2486168.jpeg",
-      reactions: { like: 10, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
-      comments: [
-        {
-          author: {
-            name: "Jane Smith",
-            avatar: "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg"
-          },
-          content: "Looks amazing!",
-          timeAgo: "1 hour ago"
-        }
-      ],
-      shares: 3
-    }
-  ]);
+  const { posts, addNewPost } = useContext(PostContext);
+  const { user } = useAuth();
+
+  // Lọc post: chỉ hiện bài của tôi, tôi được tag, hoặc tôi là người share
+  const myName = user?.displayName || user?.email || 'User';
+  const myPosts = posts.filter(post =>
+    post.author.name === myName ||
+    (post.taggedPeople && post.taggedPeople.some(p => p.name === myName))
+    // Có thể mở rộng thêm điều kiện share nếu có trường shareBy
+  );
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -108,23 +72,15 @@ const ProfileContent = () => {
 
       {/* Posts Feed section */}
       <div className="space-y-4">
-        {/* Render PostCard components */}
-        {posts.map((post, index) => (
+        {myPosts.map((post, index) => (
           <PostCard 
-            key={index} 
-            avatarUrl={post.author.avatar}
-            userName={post.author.name}
-            postTime={post.timeAgo}
-            postContent={post.content}
-            postImageUrl={post.imageUrl}
-            reactions={post.reactions}
-            commentsCount={post.comments.length}
-            sharesCount={post.shares}
+            key={index}
+            post={post}
           />
         ))}
       </div>
        {/* Create Post Modal */}
-       {isModalOpen && <CreatePostModal onClose={handleCloseModal} />} {/* Render modal conditionally */}
+       {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={addNewPost} />} {/* Render modal conditionally */}
     </div>
   );
 };

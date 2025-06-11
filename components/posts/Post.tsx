@@ -5,6 +5,13 @@ import { CommentData } from '@/lib/dummyData';
 import SharePostModal from '../modals/SharePostModal';
 import { useAuth } from '../auth/AuthContext';
 import TagPeopleModal from '../modals/TagPeopleModal';
+import MediaViewerModal from '../modals/MediaViewerModal';
+import EditPostModal from '../modals/EditPostModal';
+import { PostContext } from '@/context/PostContext';
+
+interface Person {
+  name: string;
+}
 
 export interface PostProps {
   author: {
@@ -13,8 +20,7 @@ export interface PostProps {
   };
   timeAgo: string;
   content: string;
-  imageUrl?: string;
-  images?: string[];
+  media?: { type: 'image' | 'video'; url: string }[];
   reactions: {
     like: number;
     love: number;
@@ -25,24 +31,21 @@ export interface PostProps {
   };
   comments: CommentData[];
   shares: number;
-  taggedPeople?: Array<{
-    name: string;
-    avatar: string;
-  }>;
+  taggedPeople?: Person[];
   onDelete?: () => void;
 }
 
-const Post: React.FC<PostProps> = ({
+const Post: React.FC<PostProps & { index?: number }> = ({
   author,
   timeAgo,
   content,
-  imageUrl,
-  images,
+  media = [],
   reactions,
   comments,
   shares,
   taggedPeople,
   onDelete,
+  index,
 }) => {
   const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
   const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
@@ -56,6 +59,10 @@ const Post: React.FC<PostProps> = ({
   const [showTaggedPeopleModal, setShowTaggedPeopleModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const moreBtnRef = useRef<HTMLDivElement>(null);
+  const [showMediaViewer, setShowMediaViewer] = useState(false);
+  const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
+  const { updatePost } = React.useContext(PostContext);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -127,6 +134,60 @@ const Post: React.FC<PostProps> = ({
 
   const reactionButtonProps = getReactionButtonProps();
 
+  const handleOpenMediaViewer = (idx: number) => {
+    setMediaViewerIndex(idx);
+    setShowMediaViewer(true);
+  };
+
+  const handleAddComment = (text: string) => {
+    if (!user) return;
+    const newComment = {
+      author: {
+        name: user.displayName || 'User',
+        avatar: user.photoURL || '/default-avatar.png',
+      },
+      content: text,
+      timeAgo: 'Just now',
+    };
+    setAllComments(prev => [...prev, newComment]);
+  };
+
+  // Render media grid giống Facebook
+  const renderMediaGrid = () => {
+    if (!media || media.length === 0) return null;
+    if (media.length === 1) {
+      return media[0].type === 'image' ? (
+        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+          <Image src={media[0].url} alt="Post media" fill style={{ objectFit: 'cover' }} className="rounded-lg" />
+        </div>
+      ) : (
+        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+          <video src={media[0].url} controls className="w-full rounded-lg max-h-96 object-cover bg-black" />
+        </div>
+      );
+    }
+    // 2-4 media: grid
+    const gridClass = media.length === 2 ? 'grid-cols-2' : 'grid-cols-2 grid-rows-2';
+    return (
+      <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>
+        {media.slice(0,4).map((m, i) => (
+          <div key={i} className="relative w-full h-full aspect-square cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+            {m.type === 'image' ? (
+              <Image src={m.url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+            ) : (
+              <video src={m.url} controls className="w-full h-full object-cover bg-black" />
+            )}
+            {i === 3 && media.length > 4 && (
+              <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">+{media.length-4}</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
@@ -178,6 +239,15 @@ const Post: React.FC<PostProps> = ({
             </svg>
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                {user && user.displayName === author.name && (
+                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
+                    <span className="text-lg mr-3">✏️</span>
+                    <span>
+                      <span className="font-semibold">Edit Post</span>
+                      <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
+                    </span>
+                  </button>
+                )}
                 <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => setShowDropdown(false)}>
                   <span className="text-lg mr-3">🔖</span>
                   <span>
@@ -202,56 +272,7 @@ const Post: React.FC<PostProps> = ({
 
       <div className="mb-3">
         <p className="text-gray-800 text-sm mb-2">{content}</p>
-        {/* Multi-image layout */}
-        {images && images.length > 1 ? (
-          <div className={`grid gap-1 rounded-lg overflow-hidden ${images.length === 2 ? 'grid-cols-2' : images.length === 3 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2 grid-rows-2'}`} style={{height: images.length > 2 ? 300 : 200}}>
-            {/* 2 images: 2 columns */}
-            {images.length === 2 && images.map((img, i) => (
-              <div key={i} className="relative w-full h-full aspect-square">
-                <Image src={img} alt={`Post image ${i+1}`} fill style={{objectFit:'cover'}} className="" />
-              </div>
-            ))}
-            {/* 3 images: 1 big left, 2 right */}
-            {images.length === 3 && (
-              <>
-                <div className="relative row-span-2 col-span-1">
-                  <Image src={images[0]} alt="Post image 1" fill style={{objectFit:'cover'}} className="" />
-                </div>
-                <div className="relative col-span-1 row-span-1">
-                  <Image src={images[1]} alt="Post image 2" fill style={{objectFit:'cover'}} className="" />
-                </div>
-                <div className="relative col-span-1 row-span-1">
-                  <Image src={images[2]} alt="Post image 3" fill style={{objectFit:'cover'}} className="" />
-                </div>
-              </>
-            )}
-            {/* 4+ images: 2x2 grid, overlay số còn lại */}
-            {images.length >= 4 && (
-              <>
-                {images.slice(0,4).map((img, i) => (
-                  <div key={i} className="relative w-full h-full aspect-square">
-                    <Image src={img} alt={`Post image ${i+1}`} fill style={{objectFit:'cover'}} className="" />
-                    {i === 3 && images.length > 4 && (
-                      <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
-                        <span className="text-white text-2xl font-bold">+{images.length-4}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-        ) : imageUrl && (
-          <div className="relative w-full" style={{ paddingBottom: '60%' }}>
-            <Image
-              src={imageUrl}
-              alt="Post image"
-              fill
-              style={{ objectFit: 'cover' }}
-              className="rounded-lg"
-            />
-          </div>
-        )}
+        {renderMediaGrid()}
       </div>
 
       <div className="flex items-center justify-between text-gray-500 text-xs mb-3 border-b border-gray-200 pb-2">
@@ -387,7 +408,7 @@ const Post: React.FC<PostProps> = ({
           onClose={() => setShowShareModal(false)}
           author={author}
           content={content}
-          imageUrl={imageUrl}
+          imageUrl={media?.find(m => m.type === 'image')?.url}
         />
       )}
 
@@ -395,6 +416,29 @@ const Post: React.FC<PostProps> = ({
         <TagPeopleModal
           onClose={() => setShowTaggedPeopleModal(false)}
           onTagPeople={() => {}} // No-op, just for display
+        />
+      )}
+
+      {/* Media Viewer Modal */}
+      {showMediaViewer && (
+        <MediaViewerModal
+          media={media}
+          initialIndex={mediaViewerIndex}
+          comments={allComments}
+          onClose={() => setShowMediaViewer(false)}
+          onComment={handleAddComment}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && user && user.displayName === author.name && (
+        <EditPostModal
+          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
+          onClose={() => setShowEditModal(false)}
+          onEdit={(updatedPost) => {
+            if (typeof index === 'number') updatePost(index, updatedPost);
+            setShowEditModal(false);
+          }}
         />
       )}
     </div>

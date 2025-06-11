@@ -10,24 +10,23 @@ import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected 
 import Link from 'next/link';
 import { useAuth } from '../auth/AuthContext';
 import useRequireAuth from '@/lib/useRequireAuth';
+import { PostContext } from '@/context/PostContext';
+import { useContext } from 'react';
 
 const NewsFeed = () => {
   useRequireAuth();
-  // Use initial dummy posts from the data file
   const { user } = useAuth();
-  const [posts, setPosts] = useState(initialDummyPosts);
+  const { posts, addNewPost, removePost } = useContext(PostContext);
   const [loading, setLoading] = useState(false);
   // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
-  const addNewPost  = (newPost:PostData)=> {
-    setPosts((prev) => [newPost, ...prev]);
-  };
+
   const handleLoadMore = () => {
     setLoading(true);
     // Simulate fetching more data
     setTimeout(() => {
-      setPosts([...posts, ...moreDummyPosts]);
+      // setPosts([...posts, ...moreDummyPosts]);
       setLoading(false);
     }, 1000); // Simulate network delay
   };
@@ -63,7 +62,7 @@ const NewsFeed = () => {
   };
 
   const handleDeletePost = (index: number) => {
-    setPosts((prev) => prev.filter((_, i) => i !== index));
+    removePost(index);
   };
 
   // Infinite scroll effect
@@ -148,13 +147,13 @@ const NewsFeed = () => {
             author={post.author}
             timeAgo={post.timeAgo}
             content={post.content}
-            imageUrl={post.imageUrl}
-            images={post.images}
+            media={post.media}
             reactions={post.reactions}
             comments={post.comments}
             shares={post.shares}
             taggedPeople={post.taggedPeople}
             onDelete={() => handleDeletePost(index)}
+            index={index}
           />
         ))}
       </div>

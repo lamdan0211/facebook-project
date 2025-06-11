@@ -2,6 +2,7 @@ import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import ProfileContent from '@/components/profile/ProfileContent';
 import Header from '@/components/layout/Header';
+import { PostProvider } from '@/context/PostContext';
 
 export default function ProfilePage() {
   const userData = {

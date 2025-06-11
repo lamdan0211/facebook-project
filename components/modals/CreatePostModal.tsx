@@ -23,38 +23,33 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTagPeopleModal, setShowTagPeopleModal] = useState(false);
   const [taggedPeople, setTaggedPeople] = useState<Person[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [previewMedia, setPreviewMedia] = useState<{type: 'image'|'video', url: string, file: File}[]>([]);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle post creation here
-    console.log('Post content:', postContent);
-    console.log('Selected audience:', selectedAudience);
-    console.log('Tagged people:', taggedPeople);
-    console.log('Selected files:', selectedFiles);
     onClose();
     addNew({
       author: {
         name: user?.displayName || 'User',
         avatar: user?.photoURL || "/default-avatar.png",
       },
-     timeAgo: 'Just now',
-     content: postContent,
-     imageUrl:  selectedFiles.length > 0? URL.createObjectURL(selectedFiles[0]) : '',
-     reactions: {
-       like: 0,
-       love: 0,
-       haha: 0,
-       wow: 0,
-       sad: 0,
-       angry: 0,
-     },
-     comments: [], // You can replace this with a more specific type
-     shares: 0,
-   })
+      timeAgo: 'Just now',
+      content: postContent,
+      media: previewMedia.map(m => ({type: m.type, url: m.url})),
+      reactions: {
+        like: 0,
+        love: 0,
+        haha: 0,
+        wow: 0,
+        sad: 0,
+        angry: 0,
+      },
+      comments: [],
+      shares: 0,
+      taggedPeople: taggedPeople,
+    });
   };
 
   const toggleAudienceDropdown = () => {
@@ -84,17 +79,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setSelectedFiles(prev => [...prev, ...files]);
-    
-    // Create preview URLs for the selected files
-    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
-    setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+    const newMedia = files.map(file => ({
+      type: file.type.startsWith('image/') ? 'image' : 'video',
+      url: URL.createObjectURL(file),
+      file
+    }));
+    setPreviewMedia(prev => [...prev, ...newMedia]);
   };
 
   const removeFile = (index: number) => {
-    URL.revokeObjectURL(previewUrls[index]);
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    URL.revokeObjectURL(previewMedia[index].url);
+    setPreviewMedia(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleTagPeople = (people: Person[]) => {
@@ -105,7 +100,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
   // Clean up preview URLs when component unmounts
   React.useEffect(() => {
     return () => {
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      previewMedia.forEach(m => URL.revokeObjectURL(m.url));
     };
   }, []);
 
@@ -218,30 +213,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             )}
 
             {/* Media Preview */}
-            {previewUrls.length > 0 && (
+            {previewMedia.length > 0 && (
               <div className="mb-4 border rounded-lg p-2">
                 <div className="grid grid-cols-2 gap-2">
-                  {previewUrls.map((url, index) => (
+                  {previewMedia.map((media, index) => (
                     <div key={index} className="relative aspect-video">
-                      {selectedFiles[index].type.startsWith('image/') ? (
-                        <Image
-                          src={url}
-                          alt="Preview"
-                          fill
-                          className="object-cover rounded-lg"
-                        />
+                      {media.type === 'image' ? (
+                        <Image src={media.url} alt="Preview" fill className="object-cover rounded-lg" />
                       ) : (
-                        <video
-                          src={url}
-                          className="w-full h-full object-cover rounded-lg"
-                          controls
-                        />
+                        <video src={media.url} className="w-full h-full object-cover rounded-lg" controls />
                       )}
-                      <button
-                        type="button"
-                        onClick={() => removeFile(index)}
-                        className="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 rounded-full text-white"
-                      >
+                      <button type="button" onClick={() => removeFile(index)} className="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 rounded-full text-white">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -297,7 +279,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
           <div className="p-4">
             <button
               type="submit"
-              disabled={!postContent.trim() && selectedFiles.length === 0}
+              disabled={!postContent.trim() && previewMedia.length === 0}
               className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Post
