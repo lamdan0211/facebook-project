@@ -4,13 +4,12 @@ import Image from 'next/image';
 import CreatePostModal from '@/components/modals/CreatePostModal';
 import React, { useState } from 'react';
 import { PostData } from '@/lib/dummyData';
-import { PostContext } from '@/context/PostContext';
-import { useContext } from 'react';
+import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/components/auth/AuthContext';
 
 const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { posts, addNewPost } = useContext(PostContext);
+  const { posts, addNewPost } = usePostContext();
   const { user } = useAuth();
 
   // Lọc post: chỉ hiện bài của tôi, tôi được tag, hoặc tôi là người share

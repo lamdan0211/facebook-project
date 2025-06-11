@@ -1,12 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { useContext } from "react";
-import { PostContext } from "@/context/PostContext";
+import { usePostContext } from "@/context/PostContext";
 import Post from "@/components/posts/Post";
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function SearchPage() {
-  const { posts } = useContext(PostContext);
+  const { posts } = usePostContext();
   const [query, setQuery] = useState("");
   const { user } = useAuth();
 

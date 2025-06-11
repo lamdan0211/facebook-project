@@ -7,6 +7,8 @@ export interface CommentData {
   };
   content: string;
   timeAgo: string;
+  likes: number;
+  replies?: CommentData[];
 }
 
 export interface PostData {
@@ -16,7 +18,10 @@ export interface PostData {
   };
   timeAgo: string;
   content: string;
-  media?: { type: 'image' | 'video'; url: string }[];
+  media?: {
+    type: 'image' | 'video';
+    url: string;
+  }[];
   reactions: {
     like: number;
     love: number;
@@ -27,7 +32,11 @@ export interface PostData {
   };
   comments: CommentData[];
   shares: number;
-  taggedPeople?: { name: string; avatar: string }[];
+  taggedPeople?: {
+    name: string;
+    avatar: string;
+  }[];
+  isSaved?: boolean;
 }
 
 export const initialPosts: PostData[] = [
@@ -40,8 +49,8 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 15, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [
-       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Great post!', timeAgo: '1 min ago' },
-       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Thanks!', timeAgo: '30 seconds ago' },
+       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Great post!', timeAgo: '1 min ago', likes: 5 },
+       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Thanks!', timeAgo: '30 seconds ago', likes: 3 },
     ],
     shares: 100,
     taggedPeople: [
@@ -49,6 +58,7 @@ export const initialPosts: PostData[] = [
       { name: 'Quý Phú', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
       { name: 'Lan Anh', avatar: 'https://randomuser.me/api/portraits/women/13.jpg' },
     ],
+    isSaved: false,
   },
   {
     author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
@@ -59,12 +69,13 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 50, love: 30, haha: 10, wow: 5, sad: 2, angry: 1 },
     comments: [
-      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Where is this?', timeAgo: '50 mins ago' },
+      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
     ],
     shares: 20,
     taggedPeople: [
       { name: 'Nguyễn Nguyên', avatar: 'https://randomuser.me/api/portraits/men/14.jpg' },
     ],
+    isSaved: false,
   },
    {
     author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
@@ -73,6 +84,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 10, love: 1, haha: 0, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 5,
+    isSaved: false,
   },
   {
     author: { name: 'Lam Dan', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
@@ -84,6 +96,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 22, love: 8, haha: 1, wow: 3, sad: 0, angry: 0 },
     comments: [],
     shares: 7,
+    isSaved: false,
   },
   {
     author: { name: 'Jenny Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
@@ -95,6 +108,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 12, love: 2, haha: 0, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 1,
+    isSaved: false,
   },
   {
     author: { name: 'Tom Russo', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
@@ -106,6 +120,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 30, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 3,
+    isSaved: false,
   },
   {
     author: { name: 'Anna Becklund', avatar: 'https://randomuser.me/api/portraits/women/65.jpg' },
@@ -117,6 +132,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 18, love: 4, haha: 0, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 2,
+    isSaved: false,
   },
   {
     author: { name: 'Dennis Han', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
@@ -128,6 +144,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 25, love: 6, haha: 1, wow: 2, sad: 0, angry: 0 },
     comments: [],
     shares: 4,
+    isSaved: false,
   },
   {
     author: { name: 'Cynthia Lopez', avatar: 'https://randomuser.me/api/portraits/women/22.jpg' },
@@ -139,6 +156,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 14, love: 3, haha: 0, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 1,
+    isSaved: false,
   },
   {
     author: { name: 'Eric Jones', avatar: 'https://randomuser.me/api/portraits/men/23.jpg' },
@@ -150,6 +168,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 19, love: 2, haha: 1, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 2,
+    isSaved: false,
   },
   {
     author: { name: 'Aiden Brown', avatar: 'https://randomuser.me/api/portraits/men/54.jpg' },
@@ -161,6 +180,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 11, love: 1, haha: 0, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 0,
+    isSaved: false,
   },
   {
     author: { name: 'Sophie Turner', avatar: 'https://randomuser.me/api/portraits/women/33.jpg' },
@@ -172,6 +192,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 16, love: 5, haha: 1, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 1,
+    isSaved: false,
   },
   {
     author: { name: 'Lucas White', avatar: 'https://randomuser.me/api/portraits/men/77.jpg' },
@@ -183,6 +204,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 21, love: 7, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 2,
+    isSaved: false,
   },
   {
     author: { name: 'Multi Photo User', avatar: 'https://randomuser.me/api/portraits/men/31.jpg' },
@@ -195,6 +217,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 10, love: 2, haha: 0, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 1,
+    isSaved: false,
   },
   {
     author: { name: 'Gallery Girl', avatar: 'https://randomuser.me/api/portraits/women/32.jpg' },
@@ -208,6 +231,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 8, love: 1, haha: 1, wow: 0, sad: 0, angry: 0 },
     comments: [],
     shares: 0,
+    isSaved: false,
   },
   {
     author: { name: 'Quad Squad', avatar: 'https://randomuser.me/api/portraits/men/33.jpg' },
@@ -222,6 +246,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 12, love: 3, haha: 0, wow: 2, sad: 0, angry: 0 },
     comments: [],
     shares: 2,
+    isSaved: false,
   },
   {
     author: { name: 'Photo Bomb', avatar: 'https://randomuser.me/api/portraits/women/34.jpg' },
@@ -237,6 +262,7 @@ export const initialPosts: PostData[] = [
     reactions: { like: 20, love: 5, haha: 1, wow: 1, sad: 0, angry: 0 },
     comments: [],
     shares: 3,
+    isSaved: false,
   },
 ];
 
@@ -250,9 +276,10 @@ export const moreDummyPosts: PostData[] = [
       ],
       reactions: { like: 120, love: 50, haha: 15, wow: 10, sad: 5, angry: 3 },
       comments: [
-         { author: { name: 'Aiden Brown', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Looks great!', timeAgo: '23 hours ago' },
+         { author: { name: 'Aiden Brown', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Looks great!', timeAgo: '23 hours ago', likes: 5 },
       ],
       shares: 30,
+      isSaved: false,
     },
     {
       author: { name: 'Eric Jones', avatar: 'https://images.pexels.com/photos/842871/pexels-photo-842871.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
@@ -261,6 +288,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 8, love: 2, haha: 1, wow: 0, sad: 0, angry: 0 },
       comments: [],
       shares: 2,
+      isSaved: false,
     },
     {
       author: { name: 'Mia Green', avatar: 'https://randomuser.me/api/portraits/women/55.jpg' },
@@ -272,6 +300,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 40, love: 12, haha: 3, wow: 2, sad: 0, angry: 0 },
       comments: [],
       shares: 5,
+      isSaved: false,
     },
     {
       author: { name: 'Noah Black', avatar: 'https://randomuser.me/api/portraits/men/88.jpg' },
@@ -283,6 +312,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 13, love: 2, haha: 0, wow: 0, sad: 0, angry: 0 },
       comments: [],
       shares: 1,
+      isSaved: false,
     },
     {
       author: { name: 'Emma Stone', avatar: 'https://randomuser.me/api/portraits/women/66.jpg' },
@@ -294,6 +324,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 17, love: 4, haha: 1, wow: 0, sad: 0, angry: 0 },
       comments: [],
       shares: 2,
+      isSaved: false,
     },
     {
       author: { name: 'Oliver King', avatar: 'https://randomuser.me/api/portraits/men/99.jpg' },
@@ -305,6 +336,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 23, love: 6, haha: 2, wow: 1, sad: 0, angry: 0 },
       comments: [],
       shares: 3,
+      isSaved: false,
     },
     {
       author: { name: 'Sophia Lee', avatar: 'https://randomuser.me/api/portraits/women/77.jpg' },
@@ -316,6 +348,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 29, love: 9, haha: 1, wow: 2, sad: 0, angry: 0 },
       comments: [],
       shares: 4,
+      isSaved: false,
     },
     {
       author: { name: 'James Bond', avatar: 'https://randomuser.me/api/portraits/men/7.jpg' },
@@ -327,6 +360,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 35, love: 10, haha: 2, wow: 1, sad: 0, angry: 0 },
       comments: [],
       shares: 6,
+      isSaved: false,
     },
     {
       author: { name: 'Lily Brown', avatar: 'https://randomuser.me/api/portraits/women/88.jpg' },
@@ -338,6 +372,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 27, love: 8, haha: 1, wow: 0, sad: 0, angry: 0 },
       comments: [],
       shares: 2,
+      isSaved: false,
     },
     {
       author: { name: 'William Scott', avatar: 'https://randomuser.me/api/portraits/men/66.jpg' },
@@ -349,6 +384,7 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 31, love: 7, haha: 2, wow: 1, sad: 0, angry: 0 },
       comments: [],
       shares: 3,
+      isSaved: false,
     },
     {
       author: { name: 'Ella Walker', avatar: 'https://randomuser.me/api/portraits/women/99.jpg' },
@@ -360,5 +396,6 @@ export const moreDummyPosts: PostData[] = [
       reactions: { like: 15, love: 3, haha: 0, wow: 0, sad: 0, angry: 0 },
       comments: [],
       shares: 1,
+      isSaved: false,
     },
 ]; 

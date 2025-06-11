@@ -7,7 +7,7 @@ import { useAuth } from '../auth/AuthContext';
 import TagPeopleModal from '../modals/TagPeopleModal';
 import MediaViewerModal from '../modals/MediaViewerModal';
 import EditPostModal from '../modals/EditPostModal';
-import { PostContext } from '@/context/PostContext';
+import { usePostContext } from '@/context/PostContext';
 
 interface Person {
   name: string;
@@ -33,6 +33,7 @@ export interface PostProps {
   shares: number;
   taggedPeople?: Person[];
   onDelete?: () => void;
+  isSaved?: boolean;
 }
 
 const Post: React.FC<PostProps & { index?: number }> = ({
@@ -61,7 +62,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const moreBtnRef = useRef<HTMLDivElement>(null);
   const [showMediaViewer, setShowMediaViewer] = useState(false);
   const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
-  const { updatePost } = React.useContext(PostContext);
+  const { updatePost } = usePostContext();
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Đóng dropdown khi click ra ngoài

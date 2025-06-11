@@ -1,39 +1,47 @@
 'use client';
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { PostData, initialPosts } from '@/lib/dummyData';
 
 interface PostContextType {
   posts: PostData[];
   addNewPost: (post: PostData) => void;
   removePost: (index: number) => void;
-  updatePost: (index: number, updatedPost: PostData) => void;
+  toggleSavePost: (index: number) => void;
 }
 
-export const PostContext = createContext<PostContextType>({
+const PostContext = createContext<PostContextType>({
   posts: [],
   addNewPost: () => {},
   removePost: () => {},
-  updatePost: () => {},
+  toggleSavePost: () => {},
 });
 
-export const PostProvider = ({ children }: { children: ReactNode }) => {
+export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<PostData[]>(initialPosts);
 
   const addNewPost = (post: PostData) => {
-    setPosts(prev => [post, ...prev]);
+    setPosts(prevPosts => [post, ...prevPosts]);
   };
 
   const removePost = (index: number) => {
-    setPosts(prev => prev.filter((_, i) => i !== index));
+    setPosts(prevPosts => prevPosts.filter((_, i) => i !== index));
   };
 
-  const updatePost = (index: number, updatedPost: PostData) => {
-    setPosts(prev => prev.map((post, i) => (i === index ? updatedPost : post)));
+  const toggleSavePost = (index: number) => {
+    setPosts(prevPosts => 
+      prevPosts.map((post, i) => 
+        i === index 
+          ? { ...post, isSaved: !post.isSaved }
+          : post
+      )
+    );
   };
 
   return (
-    <PostContext.Provider value={{ posts, addNewPost, removePost, updatePost }}>
+    <PostContext.Provider value={{ posts, addNewPost, removePost, toggleSavePost }}>
       {children}
     </PostContext.Provider>
   );
-}; 
+};
+
+export const usePostContext = () => useContext(PostContext); 

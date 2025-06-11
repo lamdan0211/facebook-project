@@ -10,13 +10,12 @@ import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected 
 import Link from 'next/link';
 import { useAuth } from '../auth/AuthContext';
 import useRequireAuth from '@/lib/useRequireAuth';
-import { PostContext } from '@/context/PostContext';
-import { useContext } from 'react';
+import { usePostContext } from '@/context/PostContext';
 
 const NewsFeed = () => {
   useRequireAuth();
   const { user } = useAuth();
-  const { posts, addNewPost, removePost } = useContext(PostContext);
+  const { posts, addNewPost, removePost } = usePostContext();
   const [loading, setLoading] = useState(false);
   // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
