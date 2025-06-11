@@ -453,7 +453,7 @@ export const watchVideos: WatchVideoData[] = [
     timeAgo: '30 mins ago',
     title: 'Funny Cat Compilation',
     videoUrl: 'https://www.w3schools.com/html/movie.mp4',
-    thumbnail: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg',
+    thumbnail: 'https://images.pexels.com/photos/45201/pexels-photo-45201.jpeg',
     reactions: {
       like: 200,
       love: 60,

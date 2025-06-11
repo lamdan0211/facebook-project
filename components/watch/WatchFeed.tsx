@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { watchVideos } from '@/lib/dummyData';
 
 const WatchFeed = () => {
@@ -18,7 +17,7 @@ const WatchFeed = () => {
           <div className="flex-1 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Image src={video.author.avatar} alt={video.author.name} width={32} height={32} className="rounded-full w-8 h-8 object-cover" />
+                <img src={video.author.avatar} alt={video.author.name} width={32} height={32} className="rounded-full w-8 h-8 object-cover" />
                 <span className="font-semibold">{video.author.name}</span>
                 <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
               </div>
