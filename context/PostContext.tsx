@@ -7,6 +7,7 @@ interface PostContextType {
   addNewPost: (post: PostData) => void;
   removePost: (index: number) => void;
   toggleSavePost: (index: number) => void;
+  updatePost: (index: number, updatedPost: PostData) => void;
 }
 
 const PostContext = createContext<PostContextType>({
@@ -14,6 +15,7 @@ const PostContext = createContext<PostContextType>({
   addNewPost: () => {},
   removePost: () => {},
   toggleSavePost: () => {},
+  updatePost: () => {},
 });
 
 export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -37,8 +39,12 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const updatePost = (index: number, updatedPost: PostData) => {
+    setPosts(prevPosts => prevPosts.map((post, i) => (i === index ? updatedPost : post)));
+  };
+
   return (
-    <PostContext.Provider value={{ posts, addNewPost, removePost, toggleSavePost }}>
+    <PostContext.Provider value={{ posts, addNewPost, removePost, toggleSavePost, updatePost }}>
       {children}
     </PostContext.Provider>
   );

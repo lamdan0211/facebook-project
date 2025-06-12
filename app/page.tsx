@@ -1,10 +1,6 @@
-import NewsFeed from '@/components/feed/NewsFeed';
-import { PostProvider } from '@/context/PostContext';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <PostProvider>
-      <NewsFeed />
-    </PostProvider>
-  );
+  redirect('/login');
+  return null;
 } 

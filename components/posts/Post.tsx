@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
 import CommentList from './CommentList';
 import { CommentData } from '@/lib/dummyData';
@@ -11,6 +11,7 @@ import { usePostContext } from '@/context/PostContext';
 
 interface Person {
   name: string;
+  avatar: string;
 }
 
 export interface PostProps {
@@ -33,7 +34,6 @@ export interface PostProps {
   shares: number;
   taggedPeople?: Person[];
   onDelete?: () => void;
-  isSaved?: boolean;
 }
 
 const Post: React.FC<PostProps & { index?: number }> = ({
@@ -55,7 +55,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
-  const [allComments, setAllComments] = useState(comments);
+  const [allComments, setAllComments] = useState<CommentData[]>(comments);
   const { user } = useAuth();
   const [showTaggedPeopleModal, setShowTaggedPeopleModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -98,9 +98,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (commentText.trim()) {
-      // Handle comment submission here
-      console.log('Comment submitted:', commentText);
-      // console.log(comments);
       const newComment: CommentData = {
         author: {
           name: user?.displayName || 'User',
@@ -108,8 +105,9 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         },
         content: commentText,
         timeAgo: 'Just now',
+        likes: 0
       };
-      setAllComments(prev => [newComment,...prev]);
+      setAllComments(prev => [newComment, ...prev]);
       setCommentText('');
     }
   };
@@ -142,13 +140,14 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
   const handleAddComment = (text: string) => {
     if (!user) return;
-    const newComment = {
+    const newComment: CommentData = {
       author: {
         name: user.displayName || 'User',
         avatar: user.photoURL || '/default-avatar.png',
       },
       content: text,
       timeAgo: 'Just now',
+      likes: 0
     };
     setAllComments(prev => [...prev, newComment]);
   };
@@ -434,7 +433,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       {/* Edit Modal */}
       {showEditModal && user && user.displayName === author.name && (
         <EditPostModal
-          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople: taggedPeople?.map(p => ({name: p.name, avatar: author.avatar})) }}
+          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
           onClose={() => setShowEditModal(false)}
           onEdit={(updatedPost) => {
             if (typeof index === 'number') updatePost(index, updatedPost);
