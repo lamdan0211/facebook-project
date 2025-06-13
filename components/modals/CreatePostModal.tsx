@@ -4,6 +4,7 @@ import EmojiPicker from 'emoji-picker-react';
 import TagPeopleModal from './TagPeopleModal';
 import { PostData } from '@/lib/dummyData';
 import { useAuth } from '../auth/AuthContext';
+import Avatar from '../user/Avatar';
 
 interface Person {
   id: string;
@@ -84,7 +85,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
       url: URL.createObjectURL(file),
       file
     }));
-    setPreviewMedia(prev => [...prev, ...newMedia]);
+    setPreviewMedia(prev => [...prev, ...newMedia] as { type: 'image' | 'video'; url: string; file: File }[]);
   };
 
   const removeFile = (index: number) => {
@@ -125,13 +126,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             {/* User Info and Privacy Selector */}
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden mr-2">
-                <Image
-                  src={user?.photoURL || "/default-avatar.png"}
-                  alt="Your Avatar"
-                  width={40}
-                  height={40}
-                  className="object-cover"
-                />
+              <Avatar author={{avatar: "from-blue-600 to-blue-300", name: user?.displayName || "User"}} />
               </div>
               <div>
                 <p className="font-semibold text-sm">{user?.displayName || "User"}</p>

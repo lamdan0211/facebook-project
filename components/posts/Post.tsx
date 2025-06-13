@@ -9,6 +9,16 @@ import MediaViewerModal from '../modals/MediaViewerModal';
 import EditPostModal from '../modals/EditPostModal';
 import { usePostContext } from '@/context/PostContext';
 
+
+ function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 interface Person {
   name: string;
   avatar: string;
@@ -191,17 +201,14 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
-      <div className="flex items-center mb-3">
-        <Image
-          src={author.avatar}
-          alt={`${author.name}'s avatar`}
-          width={40}
-          height={40}
-          className="w-10 h-10 rounded-full object-cover mr-3"
-        />
+      <div className="flex items-center mb-3 gap-2">
+      <div className={`w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
+      <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
+      </div>
         <div>
           <div className="flex items-center gap-1">
             <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+            
             {/* Tag people display */}
             {taggedPeople && taggedPeople.length > 0 && (
               <span className="text-xs text-gray-500">

@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthContext';
+import Avatar from '../user/Avatar';
 
 const LeftSidebar = () => {
   const { user } = useAuth();
@@ -16,13 +17,7 @@ const LeftSidebar = () => {
     <div className="p-4 flex flex-col">
       {/* User Section */}
       <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
-        <Image
-          src={user?.photoURL || "/default-avatar.png"}
-          alt="User avatar"
-          width={36}
-          height={36}
-          className="w-10 h-10 rounded-full object-cover mr-3r gap-[10]"
-        />
+      <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
         <span className="font-semibold text-gray-800">{user?.displayName || user?.email || 'User'}</span>
       </Link>
 

@@ -1,5 +1,15 @@
 import React from 'react';
 import Image from 'next/image';
+import Avatar from '../user/Avatar';
+
+ function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
 
 interface CommentProps {
   author: {
@@ -18,13 +28,7 @@ const Comment: React.FC<CommentProps> = ({
   return (
     <div className="flex items-start space-x-2 mb-2">
       {/* Author Avatar */}
-      <Image
-        src={author.avatar}
-        alt={`${author.name}'s avatar`}
-        width={28}
-        height={28}
-        className="rounded-full w-10 h-10 object-cover"
-      />
+      <Avatar author={{avatar: "from-blue-600 to-blue-300", name: author.name}} />
       <div className="flex-1">
         <div className="bg-gray-100 p-2 rounded-xl">
           <p className="text-gray-800 font-semibold text-sm">{author.name}</p>
