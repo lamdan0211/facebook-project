@@ -8,6 +8,7 @@ import TagPeopleModal from '../modals/TagPeopleModal';
 import MediaViewerModal from '../modals/MediaViewerModal';
 import EditPostModal from '../modals/EditPostModal';
 import { usePostContext } from '@/context/PostContext';
+import Avatar from '../user/Avatar';
 
 
  function getInitials(name: string): string {
@@ -382,13 +383,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <div className="mt-4">
           <form onSubmit={handleCommentSubmit} className="flex items-center">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-              <Image
-                src={user?.photoURL || "/default-avatar.png"}
-                alt="user"
-                width={40}
-                height={40}
-                className="object-cover"
-              />
+              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
             </div>
             <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <input
