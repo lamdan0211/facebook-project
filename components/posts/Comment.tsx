@@ -28,7 +28,7 @@ const Comment: React.FC<CommentProps> = ({
   return (
     <div className="flex items-start space-x-2 mb-2">
       {/* Author Avatar */}
-      <Avatar author={{avatar: "from-blue-600 to-blue-300", name: author.name}} />
+      <Avatar author={{avatar: "from-teal-500 to-cyan-500", name: author.name}} />
       <div className="flex-1">
         <div className="bg-gray-100 p-2 rounded-xl">
           <p className="text-gray-800 font-semibold text-sm">{author.name}</p>
