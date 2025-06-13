@@ -10,16 +10,6 @@ import EditPostModal from '../modals/EditPostModal';
 import { usePostContext } from '@/context/PostContext';
 import Avatar from '../user/Avatar';
 
-
- function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 interface Person {
   name: string;
   avatar: string;
@@ -203,9 +193,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
       <div className="flex items-center mb-3 gap-2">
-      <div className={`w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
-      <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
-      </div>
+        <Avatar author={{avatar: "from-red-600 to-red-300", name: author.name}} />
         <div>
           <div className="flex items-center gap-1">
             <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
