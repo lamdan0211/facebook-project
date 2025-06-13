@@ -93,7 +93,7 @@ const NewsFeed = () => {
         <div className="flex items-center mb-4 cursor-pointer gap-2"> {/* Added onClick here */}
           {/* User Avatar */}
            <Link href="/profile">
-            <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+           <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
            </Link>
           {/* Placeholder Input field */}
           <div className="flex-1 bg-gray-100 rounded-full py-2 px-4 text-gray-500 text-sm"  onClick={handleOpenModal}>

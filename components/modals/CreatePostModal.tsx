@@ -126,7 +126,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             {/* User Info and Privacy Selector */}
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden mr-2">
-              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+                <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
               </div>
               <div>
                 <p className="font-semibold text-sm">{user?.displayName || "User"}</p>
@@ -275,7 +275,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             <button
               type="submit"
               disabled={!postContent.trim() && previewMedia.length === 0}
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 cursor-pointer transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-500 text-white cursor-pointer font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Post
             </button>

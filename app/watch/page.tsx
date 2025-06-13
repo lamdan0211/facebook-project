@@ -13,7 +13,7 @@ export default function WatchPage() {
         <aside className="hidden md:block lg:w-72 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
           <LeftSidebar />
         </aside>
-        <main className="flex-1 overflow-y-auto p-4 flex justify-center">
+        <main className="flex-1 overflow-auto p-4 flex justify-center">
           <div className="w-full max-w-2xl">
             <WatchFeed />
           </div>
