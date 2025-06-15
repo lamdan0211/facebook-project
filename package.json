@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^14.2.15",
     "@supabase/supabase-js": "^2.49.8",
     "autoprefixer": "^10.4.21",
     "emoji-picker-react": "^4.12.2",
