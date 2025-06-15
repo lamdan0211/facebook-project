@@ -11,7 +11,7 @@ const WatchFeed = () => {
   );
 };
 
-const VideoCard = ({ video }) => {
+const VideoCard = ({ video }: { video: any }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);

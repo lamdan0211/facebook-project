@@ -67,9 +67,9 @@ const Header = () => {
          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="flex items-center justify-between w-[180px]">
                {/* Home Icon (Active) */}
-               <div className="flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg cursor-pointer border-b-2 border-blue-600 text-blue-600 h-[55px]">
+               <Link href="/dashboard" className="flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg cursor-pointer border-b-2 border-blue-600 text-blue-600 h-[55px]">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-               </div>
+               </Link>
                {/* Video Icon */}
                <Link href="/watch" className="flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg hover:bg-gray-200 cursor-pointer text-gray-500 hover:text-gray-700">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

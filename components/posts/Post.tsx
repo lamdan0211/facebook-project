@@ -227,7 +227,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       );
     }
   
-    // ✅ Từ 4 ảnh trở lên, dùng overlay ở ảnh thứ 4 nếu có thêm
+    // Từ 4 ảnh trở lên, dùng overlay ở ảnh thứ 4 nếu có thêm
     return (
       <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden h-[300px] relative">
         {media.slice(0, 4).map((m, i) => (
