@@ -267,7 +267,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             )}
           </div>
           <button
-            className="p-1 hover:bg-gray-100 rounded-full"
+            className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
             onClick={onDelete}
             aria-label="Close post"
           >
