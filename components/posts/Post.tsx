@@ -293,10 +293,10 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                 .map(([type, count], index) => {
                   if (count > 0) {
                     const emoji = type === 'like' ? '👍' :
-                                type === 'love' ? '❤️' :
-                                type === 'haha' ? '😂' :
-                                type === 'wow' ? '😮' :
-                                type === 'sad' ? '😢' : '😡';
+                                  type === 'love' ? '❤️' :
+                                  type === 'haha' ? '😂' :
+                                  type === 'wow' ? '😮' :
+                                  type === 'sad' ? '😢' : '😡';
                     return <span key={type} className={`z-${index + 1}0`}>{emoji}</span>;
                   }
                   return null;
