@@ -166,31 +166,80 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   // Render media grid giống Facebook
   const renderMediaGrid = () => {
     if (!media || media.length === 0) return null;
+  
     if (media.length === 1) {
-      return media[0].type === 'image' ? (
-        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
-          <Image src={media[0].url} alt="Post media" fill style={{ objectFit: 'cover' }} className="rounded-lg" />
-        </div>
-      ) : (
-        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
-          <video src={media[0].url} controls className="w-full rounded-lg max-h-96 object-cover bg-black" />
+      const m = media[0];
+      return (
+        <div className="relative w-full h-[400px] rounded-lg overflow-hidden" onClick={() => handleOpenMediaViewer(0)}>
+          {m.type === 'image' ? (
+            <Image src={m.url} alt="Media 0" fill style={{ objectFit: 'cover' }} className="rounded-lg cursor-pointer" />
+          ) : (
+            <video src={m.url} controls className="w-full h-full object-cover bg-black rounded-lg" />
+          )}
         </div>
       );
     }
-    // 2-4 media: grid
-    const gridClass = media.length === 2 ? 'grid-cols-2' : 'grid-cols-2 grid-rows-2';
+  
+    if (media.length === 2) {
+      return (
+        <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden h-[300px]">
+          {media.map((m, i) => (
+            <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+              {m.type === 'image' ? (
+                <Image src={m.url} alt={`Media ${i}`} fill style={{ objectFit: 'cover' }} className="rounded-lg" />
+              ) : (
+                <video src={m.url} controls className="w-full h-full object-cover bg-black rounded-lg" />
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+  
+    if (media.length === 3) {
+      return (
+        <div
+          className="grid gap-1 rounded-lg overflow-hidden"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr',
+            gridTemplateRows: '1fr 1fr',
+            gridTemplateAreas: `
+              "item0 item1"
+              "item0 item2"
+            `,
+            height: '300px',
+          }}
+        >
+          {media.map((m, i) => {
+            const area = i === 0 ? 'item0' : i === 1 ? 'item1' : 'item2';
+            return (
+              <div key={i} onClick={() => handleOpenMediaViewer(i)} className="relative w-full h-full cursor-pointer" style={{ gridArea: area }}>
+                {m.type === 'image' ? (
+                  <Image src={m.url} alt={`Media ${i}`} fill style={{ objectFit: 'cover' }} className="rounded-lg" />
+                ) : (
+                  <video src={m.url} controls className="w-full h-full object-cover bg-black rounded-lg" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+  
+    // Từ 4 ảnh trở lên, dùng overlay ở ảnh thứ 4 nếu có thêm
     return (
-      <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>
-        {media.slice(0,4).map((m, i) => (
-          <div key={i} className="relative w-full h-full aspect-square cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+      <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden h-[300px] relative">
+        {media.slice(0, 4).map((m, i) => (
+          <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
             {m.type === 'image' ? (
-              <Image src={m.url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+              <Image src={m.url} alt={`Media ${i}`} fill style={{ objectFit: 'cover' }} className="rounded-lg" />
             ) : (
-              <video src={m.url} controls className="w-full h-full object-cover bg-black" />
+              <video src={m.url} controls className="w-full h-full object-cover bg-black rounded-lg" />
             )}
             {i === 3 && media.length > 4 && (
-              <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">+{media.length-4}</span>
+              <div className="absolute inset-0 bg-gray-900/80 bg-opacity-50 flex items-center justify-center rounded-lg">
+                <span className="text-white text-3xl font-bold">+{media.length - 4}</span>
               </div>
             )}
           </div>
@@ -198,6 +247,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       </div>
     );
   };
+  
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
@@ -267,7 +317,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             )}
           </div>
           <button
-            className="p-1 hover:bg-gray-100 rounded-full"
+            className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
             onClick={onDelete}
             aria-label="Close post"
           >
@@ -293,10 +343,10 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                 .map(([type, count], index) => {
                   if (count > 0) {
                     const emoji = type === 'like' ? '👍' :
-                                type === 'love' ? '❤️' :
-                                type === 'haha' ? '😂' :
-                                type === 'wow' ? '😮' :
-                                type === 'sad' ? '😢' : '😡';
+                                  type === 'love' ? '❤️' :
+                                  type === 'haha' ? '😂' :
+                                  type === 'wow' ? '😮' :
+                                  type === 'sad' ? '😢' : '😡';
                     return <span key={type} className={`z-${index + 1}0`}>{emoji}</span>;
                   }
                   return null;

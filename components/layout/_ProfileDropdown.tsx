@@ -16,7 +16,7 @@ const ProfileDropdown = () => {
           height={32}
           className="w-10 h-10 rounded-full object-cover mr-2"
         />
-        <span className="font-semibold text-sm">Lam Dan</span>
+        <span className="font-semibold text-sm">Lam Dan12AAAAAAA</span>
       </Link>
 
       {/* Horizontal line */}

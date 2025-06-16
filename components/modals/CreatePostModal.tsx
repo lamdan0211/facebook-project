@@ -18,6 +18,20 @@ interface CreatePostModalProps {
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  // Close when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
+
   const [postContent, setPostContent] = useState('');
   const [selectedAudience, setSelectedAudience] = useState('Only me');
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
@@ -107,7 +121,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
 
   return (
     <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+      <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="relative border-b px-4 py-3 border-b-[#dedede]">
           <h1 className="text-xl font-semibold text-center">Create post</h1>

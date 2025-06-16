@@ -83,15 +83,15 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg' },
     timeAgo: '1 hour ago',
     content: 'Loving this view!',
     media: [
-      { type: 'image', url: 'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+      { type: 'image', url: 'https://images.pexels.com/photos/4613309/pexels-photo-4613309.jpeg' },
     ],
     reactions: { like: 50, love: 30, haha: 10, wow: 5, sad: 2, angry: 1 },
     comments: [
-      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
+      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
     ],
     shares: 20,
     taggedPeople: [
@@ -234,7 +234,7 @@ export const initialPosts: PostData[] = [
     content: 'Check out my trip photos!',
     media: [
       { type: 'image', url: 'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg' },
-      { type: 'image', url: 'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg' },
+      { type: 'image', url: 'https://images.pexels.com/photos/32549629/pexels-photo-32549629/free-photo-of-cho-va-co-gai.jpeg' },
     ],
     reactions: { like: 10, love: 2, haha: 0, wow: 1, sad: 0, angry: 0 },
     comments: [],
@@ -279,7 +279,7 @@ export const initialPosts: PostData[] = [
       { type: 'image', url: 'https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg' },
       { type: 'image', url: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg' },
       { type: 'image', url: 'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg' },
-      { type: 'image', url: 'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg' },
+      { type: 'image', url: 'https://images.pexels.com/photos/4613309/pexels-photo-4613309.jpeg' },
     ],
     reactions: { like: 20, love: 5, haha: 1, wow: 1, sad: 0, angry: 0 },
     comments: [],

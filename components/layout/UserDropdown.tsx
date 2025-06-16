@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/components/auth/AuthContext";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import Avatar from "../user/Avatar";
@@ -10,6 +10,8 @@ const UserDropdown = () => {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
 
   if (!user) return null;
 
@@ -17,9 +19,27 @@ const UserDropdown = () => {
     await logout();
     router.push('/login');
   };
+   //  Auto-close dropdown when click outside
+   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <div className="flex items-center gap-2 focus:outline-none cursor-pointer" onClick={() => setOpen((o) => !o)}>
        <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
         <span className="font-medium">{user.displayName || user.email}</span>
