@@ -119,6 +119,82 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
     };
   }, []);
 
+  const PlayIcon = () => (
+    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div className="bg-black/50 rounded-full p-2">
+        <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </div>
+    </div>
+  );
+
+  const renderPreviewGrid = () => {
+    if (!previewMedia || previewMedia.length === 0) return null;
+    const renderItem = (m: {type: 'image'|'video', url: string}, i: number, aspect = '1/1', overlay: React.ReactNode = null) => (
+      <div
+        key={i}
+        className="relative w-full cursor-pointer overflow-hidden bg-black"
+        style={{ aspectRatio: aspect }}
+      >
+        {m.type === 'image' ? (
+          <Image src={m.url} alt={`Preview ${i}`} fill className="object-cover object-center" />
+        ) : (
+          <>
+            <video src={m.url} className="w-full h-full object-cover object-center" />
+            {PlayIcon()}
+          </>
+        )}
+        {overlay}
+        <button type="button" onClick={() => removeFile(i)} className="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 rounded-full text-white z-20">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    );
+    switch (previewMedia.length) {
+      case 1:
+        return (
+          <div className="w-full max-w-[500px] mx-auto rounded-lg overflow-hidden cursor-pointer mb-4">
+            {renderItem(previewMedia[0], 0, '1/1')}
+          </div>
+        );
+      case 2:
+        return (
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+            {previewMedia.slice(0, 2).map((m, i) => renderItem(m, i, '4/5'))}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+            <div className="col-span-1 row-span-2">{renderItem(previewMedia[0], 0, '4/5')}</div>
+            <div className="flex flex-col gap-1">
+              {previewMedia.slice(1).map((m, i) => renderItem(m, i + 1, '4/5'))}
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+            {previewMedia.slice(0, 4).map((m, i) =>
+              renderItem(
+                m,
+                i,
+                '1/1',
+                i === 3 && previewMedia.length > 4 ? (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-3xl font-semibold z-20">
+                    +{previewMedia.length - 4}
+                  </div>
+                ) : null
+              )
+            )}
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-900/90 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
       <div ref={modalRef} className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
@@ -222,26 +298,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             )}
 
             {/* Media Preview */}
-            {previewMedia.length > 0 && (
-              <div className="mb-4 border rounded-lg p-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {previewMedia.map((media, index) => (
-                    <div key={index} className="relative aspect-video">
-                      {media.type === 'image' ? (
-                        <Image src={media.url} alt="Preview" fill className="object-cover rounded-lg" />
-                      ) : (
-                        <video src={media.url} className="w-full h-full object-cover rounded-lg" controls />
-                      )}
-                      <button type="button" onClick={() => removeFile(index)} className="absolute top-2 right-2 p-1 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 rounded-full text-white">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {renderPreviewGrid()}
 
             {/* Add to Post Options */}
             <div className="flex items-center justify-between border border-[#dedede] rounded-lg px-3 py-1.5">

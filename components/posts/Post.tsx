@@ -163,81 +163,73 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     setAllComments(prev => [...prev, newComment]);
   };
 
-  // Render media grid giống Facebook
+  const PlayIcon = () => (
+    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div className="bg-black/50 rounded-full p-2">
+        <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </div>
+    </div>
+  );
+
   const renderMediaGrid = () => {
     if (!media || media.length === 0) return null;
-  
+    const renderItem = (m, i, aspect = '1/1', overlay = null) => (
+      <div
+        key={i}
+        className="relative w-full h-full cursor-pointer overflow-hidden bg-black"
+        style={{ aspectRatio: aspect }}
+        onClick={() => handleOpenMediaViewer(i)}
+      >
+        {m.type === 'image' ? (
+          <Image src={m.url} alt={`Media ${i}`} fill className="object-cover object-center" />
+        ) : (
+          <>
+            <video src={m.url} className="w-full h-full object-cover object-center" />
+            {PlayIcon()}
+          </>
+        )}
+        {overlay}
+      </div>
+    );
     switch (media.length) {
-      // 1 image: Large, 1:1 ratio, centered
       case 1:
         return (
-          <div className="w-full max-w-[500px] mx-auto rounded-lg overflow-hidden cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
-            {media[0].type === 'image' ? (
-              <Image src={media[0].url} alt="Media 0" width={500} height={500} layout="responsive" className="object-cover rounded-lg" />
-            ) : (
-              <video src={media[0].url} controls className="w-full h-full object-cover rounded-lg" />
-            )}
+          <div className="w-full max-w-[500px] mx-auto rounded-lg overflow-hidden cursor-pointer">
+            {renderItem(media[0], 0, '1/1')}
           </div>
         );
-      // 2 images: grid-cols-2, both 4:5, equal height, no aspect/h-[400px] on div
       case 2:
         return (
           <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
-            {media.slice(0, 2).map((m, i) => (
-              <div
-                key={i}
-                className={
-                  "relative w-full cursor-pointer " +
-                  (i === 0
-                    ? "rounded-l-lg"
-                    : "rounded-r-lg")
-                }
-                style={{ aspectRatio: "4/5" }}
-                onClick={() => handleOpenMediaViewer(i)}
-              >
-                <Image
-                  src={m.url}
-                  alt={`Media ${i}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 500px) 50vw, 250px"
-                />
-              </div>
-            ))}
+            {media.slice(0, 2).map((m, i) => renderItem(m, i, '4/5'))}
           </div>
         );
-      // 3 images: left large, right 2 stacked (like attached image)
       case 3:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden" style={{height: '500px'}}>
-            {/* Left: large image, full height */}
-            <div className="relative h-full w-full cursor-pointer" style={{height: '500px'}} onClick={() => handleOpenMediaViewer(0)}>
-              <Image src={media[0].url} alt="Media 0" fill className="object-cover rounded-lg" />
-            </div>
-            {/* Right: 2 stacked images */}
-            <div className="flex flex-col gap-1 h-full w-full">
-              {media.slice(1).map((m, i) => (
-                <div key={i+1} className="relative flex-1 w-full cursor-pointer" style={{minHeight: 0}} onClick={() => handleOpenMediaViewer(i+1)}>
-                  <Image src={m.url} alt={`Media ${i+1}`} fill className="object-cover rounded-lg" />
-                </div>
-              ))}
+          <div className="grid grid-cols-2 gap-1 w-full h-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
+            <div className="col-span-1 row-span-2">{renderItem(media[0], 0, '4/5')}</div>
+            <div className="flex flex-col gap-1">
+              {media.slice(1).map((m, i) => renderItem(m, i + 1, '4/5'))}
             </div>
           </div>
         );
-      // 4+ images: grid 2x2, all square, overlay on 4th
       default:
         return (
           <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
-            {media.slice(0, 4).map((m, i) => (
-              <div key={i} className="w-full cursor-pointer relative" onClick={() => handleOpenMediaViewer(i)}>
-                <Image src={m.url} alt={`Media ${i}`} width={250} height={250} layout="responsive" className="object-cover rounded-lg" />
-                {i === 3 && media.length > 4 && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-3xl font-semibold z-10 rounded-lg">
+            {media.slice(0, 4).map((m, i) =>
+              renderItem(
+                m,
+                i,
+                '1/1',
+                i === 3 && media.length > 4 ? (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-3xl font-semibold z-20">
                     +{media.length - 4}
                   </div>
-                )}
-              </div>
-            ))}
+                ) : null
+              )
+            )}
           </div>
         );
     }
