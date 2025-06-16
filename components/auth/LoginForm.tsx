@@ -1,21 +1,21 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import GoogleSignInButton from './GoogleSignInButton';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 const LoginForm = () => {
-  const { user, loading } = useAuth();
+  const { login, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && user) {
-      router.replace('/dashboard');
-    }
-  }, [user, loading, router]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await login(email, password);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -31,20 +31,25 @@ const LoginForm = () => {
         {/* Right side - Login form */}
         <div className="w-1/2">
           <div className="bg-white p-8 rounded-lg shadow-md">
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address or phone number"
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
               />
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
               />
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 transition-colors"
+                disabled={loading}
               >
                 Log in
               </button>
