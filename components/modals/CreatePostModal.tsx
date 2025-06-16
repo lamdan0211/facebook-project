@@ -177,7 +177,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         );
       default:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] max-h-[300px] mx-auto rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] max-h-[300px] mx-auto rounded-lg overflow-auto mb-4">
             {previewMedia.slice(0, 4).map((m, i) =>
               renderItem(
                 m,

@@ -175,7 +175,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
   const renderMediaGrid = () => {
     if (!media || media.length === 0) return null;
-    const renderItem = (m, i, aspect = '1/1', overlay = null) => (
+    const renderItem = (m: {type: 'image'|'video', url: string}, i: number, aspect = '1/1', overlay: React.ReactNode = null) => (
       <div
         key={i}
         className="relative w-full h-full cursor-pointer overflow-hidden bg-black"

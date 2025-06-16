@@ -69,7 +69,6 @@ const ProfileSidebar = () => {
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">Photos</h2>
-          <a href="#" className="text-blue-600 hover:underline text-sm font-semibold">See All Photos</a>
         </div>
         <div className="grid grid-cols-3 gap-1">
           {photos.map((photoUrl, index) => (
@@ -84,7 +83,6 @@ const ProfileSidebar = () => {
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">Friends</h2>
-          <a href="#" className="text-blue-600 hover:underline text-sm font-semibold">See All Friends</a>
         </div>
         <p className="text-gray-700 text-base mb-3">X friends</p>
         <div className="grid grid-cols-3 gap-1">
