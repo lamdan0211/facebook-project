@@ -203,9 +203,9 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
       <div className="flex items-center mb-3 gap-2">
-      <div className={`w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
-      <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
-      </div>
+          <Avatar 
+                author={{avatar: author.name === "Dan Lam" ? "from-red-600 to-red-300" : "from-blue-600 to-blue-300", name: author.name || "User"}} 
+              />
         <div>
           <div className="flex items-center gap-1">
             <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
@@ -383,7 +383,9 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <div className="mt-4">
           <form onSubmit={handleCommentSubmit} className="flex items-center">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+              <Avatar 
+                author={{avatar: user?.displayName === "Dan Lam" ? "from-red-600 to-red-300" : "from-blue-600 to-blue-300", name: user?.displayName || "User"}} 
+              />
             </div>
             <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <input
