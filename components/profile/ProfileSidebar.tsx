@@ -1,4 +1,8 @@
+'use client';
+
+import React, { useState } from 'react';
 import Image from 'next/image';
+import EditDetailModal from '../modals/EditDetailModal';
 
 const ProfileSidebar = () => {
   // Placeholder data for Intro, Photos, Friends
@@ -31,6 +35,8 @@ const ProfileSidebar = () => {
     'https://source.unsplash.com/random/100x100?face,sig=15',
   ]; // 6 placeholder friend avatars
 
+  const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
+
   return (
     <div className="w-full md:w-1/3 p-2 md:p-0 md:pr-4 space-y-4">
       {/* Intro section */}
@@ -50,7 +56,13 @@ const ProfileSidebar = () => {
             <span className="font-semibold mr-1">Followed by:</span> X people
             </p>
         </div>
-        <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm">Edit Details</button>
+        <button
+          className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm"
+          onClick={() => setIsEditDetailOpen(true)}
+        >Edit Details</button>
+        {isEditDetailOpen && (
+          <EditDetailModal onClose={() => setIsEditDetailOpen(false)} />
+        )}
       </div>
 
       {/* Photos section */}
