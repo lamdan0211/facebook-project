@@ -162,13 +162,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         );
       case 2:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-auto mb-4">
             {previewMedia.slice(0, 2).map((m, i) => renderItem(m, i, '4/5'))}
           </div>
         );
       case 3:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[400px] mx-auto rounded-lg overflow-hidden mb-4">
             <div className="col-span-1 row-span-2">{renderItem(previewMedia[0], 0, '4/5')}</div>
             <div className="flex flex-col gap-1">
               {previewMedia.slice(1).map((m, i) => renderItem(m, i + 1, '4/5'))}
@@ -177,7 +177,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         );
       default:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] max-h-[300px] mx-auto rounded-lg overflow-hidden mb-4">
             {previewMedia.slice(0, 4).map((m, i) =>
               renderItem(
                 m,
@@ -269,7 +269,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}
               placeholder="What's on your mind, Lam?"
-              className="w-full min-h-[120px] text-lg resize-none border-0 focus:outline-none focus:ring-0 p-0"
+              className="w-full min-h-[80px] text-lg resize-none border-0 focus:outline-none focus:ring-0 p-0"
             />
 
             {/* Tagged People Display */}
