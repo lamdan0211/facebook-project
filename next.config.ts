@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       'i.pravatar.cc',
       'firebasestorage.googleapis.com',
       'images.remotePatterns',
+      'randomuser.me',
     ],
   },
 };
