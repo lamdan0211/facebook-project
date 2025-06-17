@@ -28,6 +28,7 @@ interface Person {
 export interface PostProps {
   author: {
     name: string;
+    email?: string;
     avatar: string;
   };
   timeAgo: string;
@@ -285,13 +286,22 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                 {user && user.displayName === author.name && (
-                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
-                    <span className="text-lg mr-3">✏️</span>
-                    <span>
-                      <span className="font-semibold">Edit Post</span>
-                      <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
-                    </span>
-                  </button>
+                  <>
+                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
+                      <span className="text-lg mr-3">✏️</span>
+                      <span>
+                        <span className="font-semibold">Edit Post</span>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
+                      </span>
+                    </button>
+                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={onDelete}>
+                      <span className="text-lg mr-3">🗑️</span>
+                      <span>
+                        <span className="font-semibold">Delete Post</span>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">Remove this post.</div>
+                      </span>
+                    </button>
+                  </>
                 )}
                 <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => setShowDropdown(false)}>
                   <span className="text-lg mr-3">🔖</span>
@@ -472,14 +482,11 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       )}
 
       {/* Edit Modal */}
-      {showEditModal && user && user.displayName === author.name && (
+      {showEditModal && (
         <EditPostModal
-          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
+          post={{author, timeAgo, content, media, reactions, comments, shares, taggedPeople}}
           onClose={() => setShowEditModal(false)}
-          onEdit={(updatedPost) => {
-            if (typeof index === 'number') updatePost(index, updatedPost);
-            setShowEditModal(false);
-          }}
+          onEdit={updatedPost => { if (typeof index === 'number') updatePost(index, updatedPost); setShowEditModal(false); }}
         />
       )}
     </div>

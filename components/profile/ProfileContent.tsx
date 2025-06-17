@@ -11,13 +11,14 @@ const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { posts, addNewPost } = usePostContext();
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  // Lọc post: chỉ hiện bài của tôi, tôi được tag, hoặc tôi là người share
+  const myEmail = user?.email || '';
   const myName = user?.displayName || user?.email || 'User';
   const myPosts = posts.filter(post =>
+    (post.author.email && post.author.email === myEmail) ||
     post.author.name === myName ||
     (post.taggedPeople && post.taggedPeople.some(p => p.name === myName))
-    // Có thể mở rộng thêm điều kiện share nếu có trường shareBy
   );
 
   const handleOpenModal = () => {
@@ -71,12 +72,18 @@ const ProfileContent = () => {
 
       {/* Posts Feed section */}
       <div className="space-y-4">
-        {myPosts.map((post, index) => (
-          <PostCard 
-            key={index}
-            post={post}
-          />
-        ))}
+        {loading ? (
+          <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
+        ) : myPosts.length === 0 ? (
+          <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
+        ) : (
+          myPosts.map((post, index) => (
+            <PostCard 
+              key={index}
+              post={post}
+            />
+          ))
+        )}
       </div>
        {/* Create Post Modal */}
        {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={addNewPost} />} {/* Render modal conditionally */}

@@ -137,21 +137,27 @@ const NewsFeed = () => {
 
       {/* Posts List */}
       <div className="space-y-4 mt-4">
-        {posts.map((post, index) => (
-          <Post
-            key={index}
-            author={post.author}
-            timeAgo={post.timeAgo}
-            content={post.content}
-            media={post.media}
-            reactions={post.reactions}
-            comments={post.comments}
-            shares={post.shares}
-            taggedPeople={post.taggedPeople}
-            onDelete={() => handleDeletePost(index)}
-            index={index}
-          />
-        ))}
+        {loading ? (
+          <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
+        ) : posts.length === 0 ? (
+          <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
+        ) : (
+          posts.map((post, index) => (
+            <Post
+              key={index}
+              author={post.author}
+              timeAgo={post.timeAgo}
+              content={post.content}
+              media={post.media}
+              reactions={post.reactions}
+              comments={post.comments}
+              shares={post.shares}
+              taggedPeople={post.taggedPeople}
+              onDelete={() => handleDeletePost(index)}
+              index={index}
+            />
+          ))
+        )}
       </div>
 
       {/* Infinite Scroll Loader */}

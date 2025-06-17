@@ -41,30 +41,43 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
   const [previewMedia, setPreviewMedia] = useState<{type: 'image'|'video', url: string, file: File}[]>([]);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onClose();
-    addNew({
-      author: {
-        name: user?.displayName || 'User',
-        avatar: user?.photoURL || "/default-avatar.png",
-      },
-      timeAgo: 'Just now',
-      content: postContent,
-      media: previewMedia.map(m => ({type: m.type, url: m.url})),
-      reactions: {
-        like: 0,
-        love: 0,
-        haha: 0,
-        wow: 0,
-        sad: 0,
-        angry: 0,
-      },
-      comments: [],
-      shares: 0,
-      taggedPeople: taggedPeople,
-    });
+    setToast(null);
+    try {
+      onClose();
+      addNew({
+        author: {
+          name: user?.displayName || user?.email || 'User',
+          email: user?.email || '',
+          avatar: user?.photoURL || "/default-avatar.png",
+        },
+        timeAgo: 'Just now',
+        content: postContent,
+        media: previewMedia.map(m => ({type: m.type, url: m.url})),
+        reactions: {
+          like: 0,
+          love: 0,
+          haha: 0,
+          wow: 0,
+          sad: 0,
+          angry: 0,
+        },
+        comments: [],
+        shares: 0,
+        taggedPeople: taggedPeople,
+      });
+      setToast('Đăng bài thành công!');
+      setPostContent('');
+      setPreviewMedia([]);
+      setTaggedPeople([]);
+      setTimeout(() => setToast(null), 2000);
+    } catch (err) {
+      setToast('Đăng bài thất bại!');
+      setTimeout(() => setToast(null), 2000);
+    }
   };
 
   const toggleAudienceDropdown = () => {
@@ -359,6 +372,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             onClose={() => setShowTagPeopleModal(false)}
             onTagPeople={handleTagPeople}
           />
+        )}
+
+        {toast && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-[9999] animate-fadeIn">
+            {toast}
+          </div>
         )}
       </div>
     </div>

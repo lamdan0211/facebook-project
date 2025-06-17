@@ -36,6 +36,8 @@ const ProfileSidebar = () => {
   ]; // 6 placeholder friend avatars
 
   const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [photoModalIndex, setPhotoModalIndex] = useState<number | null>(null);
 
   return (
     <div className="w-full md:w-1/3 p-2 md:p-0 md:pr-4 space-y-4">
@@ -72,11 +74,21 @@ const ProfileSidebar = () => {
         </div>
         <div className="grid grid-cols-3 gap-1">
           {photos.map((photoUrl, index) => (
-            <div key={index} className="w-full aspect-square bg-gray-300 rounded overflow-hidden">
+            <div key={index} className="w-full aspect-square bg-gray-300 rounded overflow-hidden cursor-pointer" onClick={() => { setPhotoModalIndex(index); setIsPhotoModalOpen(true); }}>
               <Image src={photoUrl} alt={`Photo ${index + 1}`} width={100} height={100} objectFit="cover" />
             </div>
           ))}
         </div>
+        {isPhotoModalOpen && photoModalIndex !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setIsPhotoModalOpen(false)}>
+            <div className="relative max-w-2xl w-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
+              <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full z-10" onClick={() => setIsPhotoModalOpen(false)}>
+                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+              <Image src={photos[photoModalIndex]} alt={`Photo ${photoModalIndex + 1}`} width={600} height={600} className="object-contain rounded-lg max-h-[80vh] max-w-full" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Friends section */}
