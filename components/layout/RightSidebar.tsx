@@ -1,7 +1,11 @@
+"use client";
 import React from 'react';
 import Image from 'next/image';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const RightSidebar = () => {
+  const { user } = useAuth();
+
   // Updated example data for Suggested Groups and Contacts with realistic image URLs
   const suggestedGroups = [
     { id: 1, name: 'React Developers', cover: 'https://images.pexels.com/photos/11035398/pexels-photo-11035398.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', members: '50k members' }, // Updated cover URL
@@ -22,7 +26,6 @@ const RightSidebar = () => {
 
   return (
     <div className="p-4 flex flex-col">
-
       {/* Contacts Section */}
       <div>
         <h3 className="text-base font-semibold text-gray-700 mb-3 flex justify-between items-center">

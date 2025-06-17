@@ -85,6 +85,7 @@ const Header = () => {
 
          {/* Right section: User Icons and Menu */}
          <div className="flex items-center space-x-2 md:space-x-1 flex-grow-0 ml-4">
+            
             {/* Menu Icon */}
             {/* Notifications Icon */}
             <div className="relative w-9 h-9 md:w-10 md:h-10 rounded-full hover:bg-gray-200 cursor-pointer flex items-center justify-center" ref={notifRef}>
