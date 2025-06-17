@@ -56,7 +56,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Navigation Menu */}
       <div className="mt-2">
         <nav className="-mb-px flex space-x-6 px-4 md:px-6 text-sm overflow-x-auto hide-scrollbar">
-          {[ 'Posts', 'About', 'Friends', 'Photos', 'Videos', ].map((item, index) => (
+          {[ 'Posts', 'About', 'Friends', 'Photos', 'Videos'].map((item, index) => (
+
             <a
               key={item}
               href="#"
