@@ -31,25 +31,25 @@ const MediaViewerModal: React.FC<MediaViewerModalProps> = ({ media, initialIndex
 
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-      <div className="relative w-full max-w-4xl h-[80vh] bg-white rounded-lg flex overflow-hidden">
+      <div className="relative w-full max-w-[80%] h-[80vh] bg-white rounded-lg flex overflow-hidden">
         {/* Media section */}
         <div className="flex-1 flex items-center justify-center bg-black relative">
           {/* Close button */}
-          <button onClick={onClose} className="absolute top-4 right-4 z-10 p-2 bg-black/60 rounded-full hover:bg-black/80">
+          <button onClick={onClose} className="absolute top-4 right-4 z-10 p-2 bg-black/60 rounded-full hover:bg-black/80 cursor-pointer">
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           {/* Prev/Next */}
           {current > 0 && (
-            <button onClick={handlePrev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 z-10">
+            <button onClick={handlePrev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 z-10 cursor-pointer">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
           )}
           {current < media.length - 1 && (
-            <button onClick={handleNext} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 z-10">
+            <button onClick={handleNext} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 z-10 cursor-pointer">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>

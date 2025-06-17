@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 interface SharePostModalProps {
@@ -20,6 +20,18 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
   const [shareText, setShareText] = useState('');
   const [selectedAudience, setSelectedAudience] = useState('Public');
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null); // 👈 Thêm ref
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
 
   const handleShare = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +52,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-900/90 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
+      <div ref={modalRef} className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
         {/* Modal Header */}
         <div className="border-b border-b-[#dedede] px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-semibold">Share post</h1>

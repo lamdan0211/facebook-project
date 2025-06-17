@@ -29,6 +29,7 @@ const LeftSidebar = () => {
         {menuItems.map((item) => (
           <li key={item.name}>
             <Link href={item.href} className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer text-gray-700 -ml-2 -mr-2">
+
               <div className="w-8 h-8 flex items-center justify-center mr-3 text-xl">
                 {item.icon}
               </div>
@@ -36,6 +37,7 @@ const LeftSidebar = () => {
             </Link>
           </li>
         ))}
+
       </ul>
 
     </div>

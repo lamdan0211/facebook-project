@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+lib/dummyData.ts
+components/posts/Post.tsx
+components/auth/AuthContext.tsx
