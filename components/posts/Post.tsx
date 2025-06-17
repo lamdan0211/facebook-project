@@ -28,7 +28,6 @@ interface Person {
 export interface PostProps {
   author: {
     name: string;
-    email?: string;
     avatar: string;
   };
   timeAgo: string;
@@ -164,16 +163,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     setAllComments(prev => [...prev, newComment]);
   };
 
-  const PlayIcon = () => (
-    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-      <div className="bg-black/50 rounded-full p-2">
-        <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </div>
-    </div>
-  );
-
+  // Render media grid giống Facebook
   const renderMediaGrid = () => {
     if (!media || media.length === 0) return null;
     if (media.length === 1) {
@@ -217,7 +207,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     return (
       <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>
         {media.slice(0,4).map((m, i) => (
-          <div key={i} className="relative w-full h-full aspect-square cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+          <div key={i} className="relative w-full h-full  cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
             {m.type === 'image' ? (
               <Image src={m.url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
             ) : (
@@ -232,56 +222,15 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         ))}
       </div>
     );
-    switch (media.length) {
-      case 1:
-        return (
-          <div className="w-full max-w-[500px] mx-auto rounded-lg overflow-hidden cursor-pointer">
-            {renderItem(media[0], 0, '1/1')}
-          </div>
-        );
-      case 2:
-        return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
-            {media.slice(0, 2).map((m, i) => renderItem(m, i, '4/5'))}
-          </div>
-        );
-      case 3:
-        return (
-          <div className="grid grid-cols-2 gap-1 w-full h-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
-            <div className="col-span-1 row-span-2">{renderItem(media[0], 0, '4/5')}</div>
-            <div className="flex flex-col gap-1">
-              {media.slice(1).map((m, i) => renderItem(m, i + 1, '4/5'))}
-            </div>
-          </div>
-        );
-      default:
-        return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-hidden">
-            {media.slice(0, 4).map((m, i) =>
-              renderItem(
-                m,
-                i,
-                '1/1',
-                i === 3 && media.length > 4 ? (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-3xl font-semibold z-20">
-                    +{media.length - 4}
-                  </div>
-                ) : null
-              )
-            )}
-          </div>
-        );
-    }
   };
-  
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
       <div className="flex items-center mb-3 gap-2">
-          <Avatar 
-                author={{avatar: author.name === "Dan Lam" ? "from-red-600 to-red-300" : "from-blue-600 to-blue-300", name: author.name || "User"}} 
-              />
+      <div className={`w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
+      <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
+      </div>
         <div>
           <div className="flex items-center gap-1">
             <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
@@ -324,22 +273,13 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                 {user && user.displayName === author.name && (
-                  <>
-                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
-                      <span className="text-lg mr-3">✏️</span>
-                      <span>
-                        <span className="font-semibold">Edit Post</span>
-                        <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
-                      </span>
-                    </button>
-                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={onDelete}>
-                      <span className="text-lg mr-3">🗑️</span>
-                      <span>
-                        <span className="font-semibold">Delete Post</span>
-                        <div className="text-xs text-gray-500 whitespace-nowrap">Remove this post.</div>
-                      </span>
-                    </button>
-                  </>
+                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
+                    <span className="text-lg mr-3">✏️</span>
+                    <span>
+                      <span className="font-semibold">Edit Post</span>
+                      <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
+                    </span>
+                  </button>
                 )}
                 <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => setShowDropdown(false)}>
                   <span className="text-lg mr-3">🔖</span>
@@ -352,7 +292,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             )}
           </div>
           <button
-            className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+            className="p-1 hover:bg-gray-100 rounded-full"
             onClick={onDelete}
             aria-label="Close post"
           >
@@ -384,7 +324,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                                   type === 'sad' ? '😢' : '😡';
                     return <span key={type} className={`z-${index + 1}0`}>{emoji}</span>;
                   }
-                  return null;
+                  return null;  
                 })}
             </div>
           )}
@@ -468,9 +408,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <div className="mt-4">
           <form onSubmit={handleCommentSubmit} className="flex items-center">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-              <Avatar 
-                author={{avatar: user?.displayName === "Dan Lam" ? "from-red-600 to-red-300" : "from-blue-600 to-blue-300", name: user?.displayName || "User"}} 
-              />
+              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
             </div>
             <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <input
@@ -520,11 +458,14 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       )}
 
       {/* Edit Modal */}
-      {showEditModal && (
+      {showEditModal && user && user.displayName === author.name && (
         <EditPostModal
-          post={{author, timeAgo, content, media, reactions, comments, shares, taggedPeople}}
+          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
           onClose={() => setShowEditModal(false)}
-          onEdit={updatedPost => { if (typeof index === 'number') updatePost(index, updatedPost); setShowEditModal(false); }}
+          onEdit={(updatedPost) => {
+            if (typeof index === 'number') updatePost(index, updatedPost);
+            setShowEditModal(false);
+          }}
         />
       )}
     </div>
