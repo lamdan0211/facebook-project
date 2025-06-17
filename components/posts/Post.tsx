@@ -176,22 +176,60 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
   const renderMediaGrid = () => {
     if (!media || media.length === 0) return null;
-    const renderItem = (m: {type: 'image'|'video', url: string}, i: number, aspect = '1/1', overlay: React.ReactNode = null) => (
-      <div
-        key={i}
-        className="relative w-full h-full cursor-pointer overflow-hidden bg-black"
-        style={{ aspectRatio: aspect }}
-        onClick={() => handleOpenMediaViewer(i)}
-      >
-        {m.type === 'image' ? (
-          <Image src={m.url} alt={`Media ${i}`} fill className="object-cover object-center" />
-        ) : (
-          <>
-            <video src={m.url} className="w-full h-full object-cover object-center" />
-            {PlayIcon()}
-          </>
-        )}
-        {overlay}
+    if (media.length === 1) {
+      return media[0].type === 'image' ? (
+        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+          <Image src={media[0].url} alt="Post media" fill style={{ objectFit: 'cover' }} className="rounded-lg" />
+        </div>
+      ) : (
+        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+          <video src={media[0].url} controls className="w-full rounded-lg max-h-96 object-cover bg-black" />
+        </div>
+      );
+    }
+    // 3 media: custom grid (1 lớn trái, 2 nhỏ phải)
+    if (media.length === 3) {
+      return (
+        <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 300}}>
+          {/* Hình lớn bên trái */}
+          <div className="relative row-span-2 col-span-1 w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
+            {media[0].type === 'image' ? (
+              <Image src={media[0].url} alt="Post media 1" fill style={{objectFit:'cover'}} className="" />
+            ) : (
+              <video src={media[0].url} controls className="w-full h-full object-cover bg-black" />
+            )}
+          </div>
+          {/* 2 hình nhỏ bên phải */}
+          {[1,2].map(i => (
+            <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+              {media[i].type === 'image' ? (
+                <Image src={media[i].url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+              ) : (
+                <video src={media[i].url} controls className="w-full h-full object-cover bg-black" />
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    // 2, 4 media: grid
+    const gridClass = media.length === 2 ? 'grid-cols-2' : 'grid-cols-2 grid-rows-2';
+    return (
+      <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>
+        {media.slice(0,4).map((m, i) => (
+          <div key={i} className="relative w-full h-full aspect-square cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+            {m.type === 'image' ? (
+              <Image src={m.url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+            ) : (
+              <video src={m.url} controls className="w-full h-full object-cover bg-black" />
+            )}
+            {i === 3 && media.length > 4 && (
+              <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">+{media.length-4}</span>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     );
     switch (media.length) {

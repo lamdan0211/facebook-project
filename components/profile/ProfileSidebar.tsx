@@ -1,17 +1,19 @@
-'use client';
-
+"use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
-import EditDetailModal from '../modals/EditDetailModal';
+import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
+
+const defaultDetails: DetailsData = {
+  workAt: 'Your Company',
+  studiedAt: 'Your University',
+  livesIn: 'Your City',
+  from: 'Your Hometown',
+  bio: '',
+};
 
 const ProfileSidebar = () => {
-  // Placeholder data for Intro, Photos, Friends
-  const introDetails = [
-    { label: 'Works at', value: 'Your Company' },
-    { label: 'Studied at', value: 'Your University' },
-    { label: 'Lives in', value: 'Your City' },
-    { label: 'From', value: 'Your Hometown' },
-  ];
+  const [details, setDetails] = useState<DetailsData>(defaultDetails);
+  const [showModal, setShowModal] = useState(false);
 
   // Using online placeholder image URLs for photos and friends
   const photos = [
@@ -24,7 +26,7 @@ const ProfileSidebar = () => {
     'https://source.unsplash.com/random/100x100?landscape,sig=7',
     'https://source.unsplash.com/random/100x100?landscape,sig=8',
     'https://source.unsplash.com/random/100x100?landscape,sig=9',
-  ]; // 9 placeholder photos
+  ];
 
   const friends = [
     'https://source.unsplash.com/random/100x100?face,sig=10',
@@ -33,7 +35,7 @@ const ProfileSidebar = () => {
     'https://source.unsplash.com/random/100x100?face,sig=13',
     'https://source.unsplash.com/random/100x100?face,sig=14',
     'https://source.unsplash.com/random/100x100?face,sig=15',
-  ]; // 6 placeholder friend avatars
+  ];
 
   const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
@@ -45,28 +47,22 @@ const ProfileSidebar = () => {
       <div className="bg-white p-4 rounded-lg shadow-sm text-gray-700 text-sm">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Intro</h2>
         <div className="space-y-2">
-          {/* Add placeholder icons for intro details if needed based on design */}
-          {introDetails.map((detail, index) => (
-            <p key={index} className="flex items-center">
-              {/* <div className="w-4 h-4 mr-2 bg-gray-400"></div> Placeholder Icon */}
-              <span className="font-semibold mr-1">{detail.label}:</span> {detail.value}
-            </p>
-          ))}
-          {/* Add Followed by count with icon */}
-          <p className="flex items-center">
-             {/* <div className="w-4 h-4 mr-2 bg-gray-400"></div> Placeholder Icon */}
-            <span className="font-semibold mr-1">Followed by:</span> X people
-            </p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workAt}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Studied at:</span> {details.studiedAt}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from}</p>
+          {details.bio && <p className="flex items-center"><span className="font-semibold mr-1">Bio:</span> {details.bio}</p>}
+          <p className="flex items-center"><span className="font-semibold mr-1">Followed by:</span> X people</p>
         </div>
-        <button
-          className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm"
-          onClick={() => setIsEditDetailOpen(true)}
-        >Edit Details</button>
-        {isEditDetailOpen && (
-          <EditDetailModal onClose={() => setIsEditDetailOpen(false)} />
-        )}
-      </div>
+        <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm" onClick={() => setShowModal(true)}>Edit Details</button>
+        <EditDetailsModal
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          onSave={(data) => { setDetails(data); setShowModal(false); }}
+          initialData={details}
+        />
 
+      </div>
       {/* Photos section */}
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
@@ -90,7 +86,6 @@ const ProfileSidebar = () => {
           </div>
         )}
       </div>
-
       {/* Friends section */}
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <div className="flex justify-between items-center mb-4">
@@ -105,8 +100,6 @@ const ProfileSidebar = () => {
           ))}
         </div>
       </div>
-
-      {/* Add more sections as needed */}
     </div>
   );
 };
