@@ -177,7 +177,32 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         </div>
       );
     }
-    // 2-4 media: grid
+    // 3 media: custom grid (1 lớn trái, 2 nhỏ phải)
+    if (media.length === 3) {
+      return (
+        <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 300}}>
+          {/* Hình lớn bên trái */}
+          <div className="relative row-span-2 col-span-1 w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
+            {media[0].type === 'image' ? (
+              <Image src={media[0].url} alt="Post media 1" fill style={{objectFit:'cover'}} className="" />
+            ) : (
+              <video src={media[0].url} controls className="w-full h-full object-cover bg-black" />
+            )}
+          </div>
+          {/* 2 hình nhỏ bên phải */}
+          {[1,2].map(i => (
+            <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
+              {media[i].type === 'image' ? (
+                <Image src={media[i].url} alt={`Post media ${i+1}`} fill style={{objectFit:'cover'}} className="" />
+              ) : (
+                <video src={media[i].url} controls className="w-full h-full object-cover bg-black" />
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    // 2, 4 media: grid
     const gridClass = media.length === 2 ? 'grid-cols-2' : 'grid-cols-2 grid-rows-2';
     return (
       <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>

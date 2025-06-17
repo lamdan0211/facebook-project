@@ -63,6 +63,37 @@ export interface WatchVideoData {
 
 export const initialPosts: PostData[] = [
   {
+    author: { name: 'Facebook User', avatar: 'https://randomuser.me/api/portraits/men/99.jpg' },
+    timeAgo: '1 min ago',
+    content: 'This is a saved post! 🎉',
+    media: [
+      { type: 'image', url: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg' },
+      { type: 'image', url: 'https://images.pexels.com/photos/461382/pexels-photo-461382.jpeg' },
+      { type: 'image', url: 'https://images.pexels.com/photos/127513/pexels-photo-127513.jpeg' }
+    ],
+    reactions: { like: 100, love: 50, haha: 10, wow: 5, sad: 0, angry: 0 },
+    comments: [
+      { author: { name: 'Saved Friend', avatar: 'https://randomuser.me/api/portraits/women/88.jpg' }, content: 'I saved this too!', timeAgo: 'Just now', likes: 2 }
+    ],
+    shares: 10,
+    taggedPeople: [
+      { name: 'Tag One', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' }
+    ],
+    isSaved: true,
+  },
+  {
+    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+    timeAgo: '2 hours ago',
+    content: 'Another saved post for testing.',
+    media: [
+      { type: 'image', url: 'https://images.pexels.com/photos/2473143/pexels-photo-2473143.jpeg' }
+    ],
+    reactions: { like: 20, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
+    comments: [],
+    shares: 2,
+    isSaved: true,
+  },
+  {
     author: { name: ' Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
     timeAgo: '5 mins',
     content: 'Not having fun at all 😂',
