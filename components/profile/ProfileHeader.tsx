@@ -1,4 +1,6 @@
+'use client';
 import Image from 'next/image';
+import { useAuth } from '../auth/AuthContext';
 
 interface ProfileHeaderProps {
   coverPhotoUrl: string;
@@ -11,6 +13,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profilePictureUrl,
   userName,
 }) => {
+  const { user } = useAuth();
   return (
     <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
       {/* Cover Photo */}
@@ -36,7 +39,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
 
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{userName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{user?.fullname}</h1>
           <p className="text-gray-600 text-sm mt-1">X friends</p>
         </div>
 

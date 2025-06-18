@@ -52,7 +52,6 @@ const ProfileSidebar = () => {
           <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn}</p>
           <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from}</p>
           {details.bio && <p className="flex items-center"><span className="font-semibold mr-1">Bio:</span> {details.bio}</p>}
-          <p className="flex items-center"><span className="font-semibold mr-1">Followed by:</span> X people</p>
         </div>
         <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm" onClick={() => setShowModal(true)}>Edit Details</button>
         <EditDetailsModal
@@ -68,13 +67,58 @@ const ProfileSidebar = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">Photos</h2>
         </div>
-        <div className="grid grid-cols-3 gap-1">
-          {photos.map((photoUrl, index) => (
-            <div key={index} className="w-full aspect-square bg-gray-300 rounded overflow-hidden cursor-pointer" onClick={() => { setPhotoModalIndex(index); setIsPhotoModalOpen(true); }}>
-              <Image src={photoUrl} alt={`Photo ${index + 1}`} width={100} height={100} objectFit="cover" />
+        {/* Responsive photo grid giống dashboard */}
+        {(() => {
+          const count = photos.length;
+          if (count === 0) return <div className="text-gray-400 text-center py-4">No photos yet.</div>;
+          if (count === 1) {
+            return (
+              <div className="relative w-full aspect-square bg-gray-300 rounded overflow-hidden cursor-pointer" onClick={() => { setPhotoModalIndex(0); setIsPhotoModalOpen(true); }}>
+                <Image src={photos[0]} alt="Photo 1" fill style={{objectFit:'cover'}} />
+              </div>
+            );
+          }
+          if (count === 2) {
+            return (
+              <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden">
+                {photos.slice(0,2).map((url, i) => (
+                  <div key={i} className="relative w-full aspect-square bg-gray-300 cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
+                    <Image src={url} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+          if (count === 3) {
+            return (
+              <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 200}}>
+                <div className="relative row-span-2 col-span-1 w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(0); setIsPhotoModalOpen(true); }}>
+                  <Image src={photos[0]} alt="Photo 1" fill style={{objectFit:'cover'}} />
+                </div>
+                {[1,2].map(i => (
+                  <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
+                    <Image src={photos[i]} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+          // 4+ ảnh: 2x2 grid, ảnh cuối overlay số lượng còn lại
+          return (
+            <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 200}}>
+              {photos.slice(0,4).map((url, i) => (
+                <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
+                  <Image src={url} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                  {i === 3 && count > 4 && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-2xl font-bold z-10">
+                      +{count-4}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
         {isPhotoModalOpen && photoModalIndex !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setIsPhotoModalOpen(false)}>
             <div className="relative max-w-2xl w-full flex items-center justify-center" onClick={e => e.stopPropagation()}>

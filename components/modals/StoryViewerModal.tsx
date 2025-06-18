@@ -93,7 +93,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-1 hover:bg-gray-800 rounded-full z-20"
+          className="absolute right-4 top-8 p-1 hover:bg-gray-800 rounded-full z-20"
         >
           <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -101,7 +101,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         </button>
 
         {/* Header: avatar, name, time */}
-        <div className="flex items-center gap-3 absolute left-4 top-4 z-10">
+        <div className="flex items-center gap-3 absolute left-4 top-8 z-10">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-500">
             <Image src={story.user.avatar} alt={story.user.name} width={40} height={40} className="object-cover" />
           </div>
@@ -147,20 +147,6 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
           </svg>
         </button>
 
-        {/* Reactions */}
-        <div className="flex justify-center gap-2 mt-4 mb-2">
-          {reactions.map(r => (
-            <button key={r.label} className="text-2xl hover:scale-125 transition-transform" title={r.label}>{r.emoji}</button>
-          ))}
-        </div>
-
-        {/* Reply input */}
-        <div className="w-full px-4 pb-4">
-          <input
-            className="w-full rounded-full px-4 py-2 bg-gray-800 text-white placeholder-gray-400 focus:outline-none"
-            placeholder="Reply..."
-          />
-        </div>
       </div>
     </div>
   );

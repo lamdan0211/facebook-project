@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { PostData } from '@/lib/dummyData';
 import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/components/auth/AuthContext';
+import Avatar from '../user/Avatar';
 
 const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,18 +35,14 @@ const ProfileContent = () => {
       {/* Create Post section */}
       <div className="bg-white p-4 rounded-lg shadow-sm">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Create Post</h2>
-        <div className="flex items-center mb-4">
-           <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-300 flex-shrink-0">
-             {/* Placeholder for current user avatar */}
-             {/* Using online placeholder image URL */}
-             <Image src="https://source.unsplash.com/random/100x100?current-user-avatar,sig=25" alt="Your Avatar" width={40} height={40} objectFit="cover" />
-           </div>
+        <div className="flex items-center mb-4 gap-2">
+          <Avatar author={{name:user?.fullname, avatar: "from-red-600 to-red-300"}} />
            <div
              onClick={handleOpenModal}
              className="flex-1 p-2 bg-gray-100 rounded-full text-sm text-gray-500 cursor-pointer hover:bg-gray-200"
              style={{ minHeight: '40px', paddingTop: '10px', paddingBottom: '10px' }}
            >
-             What's on your mind, User Name?
+             What's on your mind, {user?.fullname}?
            </div>
         </div>
         <div className="flex justify-around border-t border-gray-200 pt-3 -mx-4 px-4">

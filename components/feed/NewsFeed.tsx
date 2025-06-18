@@ -90,10 +90,10 @@ const NewsFeed = () => {
     <div className="space-y-4 max-w-xl mx-auto mt-4">
       {/* Create Post Section - Trigger Button */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200 mb-4">
-        <div className="flex items-center mb-4 cursor-pointer gap-2"> {/* Added onClick here */}
+        <div className="flex items-center mb-4 cursor-pointer gap-2 "> {/* Added onClick here */}
           {/* User Avatar */}
            <Link href="/profile">
-           <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+           <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
            </Link>
           {/* Placeholder Input field */}
           <div className="flex-1 bg-gray-100 rounded-full py-2 px-4 text-gray-500 text-sm"  onClick={handleOpenModal}>

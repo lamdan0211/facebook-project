@@ -20,10 +20,12 @@ import Avatar from '../user/Avatar';
     .toUpperCase();
 }
 
+
 interface Person {
   name: string;
   avatar: string;
 }
+
 
 export interface PostProps {
   author: {
@@ -205,7 +207,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     // 2, 4 media: grid
     const gridClass = media.length === 2 ? 'grid-cols-2' : 'grid-cols-2 grid-rows-2';
     return (
-      <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 200}}>
+      <div className={`grid gap-1 rounded-lg overflow-hidden ${gridClass}`} style={{height: media.length > 2 ? 300 : 400}}>
         {media.slice(0,4).map((m, i) => (
           <div key={i} className="relative w-full h-full  cursor-pointer" onClick={() => handleOpenMediaViewer(i)}>
             {m.type === 'image' ? (
@@ -214,7 +216,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
               <video src={m.url} controls className="w-full h-full object-cover bg-black" />
             )}
             {i === 3 && media.length > 4 && (
-              <div className="absolute inset-0 bg-gray-900/70 bg-opacity-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gray-900/80 bg-opacity-50 flex items-center justify-center">
                 <span className="text-white text-2xl font-bold">+{media.length-4}</span>
               </div>
             )}
@@ -223,17 +225,16 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       </div>
     );
   };
-
+ console.log(user);
+ 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
       <div className="flex items-center mb-3 gap-2">
-      <div className={`w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0`}>
-      <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
-      </div>
+        <Avatar author={{name:user?.fullname, avatar: "from-red-600 to-red-300"}} />
         <div>
           <div className="flex items-center gap-1">
-            <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+            <span className="font-semibold text-gray-800 text-sm">{user?.fullname}</span>
             
             {/* Tag people display */}
             {taggedPeople && taggedPeople.length > 0 && (
@@ -408,7 +409,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <div className="mt-4">
           <form onSubmit={handleCommentSubmit} className="flex items-center">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
-              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
             </div>
             <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <input

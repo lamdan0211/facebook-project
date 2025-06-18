@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React from 'react'
-function getInitials(name: string): string {
+function getInitials(name: string | undefined | null): string {
+    if (!name || typeof name !== 'string') return 'U';
     return name
         .split(' ')
         .map(word => word[0])

@@ -229,10 +229,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             {/* User Info and Privacy Selector */}
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden mr-2">
-                <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.displayName || "User"}} />
+                <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
               </div>
               <div>
-                <p className="font-semibold text-sm">{user?.displayName || "User"}</p>
+                <p className="font-semibold text-sm">{user?.fullname}</p>
                 <div className="relative">
                   <button
                     type="button"
