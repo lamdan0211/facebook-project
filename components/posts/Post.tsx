@@ -9,6 +9,7 @@ import MediaViewerModal from '../modals/MediaViewerModal';
 import EditPostModal from '../modals/EditPostModal';
 import { usePostContext } from '@/context/PostContext';
 import Avatar from '../user/Avatar';
+import EmojiPicker from 'emoji-picker-react';
 
 
  function getInitials(name: string): string {
@@ -77,6 +78,9 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
   const { updatePost } = usePostContext();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const emojiList = ['😀','😂','😍','😢','😮','😡','👍','❤️','🎉','😆','😎','🙏'];
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -163,6 +167,12 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       likes: 0
     };
     setAllComments(prev => [...prev, newComment]);
+  };
+
+  const handleEmojiClick = (emojiData: any) => {
+    setCommentText(prev => prev + emojiData.emoji);
+    setShowEmoji(false);
+    inputRef.current?.focus();
   };
 
   // Render media grid giống Facebook
@@ -411,16 +421,22 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
               <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
             </div>
-            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
+            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2 relative">
               <input
+                ref={inputRef}
                 type="text"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
                 className="flex-1 bg-transparent focus:outline-none text-sm"
               />
-              <div className="flex space-x-2 ml-2 text-gray-500">
-                <button type="button" className="hover:text-gray-700">😊</button>
+              <div className="flex space-x-2 ml-2 text-gray-500 relative">
+                <button type="button" className="hover:text-gray-700" onClick={() => setShowEmoji(v => !v)}>😊</button>
+                {showEmoji && (
+                  <div className="absolute bottom-10 right-0 z-50">
+                    <EmojiPicker onEmojiClick={handleEmojiClick} height={350} width={300} />
+                  </div>
+                )}
               </div>
             </div>
           </form>
