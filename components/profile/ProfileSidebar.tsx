@@ -17,24 +17,24 @@ const ProfileSidebar = () => {
 
   // Using online placeholder image URLs for photos and friends
   const photos = [
-    'https://source.unsplash.com/random/100x100?landscape,sig=1',
-    'https://source.unsplash.com/random/100x100?landscape,sig=2',
-    'https://source.unsplash.com/random/100x100?landscape,sig=3',
-    'https://source.unsplash.com/random/100x100?landscape,sig=4',
-    'https://source.unsplash.com/random/100x100?landscape,sig=5',
-    'https://source.unsplash.com/random/100x100?landscape,sig=6',
-    'https://source.unsplash.com/random/100x100?landscape,sig=7',
-    'https://source.unsplash.com/random/100x100?landscape,sig=8',
-    'https://source.unsplash.com/random/100x100?landscape,sig=9',
+    'https://images.pexels.com/photos/31173336/pexels-photo-31173336.jpeg',
+    'https://images.pexels.com/photos/15367435/pexels-photo-15367435.jpeg',
+    'https://images.pexels.com/photos/23719794/pexels-photo-23719794.jpeg',
+    'https://images.pexels.com/photos/6498732/pexels-photo-6498732.jpeg',
+    'https://images.pexels.com/photos/10983885/pexels-photo-10983885.jpeg',
+    'https://images.pexels.com/photos/18051140/pexels-photo-18051140.jpeg',
+    'https://images.pexels.com/photos/6498283/pexels-photo-6498283.jpeg',
+    'https://images.pexels.com/photos/18253365/pexels-photo-18253365.jpeg',
+    'https://images.pexels.com/photos/7849511/pexels-photo-7849511.jpeg',
   ];
 
   const friends = [
-    'https://source.unsplash.com/random/100x100?face,sig=10',
-    'https://source.unsplash.com/random/100x100?face,sig=11',
-    'https://source.unsplash.com/random/100x100?face,sig=12',
-    'https://source.unsplash.com/random/100x100?face,sig=13',
-    'https://source.unsplash.com/random/100x100?face,sig=14',
-    'https://source.unsplash.com/random/100x100?face,sig=15',
+    'https://images.pexels.com/photos/32371659/pexels-photo-32371659.jpeg',
+    'https://images.pexels.com/photos/30173732/pexels-photo-30173732.jpeg',
+    'https://images.pexels.com/photos/21085358/pexels-photo-21085358.jpeg',
+    'https://images.pexels.com/photos/7915359/pexels-photo-7915359.jpeg',
+    'https://images.pexels.com/photos/3761264/pexels-photo-3761264.jpeg',
+    'https://images.pexels.com/photos/7849511/pexels-photo-7849511.jpeg',
   ];
 
   const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
@@ -122,10 +122,37 @@ const ProfileSidebar = () => {
         {isPhotoModalOpen && photoModalIndex !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" onClick={() => setIsPhotoModalOpen(false)}>
             <div className="relative max-w-2xl w-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
-              <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full z-10" onClick={() => setIsPhotoModalOpen(false)}>
-                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-              <Image src={photos[photoModalIndex]} alt={`Photo ${photoModalIndex + 1}`} width={600} height={600} className="object-contain rounded-lg max-h-[80vh] max-w-full" />
+              <div className="relative">
+                {/* Button X luôn nằm trên ảnh */}
+                <button
+                  className="absolute top-2 right-2 p-1 bg-blue-500 rounded-full z-20"
+                  onClick={() => setIsPhotoModalOpen(false)}
+                  style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
+                >
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                {/* Nút prev */}
+                <button
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-700 rounded-full p-2 z-10"
+                  onClick={() => setPhotoModalIndex(i => (i !== null && i > 0 ? i - 1 : i))}
+                  disabled={photoModalIndex === 0}
+                  aria-label="Previous photo"
+                >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                {/* Nút next */}
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-700 rounded-full p-2 z-10"
+                  onClick={() => setPhotoModalIndex(i => (i !== null && i < photos.length - 1 ? i + 1 : i))}
+                  disabled={photoModalIndex === photos.length - 1}
+                  aria-label="Next photo"
+                >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+                <Image src={photos[photoModalIndex]} alt={`Photo ${photoModalIndex + 1}`} width={600} height={600} className="object-contain rounded-lg max-h-[80vh] max-w-full" />
+              </div>
             </div>
           </div>
         )}
@@ -138,8 +165,8 @@ const ProfileSidebar = () => {
         <p className="text-gray-700 text-base mb-3">X friends</p>
         <div className="grid grid-cols-3 gap-1">
           {friends.map((avatarUrl, index) => (
-            <div key={index} className="w-full aspect-square bg-gray-300 rounded-lg overflow-hidden">
-               <Image src={avatarUrl} alt={`Friend ${index + 1}`} width={100} height={100} objectFit="cover" />
+            <div key={index} className="w-full h-full aspect-square bg-gray-300">
+               <Image src={avatarUrl} alt={`Friend ${index + 1}`} width={100} height={100} style={{objectFit:'cover', width:'100%', height:'100%'}} />
             </div>
           ))}
         </div>

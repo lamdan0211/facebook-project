@@ -43,15 +43,22 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          onNext();
-          return 0;
+          return prev;
         }
         return prev + increment;
       });
     }, interval);
 
     return () => clearInterval(timer);
-  }, [currentIndex, isPaused, onNext]);
+  }, [currentIndex, isPaused]);
+
+  // Khi progress đạt 100, gọi onNext ngoài render phase
+  useEffect(() => {
+    if (progress >= 100) {
+      setProgress(0);
+      onNext();
+    }
+  }, [progress, onNext]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => onNext(),

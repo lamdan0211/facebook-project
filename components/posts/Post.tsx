@@ -180,11 +180,11 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     if (!media || media.length === 0) return null;
     if (media.length === 1) {
       return media[0].type === 'image' ? (
-        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+        <div className="relative w-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
           <Image src={media[0].url} alt="Post media" fill style={{ objectFit: 'cover' }} className="rounded-lg" />
         </div>
       ) : (
-        <div className="relative w-full cursor-pointer" style={{ paddingBottom: '60%' }} onClick={() => handleOpenMediaViewer(0)}>
+        <div className="relative w-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
           <video src={media[0].url} controls className="w-full rounded-lg max-h-96 object-cover bg-black" />
         </div>
       );

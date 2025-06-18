@@ -19,7 +19,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Cover Photo */}
       <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative">
         <Image
-          src={coverPhotoUrl}
+          src={'https://images.pexels.com/photos/32601540/pexels-photo-32601540.jpeg'}
           alt="Cover Photo"
           layout="fill"
           objectFit="cover"
