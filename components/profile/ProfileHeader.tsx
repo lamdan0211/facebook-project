@@ -14,6 +14,7 @@ interface ProfileHeaderProps {
   userName: string;
   profileId: number;
   currentUserId: number;
+  onProfileUpdated?: () => void;
 }
 
 const defaultDetails: DetailsData = {
@@ -30,6 +31,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userName,
   profileId,
   currentUserId,
+  onProfileUpdated,
 }) => {
   const { user } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -136,11 +138,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       )}
 
       {showAvatarModal && (
-        <EditAvatarModal onClose={() => setShowAvatarModal(false)} />
+        <EditAvatarModal 
+          onClose={() => setShowAvatarModal(false)}
+          userId={currentUserId}
+          accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
+          onUploaded={typeof onProfileUpdated === 'function' ? onProfileUpdated : undefined}
+        />
       )}
 
       {showCoverModal && (
-        <EditCoverPhotoModal onClose={() => setShowCoverModal(false)} />
+        <EditCoverPhotoModal 
+          onClose={() => setShowCoverModal(false)}
+          userId={currentUserId}
+          accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
+          onUploaded={typeof onProfileUpdated === 'function' ? onProfileUpdated : undefined}
+        />
       )}
     </div>
   );

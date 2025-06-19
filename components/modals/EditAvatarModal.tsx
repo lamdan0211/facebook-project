@@ -3,35 +3,71 @@ import React, { useRef, useState } from 'react';
 
 interface EditAvatarModalProps {
   onClose: () => void;
+  userId: number;
+  accessToken: string;
+  onUploaded?: () => void;
 }
 
-const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose }) => {
+const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, accessToken, onUploaded }) => {
   const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
+    const f = e.target.files?.[0];
+    if (f) {
+      setFile(f);
+      setPreview(URL.createObjectURL(f));
+      setError(null);
+      console.log('Chọn file:', f);
     }
   };
 
-  const handleSave = () => {
-    if (!preview) return;
+  const handleUpload = async () => {
+    if (!file) return;
     setLoading(true);
-    // Giả lập upload và cập nhật user.photoURL trong sessionStorage
-    setTimeout(() => {
-      const userStr = sessionStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        user.photoURL = preview;
-        sessionStorage.setItem('user', JSON.stringify(user));
+    setError(null);
+    try {
+      // 1. Upload file
+      const formData = new FormData();
+      formData.append('file', file);
+      console.log('Bắt đầu upload file:', file);
+      const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      const uploadData = await uploadRes.json();
+      console.log('Kết quả upload:', uploadData);
+      if (!uploadData.path) throw new Error('Không nhận được path từ API upload');
+      const imageUrl = `http://localhost:3301/${uploadData.path}`;
+      // 2. Gọi API update profilepic
+      console.log('Gọi PUT update profilepic:', imageUrl);
+      const updateRes = await fetch(`http://localhost:3301/backend/user/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ profilepic: imageUrl })
+      });
+      const updateData = await updateRes.json();
+      console.log('Kết quả update profilepic:', updateData);
+      if (onUploaded) {
+        console.log('Gọi callback onUploaded');
+        onUploaded();
       }
-      setLoading(false);
       onClose();
-      window.location.reload();
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi không xác định');
+      console.error('Lỗi upload avatar:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,12 +102,13 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose }) => {
             Chọn ảnh mới
           </button>
           <button
-            className="px-7 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 cursor-pointer"
-            onClick={handleSave}
-            disabled={!preview || loading}
+            className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 mt-4"
+            onClick={handleUpload}
+            disabled={loading || !file}
           >
-            {loading ? 'Đang lưu...' : 'Lưu avatar'}
+            {loading ? 'Đang lưu...' : 'Lưu ảnh đại diện'}
           </button>
+          {error && <div className="text-red-500 mt-2">{error}</div>}
         </div>
       </div>
     </div>

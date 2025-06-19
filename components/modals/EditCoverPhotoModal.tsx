@@ -3,71 +3,106 @@ import React, { useRef, useState } from 'react';
 
 interface EditCoverPhotoModalProps {
   onClose: () => void;
+  userId: number;
+  accessToken: string;
+  onUploaded?: () => void;
 }
 
-const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose }) => {
+const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, userId, accessToken, onUploaded }) => {
   const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
+    const f = e.target.files?.[0];
+    if (f) {
+      setFile(f);
+      setPreview(URL.createObjectURL(f));
+      setError(null);
+      console.log('Chọn file cover:', f);
     }
   };
 
-  const handleSave = () => {
-    if (!preview) return;
+  const handleUpload = async () => {
+    if (!file) return;
     setLoading(true);
-    // Lưu cover photo tạm vào localStorage
-    setTimeout(() => {
-      localStorage.setItem('temp_cover_photo', preview);
-      setLoading(false);
+    setError(null);
+    try {
+      // 1. Upload file
+      const formData = new FormData();
+      formData.append('file', file);
+      console.log('Bắt đầu upload file cover:', file);
+      const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      const uploadData = await uploadRes.json();
+      console.log('Kết quả upload cover:', uploadData);
+      if (!uploadData.path) throw new Error('Không nhận được path từ API upload');
+      const imageUrl = `http://localhost:3301/${uploadData.path}`;
+      // 2. Gọi API update coverpic
+      console.log('Gọi PUT update coverpic:', imageUrl);
+      const updateRes = await fetch(`http://localhost:3301/backend/user/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ coverpic: imageUrl })
+      });
+      const updateData = await updateRes.json();
+      console.log('Kết quả update coverpic:', updateData);
+      if (onUploaded) {
+        console.log('Gọi callback onUploaded');
+        onUploaded();
+      }
       onClose();
-      window.location.reload();
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi không xác định');
+      console.error('Lỗi upload coverpic:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 relative" onClick={e => e.stopPropagation()}>
-        <button className="absolute right-4 top-4 p-1 hover:bg-gray-100 rounded-full" onClick={onClose}>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        <h2 className="text-lg font-semibold text-center mb-4">Cập nhật Cover Photo</h2>
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-full h-40 md:h-60 lg:h-80 rounded-lg overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative">
-            {preview ? (
-              <img src={preview} alt="Cover preview" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-gray-400 flex items-center justify-center w-full h-full">Chưa chọn ảnh</span>
-            )}
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <button
-            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-          >
-            Chọn ảnh mới
-          </button>
-          <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 cursor-pointer"
-            onClick={handleSave}
-            disabled={!preview || loading}
-          >
-            {loading ? 'Đang lưu...' : 'Lưu cover photo'}
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4">Chỉnh sửa ảnh cover</h2>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        <div className="w-full h-40 object-cover rounded mb-4 flex items-center justify-center bg-gray-200 overflow-hidden cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          {preview ? (
+            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-gray-500">Chưa chọn ảnh</span>
+          )}
         </div>
+        <button
+          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 mt-4"
+          onClick={handleUpload}
+          disabled={loading || !file}
+        >
+          {loading ? 'Đang lưu...' : 'Lưu ảnh cover'}
+        </button>
+        <button
+          className="w-full py-2 mt-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300"
+          onClick={onClose}
+          disabled={loading}
+        >
+          Hủy
+        </button>
+        {error && <div className="text-red-500 mt-2">{error}</div>}
       </div>
     </div>
   );
