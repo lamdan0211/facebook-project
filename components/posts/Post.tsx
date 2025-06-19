@@ -31,6 +31,7 @@ export interface PostProps {
   author: {
     name: string;
     avatar: string;
+    email: string;
   };
   timeAgo: string;
   content: string;
@@ -47,6 +48,7 @@ export interface PostProps {
   shares: number;
   taggedPeople?: Person[];
   onDelete?: () => void;
+  onEdit?: (updatedPost: any) => void;
 }
 
 const Post: React.FC<PostProps & { index?: number }> = ({
@@ -59,6 +61,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   shares,
   taggedPeople,
   onDelete,
+  onEdit,
   index,
 }) => {
   const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
@@ -119,6 +122,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         author: {
           name: user?.displayName || 'User',
           avatar: user?.photoURL || "/default-avatar.png",
+          email: user?.email || '',
         },
         content: commentText,
         timeAgo: 'Just now',
@@ -161,6 +165,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       author: {
         name: user.displayName || 'User',
         avatar: user.photoURL || '/default-avatar.png',
+        email: user.email || '',
       },
       content: text,
       timeAgo: 'Just now',
@@ -283,7 +288,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             </svg>
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                {user && user.displayName === author.name && (
+                {user && user.email && author.email && user.email === author.email && (
                   <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
                     <span className="text-lg mr-3">✏️</span>
                     <span>
@@ -305,7 +310,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           <button
             className="p-1 hover:bg-gray-100 rounded-full"
             onClick={onDelete}
-            aria-label="Close post"
+            aria-label="Delete post"
           >
             <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -475,12 +480,12 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       )}
 
       {/* Edit Modal */}
-      {showEditModal && user && user.displayName === author.name && (
+      {showEditModal && user && user.email && author.email && user.email === author.email && (
         <EditPostModal
           post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
           onClose={() => setShowEditModal(false)}
           onEdit={(updatedPost) => {
-            if (typeof index === 'number') updatePost(index, updatedPost);
+            if (typeof index === 'number' && onEdit) onEdit(updatedPost);
             setShowEditModal(false);
           }}
         />

@@ -4,6 +4,7 @@ import EmojiPicker from 'emoji-picker-react';
 import TagPeopleModal from './TagPeopleModal';
 import { PostData } from '@/lib/dummyData';
 import { useAuth } from '../auth/AuthContext';
+import Avatar from '../user/Avatar';
 
 interface Person {
   id?: string;
@@ -116,16 +117,8 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
         <form onSubmit={handleSubmit}>
           <div className="p-4">
             {/* User Info and Privacy Selector */}
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full overflow-hidden mr-2">
-                <Image
-                  src={user?.photoURL || post.author.avatar || "/default-avatar.png"}
-                  alt="Your Avatar"
-                  width={40}
-                  height={40}
-                  className="object-cover"
-                />
-              </div>
+            <div className="flex items-center mb-4 gap-2">
+            <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
               <div>
                 <p className="font-semibold text-sm">{user?.displayName || post.author.name || "User"}</p>
                 {/* Audience dropdown (optional) */}

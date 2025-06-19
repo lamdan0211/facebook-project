@@ -4,6 +4,7 @@ export interface CommentData {
   author: {
     name: string;
     avatar: string;
+    email?: string;
   };
   content: string;
   timeAgo: string;
@@ -15,6 +16,7 @@ export interface PostData {
   author: {
     name: string;
     avatar: string;
+    email: string;
   };
   timeAgo: string;
   content: string;
@@ -63,7 +65,7 @@ export interface WatchVideoData {
 
 export const initialPosts: PostData[] = [
   {
-    author: { name: 'Facebook User', avatar: 'https://randomuser.me/api/portraits/men/99.jpg' },
+    author: { name: 'Facebook User', avatar: 'https://randomuser.me/api/portraits/men/99.jpg', email: 'facebookuser@example.com' },
     timeAgo: '1 min ago',
     content: 'This is a saved post! 🎉',
     media: [
@@ -73,7 +75,7 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 100, love: 50, haha: 10, wow: 5, sad: 0, angry: 0 },
     comments: [
-      { author: { name: 'Saved Friend', avatar: 'https://randomuser.me/api/portraits/women/88.jpg' }, content: 'I saved this too!', timeAgo: 'Just now', likes: 2 }
+      { author: { name: 'Saved Friend', avatar: 'https://randomuser.me/api/portraits/women/88.jpg', email: 'savedfriend@example.com' }, content: 'I saved this too!', timeAgo: 'Just now', likes: 2 }
     ],
     shares: 10,
     taggedPeople: [
@@ -82,7 +84,7 @@ export const initialPosts: PostData[] = [
     isSaved: true,
   },
   {
-    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'anna@example.com' },
     timeAgo: '2 hours ago',
     content: 'Another saved post for testing.',
     media: [
@@ -94,7 +96,7 @@ export const initialPosts: PostData[] = [
     isSaved: true,
   },
   {
-    author: { name: ' Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+    author: { name: ' Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'russo@example.com' },
     timeAgo: '5 mins',
     content: 'Not having fun at all 😂',
     media: [
@@ -102,8 +104,8 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 15, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [
-       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Great post!', timeAgo: '1 min ago', likes: 5 },
-       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }, content: 'Thanks!', timeAgo: '30 seconds ago', likes: 3 },
+       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'jenny@example.com' }, content: 'Great post!', timeAgo: '1 min ago', likes: 5 },
+       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'tomrusso@example.com' }, content: 'Thanks!', timeAgo: '30 seconds ago', likes: 3 },
     ],
     shares: 100,
     taggedPeople: [
@@ -114,7 +116,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg' },
+    author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg', email: 'anna@example.com' },
     timeAgo: '1 hour ago',
     content: 'Loving this view!',
     media: [
@@ -122,7 +124,7 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 50, love: 30, haha: 10, wow: 5, sad: 2, angry: 1 },
     comments: [
-      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
+      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'dennis@example.com' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
     ],
     shares: 20,
     taggedPeople: [
@@ -131,7 +133,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
    {
-    author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+    author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'dennis@example.com' },
     timeAgo: '3 hours ago',
     content: 'Just a thought...',
     reactions: { like: 10, love: 1, haha: 0, wow: 0, sad: 0, angry: 0 },
@@ -140,7 +142,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Lam Dan', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+    author: { name: 'Lam Dan', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', email: 'lamdan@example.com' },
     timeAgo: '4 hours ago',
     content: 'Check out this awesome sunset!',
     media: [
@@ -152,7 +154,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Jenny Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    author: { name: 'Jenny Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', email: 'jenny@example.com' },
     timeAgo: '5 hours ago',
     content: 'Coffee time ☕',
     media: [
@@ -164,7 +166,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Tom Russo', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
+    author: { name: 'Tom Russo', avatar: 'https://randomuser.me/api/portraits/men/45.jpg', email: 'tomrusso@example.com' },
     timeAgo: '6 hours ago',
     content: 'Just finished a 10k run!',
     media: [
@@ -176,7 +178,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Anna Becklund', avatar: 'https://randomuser.me/api/portraits/women/65.jpg' },
+    author: { name: 'Anna Becklund', avatar: 'https://randomuser.me/api/portraits/women/65.jpg', email: 'anna@example.com' },
     timeAgo: '7 hours ago',
     content: 'Reading a new book today.',
     media: [
@@ -188,7 +190,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
-    author: { name: 'Dennis Han', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
+    author: { name: 'Dennis Han', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', email: 'dennis@example.com' },
     timeAgo: '8 hours ago',
     content: 'Nature walk in the park.',
     media: [

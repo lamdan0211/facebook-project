@@ -10,7 +10,7 @@ import Avatar from '../user/Avatar';
 
 const ProfileContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { posts, addNewPost } = usePostContext();
+  const { posts, addNewPost, updatePost } = usePostContext();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -78,6 +78,15 @@ const ProfileContent = () => {
             <PostCard 
               key={index}
               post={post}
+              onEdit={updatedPost => updatePost(index, updatedPost)}
+              onDelete={() => {
+                const postIndex = posts.findIndex(p => p === post);
+                if (postIndex !== -1) {
+                  posts.splice(postIndex, 1);
+                  updatePost(postIndex, { ...post, deleted: true });
+                }
+              }}
+              index={index}
             />
           ))
         )}

@@ -7,9 +7,12 @@ import Post from '@/components/posts/Post';
 
 interface PostCardProps {
   post: PostData;
+  onEdit?: (updatedPost: PostData) => void;
+  onDelete?: () => void;
+  index?: number;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, index }) => {
   const [showReactionMenu, setShowReactionMenu] = useState(false);
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -60,7 +63,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
   const reactionButtonProps = getReactionButtonProps();
 
-  return <Post {...post} />;
+  return <Post {...post} onEdit={onEdit} onDelete={onDelete} index={index} />;
 };
 
 export default PostCard; 

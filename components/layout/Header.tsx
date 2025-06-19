@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import ProfileDropdown from './_ProfileDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

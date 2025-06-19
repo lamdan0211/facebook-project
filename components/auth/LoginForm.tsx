@@ -48,7 +48,7 @@ const LoginForm = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 transition-colors"
+                className="w-full bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 transition-colors cursor-pointer"
                 disabled={loading}
               >
                 Log in
@@ -68,12 +68,14 @@ const LoginForm = () => {
               </div>
               <GoogleSignInButton />
               <div className="text-center">
-                <button
-                  type="button"
-                  className="bg-green-500 text-white px-6 py-3 rounded-md font-bold hover:bg-green-600 transition-colors"
-                >
-                  Create new account
-                </button>
+                <Link href="/register">
+                  <button
+                    type="button"
+                    className="bg-green-500 text-white px-6 py-3 rounded-md font-bold hover:bg-green-600 transition-colors cursor-pointer"
+                  >
+                    Create new account
+                  </button>
+                </Link>
               </div>
             </form>
           </div>
