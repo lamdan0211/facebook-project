@@ -100,16 +100,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer">
               <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
             </button>
-            <button
-              className="z-50 flex items-center px-3 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 transition duration-300 text-sm cursor-pointer"
-              onClick={() => {
-                setShowEditModal(true)
-                console.log('showEditModal', showEditModal)
-              }}
-            >
-              <Image src="/images/icon-edit.png" width={16} height={16} alt="Edit Profile"  className='gap-[10] flex mr-2'/>
-              <span>Edit Profile</span>
-            </button>
           </>
         )}
       </div>
