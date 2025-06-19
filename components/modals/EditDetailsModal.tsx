@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface EditDetailsModalProps {
   open: boolean;
@@ -18,6 +18,12 @@ export interface DetailsData {
 
 const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSave, initialData }) => {
   const [form, setForm] = useState<DetailsData>(initialData);
+
+  useEffect(() => {
+    if (open) {
+      setForm(initialData);
+    }
+  }, [open, initialData]);
 
   if (!open) return null;
 

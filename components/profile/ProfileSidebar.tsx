@@ -159,10 +159,12 @@ const ProfileSidebar = () => {
       </div>
       {/* Friends section */}
       <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Friends</h2>
+        <div className='flex flex-row gap-2 items-center justify-between'>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Friends</h2>
+          </div>
+          <p className="text-gray-700 text-base mb-3">54 friends</p>
         </div>
-        <p className="text-gray-700 text-base mb-3">X friends</p>
         <div className="grid grid-cols-3 gap-1">
           {friends.map((avatarUrl, index) => (
             <div key={index} className="w-full h-full aspect-square bg-gray-300">
