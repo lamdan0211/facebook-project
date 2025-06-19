@@ -4,6 +4,9 @@ import { useAuth } from '../auth/AuthContext';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import EditAvatarModal from '../modals/EditAvatarModal';
+import { FolderDot } from 'lucide-react';
+import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
 
 interface ProfileHeaderProps {
   coverPhotoUrl: string;
@@ -27,23 +30,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const { user } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showCoverModal, setShowCoverModal] = useState(false);
+
+  // Lấy cover photo tạm nếu có
+  let coverPhoto = coverPhotoUrl;
+  if (typeof window !== 'undefined') {
+    const temp = localStorage.getItem('temp_cover_photo');
+    if (temp) coverPhoto = temp;
+  }
 
   return (
     <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
       {/* Cover Photo */}
-      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative">
+      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group">
         <Image
-          src={'https://images.pexels.com/photos/32601540/pexels-photo-32601540.jpeg'}
+          src={coverPhoto}
           alt="Cover Photo"
           layout="fill"
           objectFit="cover"
         />
+        <button
+          className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition"
+          onClick={() => setShowCoverModal(true)}
+          title="Cập nhật cover photo"
+        >
+         <FolderDot className="w-10 h-10 text-white" />
+        </button>
       </div>
 
       {/* Profile Info and Buttons */}
       <div className="relative px-4 md:px-6 -mt-12 md:-mt-16 flex flex-col md:flex-row items-center md:items-end pb-4 border-b border-gray-200">
         {/* Profile Picture */}
-        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative">
+        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group">
           <Image
             src={profilePictureUrl}
             alt="Profile Picture"
@@ -51,6 +70,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             objectFit="cover"
             className='rounded-full max-w-[130px] max-h-[130px] absolute top-0 left-0'
           />
+          <button
+            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-full"
+            onClick={() => setShowAvatarModal(true)}
+            title="Cập nhật avatar"
+          >
+            <FolderDot className="w-6 h-6 text-white" />
+          </button>
         </div>
 
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
@@ -74,8 +100,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <Image src="/images/icon-edit.png" width={16} height={16} alt="Edit Profile"  className='gap-[10] flex mr-2'/>
             <span>Edit Profile</span>
           </button>
-
-
         </div>
       </div>
 
@@ -108,6 +132,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           initialData={details}
         />,
         document.body
+      )}
+
+      {showAvatarModal && (
+        <EditAvatarModal onClose={() => setShowAvatarModal(false)} />
+      )}
+
+      {showCoverModal && (
+        <EditCoverPhotoModal onClose={() => setShowCoverModal(false)} />
       )}
     </div>
   );
