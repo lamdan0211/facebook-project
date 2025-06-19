@@ -8,21 +8,23 @@
 
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
-      { protocol: 'https', hostname: 'randomuser.me', pathname: '/**' },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
     ],
-    domains: [
-      'images.pexels.com',
-      'lh3.googleusercontent.com',
-      'source.unsplash.com',
-      'i.pravatar.cc',
-      'firebasestorage.googleapis.com',
-      'images.remotePatterns',
-      'randomuser.me',
-    ],
+    // fallback: allow all domains (Next.js 13+)
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
-export default nextConfig;
+
+module.exports = nextConfig;

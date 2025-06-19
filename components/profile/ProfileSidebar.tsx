@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 
@@ -11,9 +11,21 @@ const defaultDetails: DetailsData = {
   bio: '',
 };
 
-const ProfileSidebar = () => {
+const ProfileSidebar = ({ profile }: { profile?: any }) => {
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setDetails({
+        workAt: profile.workingPlace || '',
+        studiedAt: profile.studiedAt || '',
+        livesIn: profile.birthplace || '',
+        from: profile.birthplace || '',
+        bio: profile.bio || '',
+      });
+    }
+  }, [profile]);
 
   // Using online placeholder image URLs for photos and friends
   const photos = [
@@ -48,7 +60,7 @@ const ProfileSidebar = () => {
         <h2 className="text-xl font-bold text-gray-900 mb-4">Intro</h2>
         <div className="space-y-2">
           <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workAt}</p>
-          <p className="flex items-center"><span className="font-semibold mr-1">Studied at:</span> {details.studiedAt}</p>
+          {/* <p className="flex items-center"><span className="font-semibold mr-1">Studied at:</span> {details.studiedAt}</p> */}
           <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn}</p>
           <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from}</p>
           {details.bio && <p className="flex items-center"><span className="font-semibold mr-1">Bio:</span> {details.bio}</p>}

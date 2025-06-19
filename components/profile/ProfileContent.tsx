@@ -8,7 +8,7 @@ import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/components/auth/AuthContext';
 import Avatar from '../user/Avatar';
 
-const ProfileContent = () => {
+const ProfileContent = ({ profile }: { profile?: any }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { posts, addNewPost, updatePost } = usePostContext();
   const { user } = useAuth();
