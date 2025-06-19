@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
+import { useAuth } from '../auth/AuthContext';
 
 const defaultDetails: DetailsData = {
   workAt: 'Your Company',
@@ -11,7 +12,8 @@ const defaultDetails: DetailsData = {
   bio: '',
 };
 
-const ProfileSidebar = ({ profile }: { profile?: any }) => {
+const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, currentUserId: number, profileId: number }) => {
+  const { user } = useAuth();
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
 
@@ -53,26 +55,54 @@ const ProfileSidebar = ({ profile }: { profile?: any }) => {
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [photoModalIndex, setPhotoModalIndex] = useState<number | null>(null);
 
+  const isOwner = profileId === currentUserId;
+
   return (
     <div className="w-full md:w-1/3 p-2 md:p-0 md:pr-4 space-y-4">
       {/* Intro section */}
       <div className="bg-white p-4 rounded-lg shadow-sm text-gray-700 text-sm">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Intro</h2>
         <div className="space-y-2">
-          <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workAt}</p>
-          {/* <p className="flex items-center"><span className="font-semibold mr-1">Studied at:</span> {details.studiedAt}</p> */}
-          <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn}</p>
-          <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workAt || profile?.workingPlace}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Phone:</span> {profile?.phone}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn || profile?.birthplace}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from || profile?.birthplace}</p>
           {details.bio && <p className="flex items-center"><span className="font-semibold mr-1">Bio:</span> {details.bio}</p>}
         </div>
-        <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm" onClick={() => setShowModal(true)}>Edit Details</button>
-        <EditDetailsModal
-          open={showModal}
-          onClose={() => setShowModal(false)}
-          onSave={(data) => { setDetails(data); setShowModal(false); }}
-          initialData={details}
-        />
-
+        {isOwner && (
+          <>
+            <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm" onClick={() => setShowModal(true)}>Edit Details</button>
+            <EditDetailsModal
+              open={showModal}
+              onClose={() => setShowModal(false)}
+              onSave={(data) => {
+                setDetails(data);
+                setShowModal(false);
+                if (onProfileUpdated) onProfileUpdated();
+                if (profileId === currentUserId && typeof window !== 'undefined') {
+                  const userStr = sessionStorage.getItem('user');
+                  if (userStr) {
+                    const userObj = JSON.parse(userStr);
+                    userObj.fullname = data.fullname;
+                    sessionStorage.setItem('user', JSON.stringify(userObj));
+                  }
+                }
+              }}
+              initialData={{
+                fullname: profile?.fullname || '',
+                phone: profile?.phone || '',
+                profilepic: profile?.profilepic || '',
+                coverpic: profile?.coverpic || '',
+                bio: profile?.bio || '',
+                birthplace: profile?.birthplace || '',
+                workingPlace: profile?.workingPlace || '',
+                isActive: profile?.isActive ?? true,
+              }}
+              userId={profileId}
+              accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
+            />
+          </>
+        )}
       </div>
       {/* Photos section */}
       <div className="bg-white p-4 rounded-lg shadow-sm">

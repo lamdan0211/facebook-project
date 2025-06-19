@@ -32,6 +32,20 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleProfileUpdated = async () => {
+    if (!id) return;
+    setLoading(true);
+    fetch(`http://localhost:3301/backend/user/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => setProfile(data))
+      .catch(() => setProfile(null))
+      .finally(() => setLoading(false));
+  };
+
   if (loading) return <div className="text-center py-10">Đang tải thông tin cá nhân...</div>;
   if (!profile) return <div className="text-center py-10 text-red-500">Không tìm thấy thông tin người dùng.</div>;
 
@@ -44,11 +58,11 @@ export default function ProfilePage() {
   return (
     <PostProvider>
       <div className="bg-gray-100 min-h-screen">
-        <ProfileHeader {...userData} />
+        <ProfileHeader {...userData} profileId={profile.id} currentUserId={user?.id} />
         <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-4">
           <div className="flex flex-col md:flex-row mt-4 lg:mt-6 mx-auto max-w-[1200px]">
-            <ProfileSidebar profile={profile} />
-            <ProfileContent profile={profile} />
+            <ProfileSidebar profile={profile} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} />
+            <ProfileContent profile={profile} profileId={profile.id} currentUserId={user?.id} />
           </div>
         </div>
       </div>
