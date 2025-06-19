@@ -43,12 +43,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Profile Info and Buttons */}
       <div className="relative px-4 md:px-6 -mt-12 md:-mt-16 flex flex-col md:flex-row items-center md:items-end pb-4 border-b border-gray-200">
         {/* Profile Picture */}
-        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0">
+        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative">
           <Image
             src={profilePictureUrl}
             alt="Profile Picture"
             layout="fill"
             objectFit="cover"
+            className='rounded-full max-w-[130px] max-h-[130px] absolute top-0 left-0'
           />
         </div>
 
@@ -62,13 +63,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer">
             <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
           </button>
+
           <button
-            className="flex items-center px-3 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 transition duration-300 text-sm cursor-pointer"
-            onClick={() => setShowEditModal(true)}
+            className="z-50 flex items-center px-3 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 transition duration-300 text-sm cursor-pointer"
+            onClick={() => {
+              setShowEditModal(true)
+              console.log('showEditModal', showEditModal)
+            }}
           >
             <Image src="/images/icon-edit.png" width={16} height={16} alt="Edit Profile"  className='gap-[10] flex mr-2'/>
             <span>Edit Profile</span>
           </button>
+
+
         </div>
       </div>
 

@@ -22,7 +22,7 @@ export default function AboutPage() {
         <LeftSidebar />
       </div>
       {/* About content right */}
-      <div className="flex-1 overflow-auto scrollbar-hide p-4 flex justify-center">
+      <div className="flex-1 overflow-auto scrollbar-hide p-4 flex justify-center pt-10">
         <div className="bg-white rounded-lg shadow p-6">
           <h1 className="text-2xl font-bold mb-6 text-blue-700">About {userName}</h1>
           <div className="space-y-4 text-gray-800 text-base">

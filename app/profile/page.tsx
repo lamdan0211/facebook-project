@@ -7,7 +7,7 @@ import { PostProvider } from '@/context/PostContext';
 export default function ProfilePage() {
   const userData = {
     coverPhotoUrl: 'https://source.unsplash.com/random/1200x400?facebook-cover',
-    profilePictureUrl: 'https://source.unsplash.com/random/200x200?face', 
+    profilePictureUrl: 'https://images.pexels.com/photos/32394873/pexels-photo-32394873.jpeg', 
     userName: 'Tên Người Dùng Giả Lập', 
   };
 

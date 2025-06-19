@@ -27,7 +27,6 @@ interface Person {
   avatar: string;
 }
 
-
 export interface PostProps {
   author: {
     name: string;
@@ -80,7 +79,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const emojiList = ['😀','😂','😍','😢','😮','😡','👍','❤️','🎉','😆','😎','🙏'];
+  const emojiList = ['😀','😂','😍','😢','😮','😡','👍','❤️','��','😆','😎','🙏'];
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -180,11 +180,11 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     if (!media || media.length === 0) return null;
     if (media.length === 1) {
       return media[0].type === 'image' ? (
-        <div className="relative w-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
+        <div className="relative w-full aspect-square cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
           <Image src={media[0].url} alt="Post media" fill style={{ objectFit: 'cover' }} className="rounded-lg" />
         </div>
       ) : (
-        <div className="relative w-full cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
+        <div className="relative w-full aspect-video cursor-pointer" onClick={() => handleOpenMediaViewer(0)}>
           <video src={media[0].url} controls className="w-full rounded-lg max-h-96 object-cover bg-black" />
         </div>
       );
@@ -484,6 +484,16 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             setShowEditModal(false);
           }}
         />
+      )}
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-8 right-8 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition"
+          aria-label="Lên đầu trang"
+        >
+          ↑
+        </button>
       )}
     </div>
   );

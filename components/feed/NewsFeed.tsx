@@ -13,22 +13,59 @@ import useRequireAuth from '@/lib/useRequireAuth';
 import { usePostContext } from '@/context/PostContext';
 import Avatar from '../user/Avatar';
 
+const PAGE_SIZE = 5;
+
 const NewsFeed = () => {
   useRequireAuth();
   const { user } = useAuth();
-  const { posts, addNewPost, removePost } = usePostContext();
-  const [loading, setLoading] = useState(false);
+  // Không dùng posts từ context, dùng state riêng cho NewsFeed
+  const [posts, setPosts] = useState<PostData[]>([]);
+  const [loading, setLoading] = useState(true);
   // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  const handleLoadMore = () => {
+  // Loading state
+  const [page, setPage] = useState(0);
+
+  // Load initial posts on mount
+  useEffect(() => {
     setLoading(true);
-    // Simulate fetching more data
     setTimeout(() => {
-      // setPosts([...posts, ...moreDummyPosts]);
+      const initial = initialDummyPosts.slice(0, PAGE_SIZE);
+      setPosts(initial);
+      setPage(1);
+      setHasMore(initialDummyPosts.length > PAGE_SIZE || moreDummyPosts.length > 0);
       setLoading(false);
-    }, 1000); // Simulate network delay
+    }, 1000);
+  }, []);
+
+  // Load more posts when scroll to bottom
+  const handleLoadMore = () => {
+    if (!hasMore || loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      // Ưu tiên lấy từ initialDummyPosts nếu còn, sau đó lấy từ moreDummyPosts
+      let nextPosts: PostData[] = [];
+      let nextPage = page;
+      if (page * PAGE_SIZE < initialDummyPosts.length) {
+        nextPosts = initialDummyPosts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+        nextPage = page + 1;
+      } else {
+        const morePage = page - Math.ceil(initialDummyPosts.length / PAGE_SIZE);
+        nextPosts = moreDummyPosts.slice(morePage * PAGE_SIZE, (morePage + 1) * PAGE_SIZE);
+        nextPage = page + 1;
+      }
+      setPosts(prev => [...prev, ...nextPosts]);
+      setPage(nextPage);
+      // Kiểm tra còn bài không
+      const totalLoaded = nextPage * PAGE_SIZE;
+      const totalAvailable = initialDummyPosts.length + moreDummyPosts.length;
+      setHasMore(totalLoaded < totalAvailable && nextPosts.length > 0);
+      setLoading(false);
+    }, 1000);
   };
 
   const handleOpenModal = () => {
@@ -62,12 +99,12 @@ const NewsFeed = () => {
   };
 
   const handleDeletePost = (index: number) => {
-    removePost(index);
+    // Implement the logic to remove the post from the state
   };
 
   // Infinite scroll effect
   useEffect(() => {
-    if (loading) return;
+    if (loading || !hasMore) return;
     const observer = new window.IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {
@@ -82,7 +119,16 @@ const NewsFeed = () => {
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [loading, posts]);
+  }, [loading, posts, hasMore]);
+
+  // Show scroll-to-top button when user scrolls down
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   console.log('user', user?.displayName);
 
@@ -97,7 +143,7 @@ const NewsFeed = () => {
            </Link>
           {/* Placeholder Input field */}
           <div className="flex-1 bg-gray-100 rounded-full py-2 px-4 text-gray-500 text-sm"  onClick={handleOpenModal}>
-            What's on your mind, Lam?
+            What's on your mind, {user?.fullname || 'User'}?
           </div>
         </div>
          {/* Added back the icons below the input field */}
@@ -136,13 +182,13 @@ const NewsFeed = () => {
       <Stories />
 
       {/* Posts List */}
-      <div className="space-y-4 mt-4">
-        {loading ? (
-          <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
-        ) : posts.length === 0 ? (
-          <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
-        ) : (
-          posts.map((post, index) => (
+      {loading && posts.length === 0 ? (
+        <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
+      ) : posts.length === 0 ? (
+        <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
+      ) : (
+        <div className="space-y-4 mt-4">
+          {posts.map((post, index) => (
             <Post
               key={index}
               author={post.author}
@@ -156,17 +202,29 @@ const NewsFeed = () => {
               onDelete={() => handleDeletePost(index)}
               index={index}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Infinite Scroll Loader */}
       <div ref={loaderRef} className="h-8 flex items-center justify-center">
-        {loading && <span className="text-gray-500">Loading...</span>}
+        {loading && posts.length > 0 && <span className="text-gray-500">Loading...</span>}
+        {!hasMore && posts.length > 0 && <span className="text-gray-400">Đã hết bài viết</span>}
       </div>
 
       {/* Create Post Modal */}
-      {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={addNewPost} />} {/* Render modal conditionally */}
+      {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={post => setPosts(prev => [post, ...prev])} />} {/* Render modal conditionally */}
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-8 right-8 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition"
+          aria-label="Lên đầu trang"
+        >
+          ↑
+        </button>
+      )}
     </div>
   );
 };

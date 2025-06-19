@@ -17,11 +17,13 @@ export interface DetailsData {
 }
 
 const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSave, initialData }) => {
+  if (typeof window === 'undefined') return null;
   const [form, setForm] = useState<DetailsData>(initialData);
 
   useEffect(() => {
     if (open) {
       setForm(initialData);
+      console.log('Modal open, initialData:', initialData);
     }
   }, [open, initialData]);
 
