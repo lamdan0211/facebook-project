@@ -47,34 +47,81 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
     e.preventDefault();
     setToast(null);
     try {
-      onClose();
-      addNew({
-        author: {
-          name: user?.displayName || user?.email || 'User',
-          email: user?.email || '',
-          avatar: user?.photoURL || "/default-avatar.png",
-        },
-        timeAgo: 'Just now',
+      const accessToken = sessionStorage.getItem('accessToken');
+      console.log('accessToken:', accessToken);
+      console.log('user:', user);
+      let mediaUrl: string[] = [];
+      if (previewMedia.length > 0) {
+        for (const media of previewMedia) {
+          const formData = new FormData();
+          formData.append('file', media.file);
+          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadRes.ok && uploadData?.path) {
+            const fullUrl = `http://localhost:3301/${uploadData.path.replace(/^\/+/, '')}`;
+            mediaUrl.push(fullUrl);
+          } else {
+            console.error('Upload failed:', uploadData);
+          }
+        }
+        console.log('mediaUrl:', mediaUrl);
+      }
+      // Map selectedAudience to isType (backend cần gì thì map lại cho đúng)
+      let isType = 0; // default: Only me
+      if (selectedAudience === 'Public') isType = 1;
+      else if (selectedAudience === 'Friends') isType = 2;
+      // ... thêm các loại khác nếu backend có
+      const payload = {
         content: postContent,
-        media: previewMedia.map(m => ({type: m.type, url: m.url})),
-        reactions: {
-          like: 0,
-          love: 0,
-          haha: 0,
-          wow: 0,
-          sad: 0,
-          angry: 0,
+        userId: user?.id,
+        isType,
+        mediaUrl,
+      };
+      console.log('POST payload:', payload);
+      const res = await fetch('http://localhost:3301/backend/post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
-        comments: [],
-        shares: 0,
-        taggedPeople: taggedPeople,
+        body: JSON.stringify(payload),
       });
+      console.log('POST /backend/post status:', res.status);
+      const result = await res.json().catch(() => null);
+      console.log('POST /backend/post response:', result);
+      if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
+      // Map lại post trả về thành PostData chuẩn
+      const mappedPost = {
+        author: {
+          name: user?.fullname || user?.email || 'User',
+          avatar: user?.profilepic || '/default-avatar.png',
+          email: user?.email || '',
+        },
+        timeAgo: result.createdAt ? new Date(result.createdAt).toLocaleString() : '',
+        content: result.content || '',
+        media: Array.isArray(result.mediaUrl)
+          ? result.mediaUrl.map((url: string) => ({ type: 'image', url }))
+          : [],
+        reactions: result.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+        comments: result.comments || [],
+        shares: result.shares || 0,
+        taggedPeople: result.taggedPeople || [],
+      };
+      addNew(mappedPost);
       setToast('Đăng bài thành công!');
       setPostContent('');
       setPreviewMedia([]);
       setTaggedPeople([]);
       setTimeout(() => setToast(null), 2000);
+      onClose();
     } catch (err) {
+      console.error('Error when posting:', err);
       setToast('Đăng bài thất bại!');
       setTimeout(() => setToast(null), 2000);
     }

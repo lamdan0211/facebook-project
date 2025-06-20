@@ -2,27 +2,54 @@
 import PostCard from '@/components/profile/PostCard';
 import Image from 'next/image';
 import CreatePostModal from '@/components/modals/CreatePostModal';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PostData } from '@/lib/dummyData';
-import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/components/auth/AuthContext';
 import Avatar from '../user/Avatar';
 
 const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, currentUserId: number, profileId: number }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { posts, addNewPost, updatePost } = usePostContext();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  const myEmail = user?.email || '';
-  const myName = user?.displayName || user?.email || 'User';
-  const myPosts = posts.filter(post =>
-    (post.author.email && post.author.email === myEmail) ||
-    post.author.name === myName ||
-    (post.taggedPeople && post.taggedPeople.some(p => p.name === myName))
-  );
+  const [posts, setPosts] = useState<PostData[]>([]);
 
   const isOwner = profileId === currentUserId;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/post/news?user_id=${profileId}&page=1&limit=30`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      const data = await res.json();
+      // Map backend data to PostData[]
+      const mappedPosts = Array.isArray(data.data)
+        ? data.data.map((item: any) => ({
+            author: {
+              name: item.user?.fullname || item.user?.email || 'User',
+              avatar: item.user?.profilepic || '/default-avatar.png',
+              email: item.user?.email || '',
+            },
+            timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
+            content: item.content || '',
+            media: Array.isArray(item.mediaUrl)
+              ? item.mediaUrl.map((url: string) => ({ type: 'image', url }))
+              : [],
+            reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+            comments: item.comments || [],
+            shares: item.shares || 0,
+            taggedPeople: item.taggedPeople || [],
+          }))
+        : [];
+      setPosts(mappedPosts);
+      setLoading(false);
+    };
+    if (profileId) fetchPosts();
+  }, [profileId]);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -75,28 +102,20 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
       <div className="space-y-4">
         {loading ? (
           <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
-        ) : myPosts.length === 0 ? (
+        ) : !Array.isArray(posts) || posts.length === 0 ? (
           <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
         ) : (
-          myPosts.map((post, index) => (
+          posts.map((post, index) => (
             <PostCard 
-              key={index}
+              key={String(index)}
               post={post}
-              onEdit={updatedPost => updatePost(index, updatedPost)}
-              onDelete={() => {
-                const postIndex = posts.findIndex(p => p === post);
-                if (postIndex !== -1) {
-                  posts.splice(postIndex, 1);
-                  updatePost(postIndex, { ...post, deleted: true });
-                }
-              }}
               index={index}
             />
           ))
         )}
       </div>
        {/* Create Post Modal */}
-       {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={addNewPost} />} {/* Render modal conditionally */}
+       {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={post => setPosts(prev => [post, ...prev])} />} {/* Render modal conditionally */}
     </div>
   );
 };
