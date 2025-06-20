@@ -19,7 +19,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
     const fetchPosts = async () => {
       setLoading(true);
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/post/news?user_id=${profileId}&page=1&limit=30`, {
+      const res = await fetch(`http://localhost:3301/backend/post/news?user=${profileId}&page=1&limit=30`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -99,14 +99,21 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
       )}
 
       {/* Posts Feed section */}
-      <div className="space-y-4">
+      <div
+        className="space-y-4"
+        style={{
+          maxHeight: '70vh',
+          overflowY: 'auto',
+          paddingRight: '4px',
+        }}
+      >
         {loading ? (
           <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
         ) : !Array.isArray(posts) || posts.length === 0 ? (
           <div className="text-center text-gray-400 py-8">Chưa có bài viết nào.</div>
         ) : (
           posts.map((post, index) => (
-            <PostCard 
+            <PostCard
               key={String(index)}
               post={post}
               index={index}

@@ -43,15 +43,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
         body: JSON.stringify({ email, password }),
       });
-      console.log('API response:', res);
+      // console.log('API response:', res);
       const data = await res.json().catch(() => null);
-      console.log('API response data:', data);
+      // console.log('API response data:', data);
       if (!res.ok) throw new Error(data?.message || 'Login failed');
       setUser(data.user);
       sessionStorage.setItem('user', JSON.stringify(data.user));
       sessionStorage.setItem('accessToken', data.accessToken);
       sessionStorage.setItem('refreshToken', data.refreshToken);
-      console.log('Đăng nhập thành công:', data);
+      // console.log('Đăng nhập thành công:', data);
       router.replace('/dashboard');
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);

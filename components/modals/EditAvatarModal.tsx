@@ -21,7 +21,6 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
       setFile(f);
       setPreview(URL.createObjectURL(f));
       setError(null);
-      console.log('Chọn file:', f);
     }
   };
 
@@ -33,7 +32,6 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
       // 1. Upload file
       const formData = new FormData();
       formData.append('file', file);
-      console.log('Bắt đầu upload file:', file);
       const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
         method: 'POST',
         body: formData,
@@ -42,11 +40,9 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
         }
       });
       const uploadData = await uploadRes.json();
-      console.log('Kết quả upload:', uploadData);
       if (!uploadData.path) throw new Error('Không nhận được path từ API upload');
       const imageUrl = `http://localhost:3301/${uploadData.path}`;
       // 2. Gọi API update profilepic
-      console.log('Gọi PUT update profilepic:', imageUrl);
       const updateRes = await fetch(`http://localhost:3301/backend/user/${userId}`, {
         method: 'PUT',
         headers: {
@@ -56,15 +52,12 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
         body: JSON.stringify({ profilepic: imageUrl })
       });
       const updateData = await updateRes.json();
-      console.log('Kết quả update profilepic:', updateData);
       if (onUploaded) {
-        console.log('Gọi callback onUploaded');
         onUploaded();
       }
       onClose();
     } catch (err: any) {
       setError(err.message || 'Lỗi không xác định');
-      console.error('Lỗi upload avatar:', err);
     } finally {
       setLoading(false);
     }

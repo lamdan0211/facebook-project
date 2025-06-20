@@ -78,23 +78,19 @@ const NewsFeed = () => {
 
   // In a real app, you would have a function here to handle submitting the new post
   const handlePostSubmit = (postContent: string) => {
-     console.log('New post content:', postContent);
      handleCloseModal();
   };
 
   // Placeholder handlers for the icons below the input
   const handleLiveVideoClick = () => {
-    console.log('Live Video icon clicked');
     handleOpenModal(); 
   };
 
   const handlePhotoVideoIconClick = () => {
-    console.log('Photo/Video icon clicked');
     handleOpenModal(); 
   };
 
   const handleFeelingActivityIconClick = () => {
-    console.log('Feeling/Activity icon clicked');
     handleOpenModal(); 
   };
 
@@ -134,8 +130,6 @@ const NewsFeed = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  console.log('user', user?.displayName);
 
   return (
     <div className="space-y-4 max-w-xl mx-auto mt-4">

@@ -36,8 +36,6 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
   const handleShare = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle share logic here
-    console.log('Sharing post with text:', shareText);
-    console.log('Selected audience:', selectedAudience);
     onClose();
   };
 

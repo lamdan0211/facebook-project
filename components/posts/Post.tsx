@@ -240,8 +240,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       </div>
     );
   };
- console.log(user);
- 
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}

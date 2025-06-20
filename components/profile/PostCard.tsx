@@ -37,7 +37,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, index }) =>
     e.preventDefault();
     if (commentText.trim()) {
       // Handle comment submission here
-      console.log('Comment submitted:', commentText);
       setCommentText('');
     }
   };

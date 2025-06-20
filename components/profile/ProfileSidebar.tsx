@@ -29,18 +29,34 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
     }
   }, [profile]);
 
-  // Using online placeholder image URLs for photos and friends
-  const photos = [
-    'https://images.pexels.com/photos/31173336/pexels-photo-31173336.jpeg',
-    'https://images.pexels.com/photos/15367435/pexels-photo-15367435.jpeg',
-    'https://images.pexels.com/photos/23719794/pexels-photo-23719794.jpeg',
-    'https://images.pexels.com/photos/6498732/pexels-photo-6498732.jpeg',
-    'https://images.pexels.com/photos/10983885/pexels-photo-10983885.jpeg',
-    'https://images.pexels.com/photos/18051140/pexels-photo-18051140.jpeg',
-    'https://images.pexels.com/photos/6498283/pexels-photo-6498283.jpeg',
-    'https://images.pexels.com/photos/18253365/pexels-photo-18253365.jpeg',
-    'https://images.pexels.com/photos/7849511/pexels-photo-7849511.jpeg',
-  ];
+  // Fetch photos from backend
+  const [photos, setPhotos] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(
+        `http://localhost:3301/backend/photo/user?user_id=${profileId}&type=0&page=1&limit=12`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = await res.json();
+      // console.log('Photo API response:', data);
+      const arr = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
+      const urls = arr.map((item: any) => {
+        if (item.url) return item.url;
+        if (item.path) return `http://localhost:3301/${item.path.replace(/^\/+/, '')}`;
+        return '';
+      });
+      setPhotos(urls.filter(Boolean));
+    };
+    if (profileId) fetchPhotos();
+  }, [profileId]);
+
+  // console.log('Photos to render:', photos);
 
   const friends = [
     'https://images.pexels.com/photos/32371659/pexels-photo-32371659.jpeg',
@@ -116,7 +132,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
           if (count === 1) {
             return (
               <div className="relative w-full aspect-square bg-gray-300 rounded overflow-hidden cursor-pointer" onClick={() => { setPhotoModalIndex(0); setIsPhotoModalOpen(true); }}>
-                <Image src={photos[0]} alt="Photo 1" fill style={{objectFit:'cover'}} />
+                <Image src={photos[0]} alt="Photo 1" fill sizes="100vw" style={{objectFit:'cover'}} />
               </div>
             );
           }
@@ -125,7 +141,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
               <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden">
                 {photos.slice(0,2).map((url, i) => (
                   <div key={i} className="relative w-full aspect-square bg-gray-300 cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
-                    <Image src={url} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                    <Image src={url} alt={`Photo ${i+1}`} fill sizes="100vw" style={{objectFit:'cover'}} />
                   </div>
                 ))}
               </div>
@@ -135,11 +151,11 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
             return (
               <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 200}}>
                 <div className="relative row-span-2 col-span-1 w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(0); setIsPhotoModalOpen(true); }}>
-                  <Image src={photos[0]} alt="Photo 1" fill style={{objectFit:'cover'}} />
+                  <Image src={photos[0]} alt="Photo 1" fill sizes="100vw" style={{objectFit:'cover'}} />
                 </div>
                 {[1,2].map(i => (
                   <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
-                    <Image src={photos[i]} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                    <Image src={photos[i]} alt={`Photo ${i+1}`} fill sizes="100vw" style={{objectFit:'cover'}} />
                   </div>
                 ))}
               </div>
@@ -150,7 +166,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
             <div className="grid grid-cols-2 grid-rows-2 gap-1 rounded-lg overflow-hidden" style={{height: 200}}>
               {photos.slice(0,4).map((url, i) => (
                 <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
-                  <Image src={url} alt={`Photo ${i+1}`} fill style={{objectFit:'cover'}} />
+                  <Image src={url} alt={`Photo ${i+1}`} fill sizes="100vw" style={{objectFit:'cover'}} />
                   {i === 3 && count > 4 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-2xl font-bold z-10">
                       +{count-4}

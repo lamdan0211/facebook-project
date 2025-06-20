@@ -48,8 +48,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
     setToast(null);
     try {
       const accessToken = sessionStorage.getItem('accessToken');
-      console.log('accessToken:', accessToken);
-      console.log('user:', user);
       let mediaUrl: string[] = [];
       if (previewMedia.length > 0) {
         for (const media of previewMedia) {
@@ -70,7 +68,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
             console.error('Upload failed:', uploadData);
           }
         }
-        console.log('mediaUrl:', mediaUrl);
       }
       // Map selectedAudience to isType (backend cần gì thì map lại cho đúng)
       let isType = 0; // default: Only me
@@ -83,7 +80,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         isType,
         mediaUrl,
       };
-      console.log('POST payload:', payload);
       const res = await fetch('http://localhost:3301/backend/post', {
         method: 'POST',
         headers: {
@@ -92,9 +88,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         },
         body: JSON.stringify(payload),
       });
-      console.log('POST /backend/post status:', res.status);
       const result = await res.json().catch(() => null);
-      console.log('POST /backend/post response:', result);
       if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
       // Map lại post trả về thành PostData chuẩn
       const mappedPost = {

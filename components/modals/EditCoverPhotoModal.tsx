@@ -21,7 +21,6 @@ const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, user
       setFile(f);
       setPreview(URL.createObjectURL(f));
       setError(null);
-      console.log('Chọn file cover:', f);
     }
   };
 
@@ -33,7 +32,6 @@ const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, user
       // 1. Upload file
       const formData = new FormData();
       formData.append('file', file);
-      console.log('Bắt đầu upload file cover:', file);
       const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
         method: 'POST',
         body: formData,
@@ -42,11 +40,9 @@ const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, user
         }
       });
       const uploadData = await uploadRes.json();
-      console.log('Kết quả upload cover:', uploadData);
       if (!uploadData.path) throw new Error('Không nhận được path từ API upload');
       const imageUrl = `http://localhost:3301/${uploadData.path}`;
       // 2. Gọi API update coverpic
-      console.log('Gọi PUT update coverpic:', imageUrl);
       const updateRes = await fetch(`http://localhost:3301/backend/user/${userId}`, {
         method: 'PUT',
         headers: {
@@ -56,15 +52,12 @@ const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, user
         body: JSON.stringify({ coverpic: imageUrl })
       });
       const updateData = await updateRes.json();
-      console.log('Kết quả update coverpic:', updateData);
       if (onUploaded) {
-        console.log('Gọi callback onUploaded');
         onUploaded();
       }
       onClose();
     } catch (err: any) {
       setError(err.message || 'Lỗi không xác định');
-      console.error('Lỗi upload coverpic:', err);
     } finally {
       setLoading(false);
     }
