@@ -28,6 +28,7 @@ interface Person {
 }
 
 export interface PostProps {
+  id: number;
   author: {
     name: string;
     avatar: string;
@@ -49,9 +50,12 @@ export interface PostProps {
   taggedPeople?: Person[];
   onDelete?: () => void;
   onEdit?: (updatedPost: any) => void;
+  isOnSavedPage?: boolean;
+  onUnsave?: () => void;
 }
 
 const Post: React.FC<PostProps & { index?: number }> = ({
+  id,
   author,
   timeAgo,
   content,
@@ -63,6 +67,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   onDelete,
   onEdit,
   index,
+  isOnSavedPage = false,
+  onUnsave,
 }) => {
   const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
   const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
@@ -84,6 +90,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const emojiList = ['😀','😂','😍','😢','😮','😡','👍','❤️','��','😆','😎','🙏'];
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -239,6 +247,44 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         ))}
       </div>
     );
+  };
+
+  const handleSavePost = async () => {
+    if (!user || !id || saveLoading) return;
+
+    setSaveLoading(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3301/backend/postsaved', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          postId: id,
+          userId: user.id,
+        }),
+      });
+
+      if (res.ok) {
+        setIsSaved(true);
+        // Có thể thêm toast/notification ở đây
+      } else {
+        // Xử lý lỗi
+        console.error("Failed to save post");
+      }
+    } catch (error) {
+      console.error("Error saving post:", error);
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const handleUnsavePost = async () => {
+    if (onUnsave) {
+      onUnsave();
+    }
   };
 
   return (
@@ -397,25 +443,35 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           )}
         </div>
         {/* Comment Button */}
-        <button 
-          className="flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer flex-1 justify-center gap-2"
+        <button
           onClick={() => setShowCommentBox(!showCommentBox)}
+          className="flex items-center justify-center flex-1 py-2 rounded-md hover:bg-gray-100 transition-colors font-semibold text-sm"
         >
-          <svg width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5.76585 19.8847C5.96698 19.9712 6.20164 20 6.40277 20C6.77152 20 7.10674 19.9135 7.37492 19.683L12.3028 16.0231C12.4368 15.9366 12.638 15.879 12.8056 15.879H17.4652C20.8845 15.879 23.6333 13.487 23.6333 10.5764V5.30259C23.6333 2.36311 20.851 0 17.4652 0H6.16812C2.74883 0 0 2.39193 0 5.30259V10.5476C0 13.0548 2.07838 15.245 4.89427 15.7349V18.7032C4.89427 19.2219 5.22949 19.683 5.76585 19.8847ZM1.67612 5.30259C1.67612 3.17003 3.68746 1.44092 6.16812 1.44092H17.4317C19.9123 1.44092 21.9237 3.17003 21.9237 5.30259V10.5187C21.9237 12.6513 19.9123 14.3804 17.4317 14.3804H12.7721C12.2022 14.3804 11.6323 14.5821 11.1965 14.8991L6.57038 18.3573V15.3602C6.57038 14.8703 6.13459 14.438 5.56471 14.3804C3.35224 14.1499 1.67612 12.5072 1.67612 10.5764V5.30259Z" fill="#2C2C2C" />
-          </svg>
-          <span>Comment</span>
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2s10 4.477 10 10z"></path></svg>
+          Comment
         </button>
-        {/* Share Button */}
-        <button 
-          className="flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer flex-1 justify-center gap-2"
-          onClick={() => setShowShareModal(true)}
-        >
-          <svg width="26" height="20" viewBox="0 0 26 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1.06616 19.9704C1.13494 20 1.23812 20 1.30691 20C1.71962 20 2.09793 19.8226 2.30429 19.4974C4.53979 16.3633 8.39174 14.3528 12.6564 14.1163V17.9008C12.6564 18.433 13.0347 18.8765 13.585 19.0834C14.1352 19.2904 14.7887 19.1721 15.2014 18.8173L24.7281 10.657C25.072 10.3614 25.244 10.0066 25.244 9.59264C25.244 9.17871 25.072 8.82392 24.7281 8.52825L15.2358 0.367937C14.8231 0.0131406 14.1696 -0.105125 13.6194 0.10184C13.0347 0.308804 12.6908 0.781866 12.6908 1.28449V4.68463C5.43399 5.57162 0 10.9823 0 17.3095C0 17.9304 0.034392 18.5217 0.137569 19.113C0.206354 19.5565 0.550274 19.8817 1.06616 19.9704ZM14.4104 4.83246V1.78712L23.49 9.59264V9.62221L14.4104 17.4277V13.9093C14.4104 13.5545 14.2384 13.1997 13.9289 12.9632C13.6194 12.7267 13.241 12.5788 12.8283 12.6084C8.39174 12.7858 4.33344 14.6485 1.68522 17.6643V17.3095C1.68522 11.6919 6.56894 6.87254 13.0691 6.13338C13.8257 6.04468 14.4104 5.48292 14.4104 4.83246Z" fill="#2C2C2C" />
-          </svg>
-          <span>Share</span>
-        </button>
+        {isOnSavedPage ? (
+          <button
+            onClick={handleUnsavePost}
+            className="flex items-center justify-center flex-1 py-2 rounded-md hover:bg-gray-100 transition-colors font-semibold text-sm text-blue-600"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5 2a1 1 0 011 1v14.586l4.293-4.293a1 1 0 011.414 0L15 17.586V3a1 1 0 011-1H6a1 1 0 01-1-1H5z" clipRule="evenodd" />
+            </svg>
+            Unsave
+          </button>
+        ) : (
+          <button
+            onClick={handleSavePost}
+            disabled={saveLoading || isSaved}
+            className={`flex items-center justify-center flex-1 py-2 rounded-md hover:bg-gray-100 transition-colors font-semibold text-sm ${isSaved ? 'text-blue-600' : 'text-gray-600'}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12l-5-3-5 3V4z" />
+            </svg>
+            {isSaved ? 'Saved' : 'Save'}
+          </button>
+        )}
       </div>
 
       {/* Comment Box */}
@@ -450,16 +506,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       {/* Comments List */}
       <CommentList comments={allComments} />
 
-      {/* Share Modal */}
-      {showShareModal && (
-        <SharePostModal
-          onClose={() => setShowShareModal(false)}
-          author={author}
-          content={content}
-          imageUrl={media?.find(m => m.type === 'image')?.url}
-        />
-      )}
-
       {showTaggedPeopleModal && (
         <TagPeopleModal
           onClose={() => setShowTaggedPeopleModal(false)}
@@ -481,7 +527,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       {/* Edit Modal */}
       {showEditModal && user && user.email && author.email && user.email === author.email && (
         <EditPostModal
-          post={{ author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
+          post={{ id, author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
           onClose={() => setShowEditModal(false)}
           onEdit={(updatedPost) => {
             if (typeof index === 'number' && onEdit) onEdit(updatedPost);

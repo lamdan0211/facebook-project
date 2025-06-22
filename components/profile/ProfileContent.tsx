@@ -29,6 +29,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
       // Map backend data to PostData[]
       const mappedPosts = Array.isArray(data.data)
         ? data.data.map((item: any) => ({
+            id: item.id,
             author: {
               name: item.user?.fullname || item.user?.email || 'User',
               avatar: item.user?.profilepic || '/default-avatar.png',
@@ -114,7 +115,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
         ) : (
           posts.map((post, index) => (
             <PostCard
-              key={String(index)}
+              key={post.id || String(index)}
               post={post}
               index={index}
             />

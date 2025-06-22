@@ -13,6 +13,7 @@ export interface CommentData {
 }
 
 export interface PostData {
+  id: number;
   author: {
     name: string;
     avatar: string;

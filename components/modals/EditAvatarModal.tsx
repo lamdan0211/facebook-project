@@ -67,12 +67,12 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">Chỉnh sửa ảnh đại diện</h2>
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
           onChange={handleFileChange}
-          className="hidden"
+            className="hidden"
         />
         <div className="w-32 h-32 rounded-full mb-4 flex items-center justify-center bg-gray-200 overflow-hidden cursor-pointer mx-auto" onClick={() => fileInputRef.current?.click()}>
           {preview ? (
@@ -81,20 +81,20 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
             <span className="text-gray-500">Chưa chọn ảnh</span>
           )}
         </div>
-        <button
+          <button
           className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 mt-4"
           onClick={handleUpload}
           disabled={loading || !file}
-        >
+          >
           {loading ? 'Đang lưu...' : 'Lưu ảnh đại diện'}
-        </button>
-        <button
+          </button>
+          <button
           className="w-full py-2 mt-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300"
           onClick={onClose}
           disabled={loading}
-        >
+          >
           Hủy
-        </button>
+          </button>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </div>
     </div>

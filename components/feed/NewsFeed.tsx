@@ -58,6 +58,7 @@ const NewsFeed = () => {
       
       if (Array.isArray(data.data)) {
         mappedPosts = data.data.map((item: any) => ({
+          id: item.id,
           author: {
             name: item.user?.fullname || item.user?.email || 'User',
             avatar: item.user?.profilepic || '/default-avatar.png',
@@ -75,6 +76,7 @@ const NewsFeed = () => {
         }));
       } else if (Array.isArray(data)) {
         mappedPosts = data.map((item: any) => ({
+          id: item.id,
           author: {
             name: item.user?.fullname || item.user?.email || 'User',
             avatar: item.user?.profilepic || '/default-avatar.png',
@@ -239,7 +241,8 @@ const NewsFeed = () => {
         <div className="space-y-4 mt-4">
           {posts.map((post, index) => (
             <Post
-              key={index}
+              key={post.id || index}
+              id={post.id}
               author={post.author}
               timeAgo={post.timeAgo}
               content={post.content}
