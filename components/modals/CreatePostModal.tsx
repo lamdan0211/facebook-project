@@ -49,37 +49,47 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
     try {
       const accessToken = sessionStorage.getItem('accessToken');
       let mediaUrl: string[] = [];
+
+      // 1. UPLOAD MEDIA
       if (previewMedia.length > 0) {
-        for (const media of previewMedia) {
-          const formData = new FormData();
-          formData.append('file', media.file);
-          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            body: formData,
-          });
-          const uploadData = await uploadRes.json();
-          if (uploadRes.ok && uploadData?.path) {
-            const fullUrl = `http://localhost:3301/${uploadData.path.replace(/^\/+/, '')}`;
-            mediaUrl.push(fullUrl);
-          } else {
-            console.error('Upload failed:', uploadData);
-          }
+        // Tạo một FormData duy nhất
+        const formData = new FormData();
+        // Thêm tất cả các file vào cùng một trường 'files'
+        previewMedia.forEach(media => {
+          formData.append('files', media.file);
+        });
+        
+        const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            // Không set Content-Type, để trình duyệt tự xử lý
+          },
+          body: formData,
+        });
+
+        const uploadData = await uploadRes.json();
+
+        if (uploadRes.ok && Array.isArray(uploadData?.paths)) {
+          mediaUrl = uploadData.paths.map((p: string) => `http://localhost:3301/${p.replace(/^\/+/, '')}`);
+        } else {
+          throw new Error(uploadData?.message || 'Upload file thất bại.');
         }
       }
-      // Map selectedAudience to isType (backend cần gì thì map lại cho đúng)
+
+      // 2. CREATE POST
       let isType = 0; // default: Only me
       if (selectedAudience === 'Public') isType = 1;
       else if (selectedAudience === 'Friends') isType = 2;
-      // ... thêm các loại khác nếu backend có
+
       const payload = {
         content: postContent,
         userId: user?.id,
         isType,
         mediaUrl,
+        friends: taggedPeople.map(p => Number(p.id)),
       };
+
       const res = await fetch('http://localhost:3301/backend/post', {
         method: 'POST',
         headers: {
@@ -88,10 +98,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         },
         body: JSON.stringify(payload),
       });
+
       const result = await res.json().catch(() => null);
       if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
-      // Map lại post trả về thành PostData chuẩn
-      const mappedPost = {
+      
+      const mappedPost: PostData = {
         author: {
           name: user?.fullname || user?.email || 'User',
           avatar: user?.profilepic || '/default-avatar.png',
@@ -107,17 +118,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         shares: result.shares || 0,
         taggedPeople: result.taggedPeople || [],
       };
+
       addNew(mappedPost);
       setToast('Đăng bài thành công!');
       setPostContent('');
       setPreviewMedia([]);
       setTaggedPeople([]);
-      setTimeout(() => setToast(null), 2000);
-      onClose();
-    } catch (err) {
+      setTimeout(() => {
+        setToast(null);
+        onClose();
+      }, 1500);
+
+    } catch (err: any) {
       console.error('Error when posting:', err);
-      setToast('Đăng bài thất bại!');
-      setTimeout(() => setToast(null), 2000);
+      setToast(err.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+      setTimeout(() => setToast(null), 3000);
     }
   };
 

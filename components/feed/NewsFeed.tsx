@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Post from '@/components/posts/Post';
 import Image from 'next/image';
-import { initialPosts as initialDummyPosts, moreDummyPosts, PostData } from '@/lib/dummyData'; // Import dummy data
+import { PostData } from '@/lib/dummyData'; // Import PostData type
 import { CommentData } from '@/lib/dummyData'; // Import CommentData for linter
 import Stories from '@/components/stories/Stories'; // Import Stories component
 import CreatePostModal from '@/components/modals/CreatePostModal'; // Corrected import path
@@ -13,59 +13,107 @@ import useRequireAuth from '@/lib/useRequireAuth';
 import { usePostContext } from '@/context/PostContext';
 import Avatar from '../user/Avatar';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 const NewsFeed = () => {
   useRequireAuth();
   const { user } = useAuth();
-  // Không dùng posts từ context, dùng state riêng cho NewsFeed
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
-  // State to control the Create Post modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  // Loading state
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   // Load initial posts on mount
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const initial = initialDummyPosts.slice(0, PAGE_SIZE);
-      setPosts(initial);
-      setPage(1);
-      setHasMore(initialDummyPosts.length > PAGE_SIZE || moreDummyPosts.length > 0);
-      setLoading(false);
-    }, 1000);
+    fetchPosts(1, true);
   }, []);
+
+  const fetchPosts = async (pageNum: number, reset: boolean = false) => {
+    if (reset) {
+      setLoading(true);
+      setPage(1);
+    }
+    
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/post/news?page=${pageNum}&limit=${PAGE_SIZE}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch posts');
+      }
+
+      const data = await res.json();
+      console.log('API Response:', data); // Debug log
+      
+      // Map backend data to PostData[] giống như ProfileContent
+      let mappedPosts: any[] = [];
+      
+      if (Array.isArray(data.data)) {
+        mappedPosts = data.data.map((item: any) => ({
+          author: {
+            name: item.user?.fullname || item.user?.email || 'User',
+            avatar: item.user?.profilepic || '/default-avatar.png',
+            email: item.user?.email || '',
+          },
+          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
+          content: item.content || '',
+          media: Array.isArray(item.mediaUrl)
+            ? item.mediaUrl.map((url: string) => ({ type: 'image', url }))
+            : [],
+          reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+          comments: item.comments || [],
+          shares: item.shares || 0,
+          taggedPeople: item.taggedPeople || [],
+        }));
+      } else if (Array.isArray(data)) {
+        mappedPosts = data.map((item: any) => ({
+          author: {
+            name: item.user?.fullname || item.user?.email || 'User',
+            avatar: item.user?.profilepic || '/default-avatar.png',
+            email: item.user?.email || '',
+          },
+          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
+          content: item.content || '',
+          media: Array.isArray(item.mediaUrl)
+            ? item.mediaUrl.map((url: string) => ({ type: 'image', url }))
+            : [],
+          reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+          comments: item.comments || [],
+          shares: item.shares || 0,
+          taggedPeople: item.taggedPeople || [],
+        }));
+      }
+      
+      console.log('Mapped Posts:', mappedPosts); // Debug log
+      
+      if (reset) {
+        setPosts(mappedPosts);
+        setHasMore(mappedPosts.length === PAGE_SIZE);
+      } else {
+        setPosts(prev => [...prev, ...mappedPosts]);
+        setHasMore(mappedPosts.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load more posts when scroll to bottom
   const handleLoadMore = () => {
     if (!hasMore || loading) return;
-    setLoading(true);
-    setTimeout(() => {
-      // Ưu tiên lấy từ initialDummyPosts nếu còn, sau đó lấy từ moreDummyPosts
-      let nextPosts: PostData[] = [];
-      let nextPage = page;
-      if (page * PAGE_SIZE < initialDummyPosts.length) {
-        nextPosts = initialDummyPosts.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-        nextPage = page + 1;
-      } else {
-        const morePage = page - Math.ceil(initialDummyPosts.length / PAGE_SIZE);
-        nextPosts = moreDummyPosts.slice(morePage * PAGE_SIZE, (morePage + 1) * PAGE_SIZE);
-        nextPage = page + 1;
-      }
-      setPosts(prev => [...prev, ...nextPosts]);
-      setPage(nextPage);
-      // Kiểm tra còn bài không
-      const totalLoaded = nextPage * PAGE_SIZE;
-      const totalAvailable = initialDummyPosts.length + moreDummyPosts.length;
-      setHasMore(totalLoaded < totalAvailable && nextPosts.length > 0);
-      setLoading(false);
-    }, 1000);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchPosts(nextPage, false);
   };
 
   const handleOpenModal = () => {
@@ -76,9 +124,11 @@ const NewsFeed = () => {
     setIsModalOpen(false);
   };
 
-  // In a real app, you would have a function here to handle submitting the new post
+  // Handle new post submission
   const handlePostSubmit = (postContent: string) => {
-     handleCloseModal();
+    handleCloseModal();
+    // Refresh posts after creating new post
+    fetchPosts(1, true);
   };
 
   // Placeholder handlers for the icons below the input
@@ -198,32 +248,41 @@ const NewsFeed = () => {
               comments={post.comments}
               shares={post.shares}
               taggedPeople={post.taggedPeople}
-              onEdit={updatedPost => handleEditPost(index, updatedPost)}
-              onDelete={() => setPosts(prev => prev.filter((_, i) => i !== index))}
-              index={index}
+              onDelete={() => handleDeletePost(index)}
+              onEdit={(updatedPost) => handleEditPost(index, updatedPost)}
             />
           ))}
         </div>
       )}
 
-      {/* Infinite Scroll Loader */}
-      <div ref={loaderRef} className="h-8 flex items-center justify-center">
-        {loading && posts.length > 0 && <span className="text-gray-500">Loading...</span>}
-        {!hasMore && posts.length > 0 && <span className="text-gray-400">Đã hết bài viết</span>}
-      </div>
+      {/* Loading indicator for infinite scroll */}
+      {hasMore && (
+        <div ref={loaderRef} className="text-center py-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
 
-      {/* Create Post Modal */}
-      {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={post => setPosts(prev => [post, ...prev])} />} {/* Render modal conditionally */}
-
-      {/* Scroll to Top Button */}
+      {/* Scroll to top button */}
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition"
-          aria-label="Lên đầu trang"
+          className="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors z-50"
         >
-          ↑
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
         </button>
+      )}
+
+      {/* Create Post Modal */}
+      {isModalOpen && (
+        <CreatePostModal
+          onClose={handleCloseModal}
+          addNew={(newPost) => {
+            setPosts(prev => [newPost, ...prev]);
+            handleCloseModal();
+          }}
+        />
       )}
     </div>
   );
