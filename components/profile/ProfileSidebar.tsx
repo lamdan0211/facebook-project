@@ -56,16 +56,32 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
     if (profileId) fetchPhotos();
   }, [profileId]);
 
-  // console.log('Photos to render:', photos);
+  // Fetch friends from backend
+  const [friends, setFriends] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchFriends = async () => {
+      const accessToken = sessionStorage.getItem('accessToken');
+      try {
+        const res = await fetch(
+          `http://localhost:3301/backend/friendrequest/friends/${profileId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setFriends(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+        setFriends([]);
+      }
+    };
+    if (profileId) fetchFriends();
+  }, [profileId]);
 
-  const friends = [
-    'https://images.pexels.com/photos/32371659/pexels-photo-32371659.jpeg',
-    'https://images.pexels.com/photos/30173732/pexels-photo-30173732.jpeg',
-    'https://images.pexels.com/photos/21085358/pexels-photo-21085358.jpeg',
-    'https://images.pexels.com/photos/7915359/pexels-photo-7915359.jpeg',
-    'https://images.pexels.com/photos/3761264/pexels-photo-3761264.jpeg',
-    'https://images.pexels.com/photos/7849511/pexels-photo-7849511.jpeg',
-  ];
+  // console.log('Photos to render:', photos);
 
   const [isEditDetailOpen, setIsEditDetailOpen] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
@@ -221,13 +237,23 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-900">Friends</h2>
           </div>
-          <p className="text-gray-700 text-base mb-3">54 friends</p>
+          <p className="text-gray-700 text-base mb-3">{friends.length} friends</p>
         </div>
         <div className="grid grid-cols-3 gap-1">
-          {friends.map((avatarUrl, index) => (
-            <div key={index} className="w-full h-full aspect-square bg-gray-300">
-               <Image src={avatarUrl} alt={`Friend ${index + 1}`} width={100} height={100} style={{objectFit:'cover', width:'100%', height:'100%'}} />
-            </div>
+          {friends.slice(0, 6).map((friend, index) => (
+            <a 
+              key={friend.id} 
+              href={`/profile/${friend.id}`}
+              className="w-full h-full aspect-square bg-gray-300 rounded overflow-hidden hover:opacity-80 transition-opacity"
+            >
+              <Image 
+                src={friend.profilepic || '/avatars/default-avatar.png'} 
+                alt={`${friend.fullname}`} 
+                width={100} 
+                height={100} 
+                style={{objectFit:'cover', width:'100%', height:'100%'}} 
+              />
+            </a>
           ))}
         </div>
       </div>

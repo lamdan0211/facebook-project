@@ -5,7 +5,7 @@ import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import EditAvatarModal from '../modals/EditAvatarModal';
-import { FolderDot } from 'lucide-react';
+import { FolderDot, UserPlus } from 'lucide-react';
 import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
 
 interface ProfileHeaderProps {
@@ -38,6 +38,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
+  const [isAddingFriend, setIsAddingFriend] = useState(false);
+  const [friendRequestSent, setFriendRequestSent] = useState(false);
 
   const isOwner = profileId === currentUserId;
 
@@ -47,6 +49,35 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     const temp = localStorage.getItem('temp_cover_photo');
     if (temp) coverPhoto = temp;
   }
+
+  const handleAddFriend = async () => {
+    if (isAddingFriend || friendRequestSent) return;
+    
+    setIsAddingFriend(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/send/${currentUserId}/${profileId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (res.ok) {
+        setFriendRequestSent(true);
+        alert('Đã gửi lời mời kết bạn thành công!');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || 'Gửi lời mời kết bạn thất bại!');
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      alert('Có lỗi xảy ra khi gửi lời mời kết bạn!');
+    } finally {
+      setIsAddingFriend(false);
+    }
+  };
 
   return (
     <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
@@ -97,12 +128,30 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
 
         {/* Action Buttons */}
-        {isOwner && (
-          <>
-            <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer">
-              <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
-            </button>
-          </>
+        {isOwner ? (
+          <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer">
+            <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
+          </button>
+        ) : (
+          <button 
+            className={`flex items-center px-3 py-2 font-semibold rounded-md shadow-sm transition duration-300 text-sm cursor-pointer ${
+              friendRequestSent 
+                ? 'bg-gray-500 text-white cursor-not-allowed' 
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+            onClick={handleAddFriend}
+            disabled={isAddingFriend || friendRequestSent}
+          >
+            <UserPlus className="w-4 h-4 mr-1" />
+            <span>
+              {isAddingFriend 
+                ? 'Đang gửi...' 
+                : friendRequestSent 
+                  ? 'Đã gửi lời mời' 
+                  : 'Add Friend'
+              }
+            </span>
+          </button>
         )}
       </div>
 
@@ -133,6 +182,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowEditModal(false)}
           onSave={(data) => { setDetails(data); setShowEditModal(false); }}
           initialData={details}
+          userId={currentUserId}
+          accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
         />,
         document.body
       )}
