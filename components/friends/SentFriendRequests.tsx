@@ -3,23 +3,23 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface Sender {
+interface Receiver {
   id: number;
   fullname: string;
   profilepic?: string;
 }
 
-interface FriendRequest {
+interface SentRequest {
   id: number;
-  sender: Sender;
+  receiver: Receiver;
   status: string;
 }
 
-const FriendRequests = () => {
-  const [requests, setRequests] = useState<FriendRequest[]>([]);
+const SentFriendRequests = () => {
+  const [requests, setRequests] = useState<SentRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPendingRequests = async () => {
+  const fetchSentRequests = async () => {
     const storedUser = sessionStorage.getItem('user');
     if (!storedUser) {
       setLoading(false);
@@ -35,12 +35,12 @@ const FriendRequests = () => {
       });
       if (res.ok) {
         const data = await res.json();
-        setRequests(data.received || []);
+        setRequests(data.sent || []);
       } else {
         setRequests([]);
       }
     } catch (error) {
-      console.error("Failed to fetch friend requests:", error);
+      console.error("Failed to fetch sent friend requests:", error);
       setRequests([]);
     } finally {
       setLoading(false);
@@ -48,77 +48,66 @@ const FriendRequests = () => {
   };
 
   useEffect(() => {
-    fetchPendingRequests();
+    fetchSentRequests();
   }, []);
 
-  const handleResponse = async (senderId: number, status: 'accepted' | 'declined') => {
+  const handleCancelRequest = async (receiverId: number) => {
     const accessToken = sessionStorage.getItem('accessToken');
+    const storedUser = sessionStorage.getItem('user');
+    if (!storedUser) return;
+    const currentUser = JSON.parse(storedUser);
+
     try {
-      const res = await fetch('http://localhost:3301/backend/friendrequest/respond', {
+      const res = await fetch('http://localhost:3301/backend/friendrequest/cancel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ senderId, status }),
+        body: JSON.stringify({ senderId: currentUser.id, receiverId }),
       });
 
       if (res.ok) {
-        setRequests(prevRequests => prevRequests.filter(req => req.sender.id !== senderId));
+        setRequests(prevRequests => prevRequests.filter(req => req.receiver.id !== receiverId));
       } else {
-        console.error('Failed to respond to friend request');
+        console.error('Failed to cancel friend request');
       }
     } catch (error) {
-      console.error('Error responding to friend request:', error);
+      console.error('Error canceling friend request:', error);
     }
   };
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
+      <h2 className="text-xl font-bold mb-4">Sent Friend Requests</h2>
       {loading ? (
         <div className="text-center text-gray-500">Loading requests...</div>
       ) : requests.length === 0 ? (
-        <div>
-          <div className="flex items-center gap-3 opacity-50">
-            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-7 bg-gray-200 rounded-md w-full"></div>
-            </div>
-          </div>
-          <p className="text-center text-gray-500 text-sm mt-4">No new friend requests.</p>
-        </div>
+        <p className="text-gray-500 text-sm">No sent requests.</p>
       ) : (
         <div className="space-y-3">
-          {requests.filter(req => req && req.sender).map((req) => (
+          {requests.filter(req => req && req.receiver).map((req) => (
             <div key={req.id} className="flex items-center gap-3">
-              <Link href={`/profile/${req.sender.id}`}>
+              <Link href={`/profile/${req.receiver.id}`}>
                 <div className="w-12 h-12 relative">
                     <Image
-                    src={req.sender.profilepic || '/avatars/default-avatar.png'}
-                    alt={req.sender.fullname}
+                    src={req.receiver.profilepic || '/avatars/default-avatar.png'}
+                    alt={req.receiver.fullname}
                     fill
                     className="rounded-full object-cover"
                     />
                 </div>
               </Link>
               <div className="flex-1">
-                <Link href={`/profile/${req.sender.id}`}>
-                    <h3 className="font-semibold text-sm hover:underline">{req.sender.fullname}</h3>
+                <Link href={`/profile/${req.receiver.id}`}>
+                    <h3 className="font-semibold text-sm hover:underline">{req.receiver.fullname}</h3>
                 </Link>
                 <div className="flex gap-2 mt-1">
                   <button
-                    onClick={() => handleResponse(req.sender.id, 'accepted')}
-                    className="flex-1 px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    onClick={() => handleResponse(req.sender.id, 'declined')}
+                    onClick={() => handleCancelRequest(req.receiver.id)}
                     className="flex-1 px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
                   >
-                    Delete
+                    Cancel Request
                   </button>
                 </div>
               </div>
@@ -130,4 +119,4 @@ const FriendRequests = () => {
   );
 };
 
-export default FriendRequests; 
+export default SentFriendRequests; 

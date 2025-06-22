@@ -15,11 +15,11 @@ interface FriendRequest {
   status: string;
 }
 
-const FriendRequests = () => {
+const ReceivedFriendRequests = () => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPendingRequests = async () => {
+  const fetchReceivedRequests = async () => {
     const storedUser = sessionStorage.getItem('user');
     if (!storedUser) {
       setLoading(false);
@@ -40,7 +40,7 @@ const FriendRequests = () => {
         setRequests([]);
       }
     } catch (error) {
-      console.error("Failed to fetch friend requests:", error);
+      console.error("Failed to fetch received friend requests:", error);
       setRequests([]);
     } finally {
       setLoading(false);
@@ -48,7 +48,7 @@ const FriendRequests = () => {
   };
 
   useEffect(() => {
-    fetchPendingRequests();
+    fetchReceivedRequests();
   }, []);
 
   const handleResponse = async (senderId: number, status: 'accepted' | 'declined') => {
@@ -75,59 +75,50 @@ const FriendRequests = () => {
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
+      <h1 className="text-2xl font-bold mb-6">Friend Requests</h1>
       {loading ? (
-        <div className="text-center text-gray-500">Loading requests...</div>
-      ) : requests.length === 0 ? (
-        <div>
-          <div className="flex items-center gap-3 opacity-50">
-            <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-7 bg-gray-200 rounded-md w-full"></div>
-            </div>
-          </div>
-          <p className="text-center text-gray-500 text-sm mt-4">No new friend requests.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
+        <div className="text-center text-gray-500">Loading...</div>
+      ) : requests.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {requests.filter(req => req && req.sender).map((req) => (
-            <div key={req.id} className="flex items-center gap-3">
-              <Link href={`/profile/${req.sender.id}`}>
-                <div className="w-12 h-12 relative">
-                    <Image
-                    src={req.sender.profilepic || '/avatars/default-avatar.png'}
-                    alt={req.sender.fullname}
-                    fill
-                    className="rounded-full object-cover"
-                    />
-                </div>
-              </Link>
-              <div className="flex-1">
+             <div key={req.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center">
                 <Link href={`/profile/${req.sender.id}`}>
-                    <h3 className="font-semibold text-sm hover:underline">{req.sender.fullname}</h3>
+                    <div className="w-24 h-24 relative mb-3 cursor-pointer">
+                    <Image
+                        src={req.sender.profilepic || '/avatars/default-avatar.png'}
+                        alt={req.sender.fullname}
+                        fill
+                        className="rounded-full object-cover"
+                    />
+                    </div>
                 </Link>
-                <div className="flex gap-2 mt-1">
-                  <button
+                <Link href={`/profile/${req.sender.id}`}>
+                    <h2 className="text-md font-semibold text-gray-900 hover:underline truncate w-full">{req.sender.fullname}</h2>
+                </Link>
+                <div className="w-full flex flex-col gap-2 mt-4">
+                    <button
                     onClick={() => handleResponse(req.sender.id, 'accepted')}
-                    className="flex-1 px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
-                  >
+                    className="w-full px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600"
+                    >
                     Confirm
-                  </button>
-                  <button
+                    </button>
+                    <button
                     onClick={() => handleResponse(req.sender.id, 'declined')}
-                    className="flex-1 px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
-                  >
+                    className="w-full px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-gray-200 text-black hover:bg-gray-300"
+                    >
                     Delete
-                  </button>
+                    </button>
                 </div>
-              </div>
             </div>
           ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 mt-10 bg-white p-6 rounded-lg shadow">
+            <p className="text-lg">No new friend requests.</p>
         </div>
       )}
     </div>
   );
 };
 
-export default FriendRequests; 
+export default ReceivedFriendRequests; 
