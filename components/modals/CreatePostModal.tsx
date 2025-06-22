@@ -13,11 +13,12 @@ interface Person {
 }
 
 interface CreatePostModalProps {
+  isOpen: boolean;
   onClose: () => void;
-  addNew: (newPost: PostData) => void;
+  onSubmit: (newPost: PostData) => void;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) => {
+const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   // Close when clicking outside
   React.useEffect(() => {
@@ -103,6 +104,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
       if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
       
       const mappedPost: PostData = {
+        id: result.id,
         author: {
           name: user?.fullname || user?.email || 'User',
           avatar: user?.profilepic || '/default-avatar.png',
@@ -119,7 +121,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, addNew }) =>
         taggedPeople: result.taggedPeople || [],
       };
 
-      addNew(mappedPost);
+      onSubmit(mappedPost);
       setToast('Đăng bài thành công!');
       setPostContent('');
       setPreviewMedia([]);

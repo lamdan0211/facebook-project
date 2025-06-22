@@ -8,6 +8,7 @@ import Link from 'next/link';
 import UserDropdown from './UserDropdown';
 import { useAuth } from '@/components/auth/AuthContext';
 import { Bell, UsersRound } from 'lucide-react';
+import { useSearch } from '@/context/SearchContext';
 
 
 const Header = () => {
@@ -17,12 +18,20 @@ const Header = () => {
    const notifRef = useRef<HTMLDivElement>(null);
    const router = useRouter();
    const { user } = useAuth();
+   const { setSearchQuery } = useSearch();
+   const [localSearch, setLocalSearch] = useState('');
 
    const toggleDropdown = () => {
       setIsDropdownOpen(!isDropdownOpen);
    };
    const toggleNotif = () => {
       setIsNotifOpen(!isNotifOpen);
+   };
+
+   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setSearchQuery(localSearch);
+      router.push('/dashboard');
    };
 
    // Close dropdowns when clicking outside
@@ -50,16 +59,18 @@ const Header = () => {
                FB
             </Link>
             {/* Search Bar */}
-            <div className="relative flex items-center">
+            <form onSubmit={handleSearchSubmit} className="relative flex items-center">
                {/* Search Icon inside input */}
                <svg className="absolute left-3 text-gray-500 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                <input
                   type="text"
                   placeholder="Search Facebook"
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
                   className="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm hidden md:inline-block"
                   style={{ minWidth: '180px' }}
                />
-            </div>
+            </form>
          </div>
 
          {/* Center section: Navigation Icons */}

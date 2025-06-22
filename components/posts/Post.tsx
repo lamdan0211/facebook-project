@@ -70,7 +70,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   isOnSavedPage = false,
   onUnsave,
 }) => {
-  const initialTotalReactions = reactions.like + reactions.love + reactions.haha + reactions.wow + reactions.sad + reactions.angry;
+  const safeReactions = reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+  const initialTotalReactions = safeReactions.like + safeReactions.love + safeReactions.haha + safeReactions.wow + safeReactions.sad + safeReactions.angry;
   const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [showReactionMenu, setShowReactionMenu] = useState(false);
@@ -373,7 +374,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <div className="flex items-center">
           {currentTotalReactions > 0 && (
             <div className="flex items-center -space-x-1 mr-1">
-              {Object.entries(reactions)
+              {Object.entries(safeReactions)
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 3)
                 .map(([type, count], index) => {
