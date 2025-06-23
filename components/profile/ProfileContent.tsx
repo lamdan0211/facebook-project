@@ -123,7 +123,13 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
         )}
       </div>
        {/* Create Post Modal */}
-       {isModalOpen && <CreatePostModal onClose={handleCloseModal} addNew={post => setPosts(prev => [post, ...prev])} />} {/* Render modal conditionally */}
+       {isModalOpen && (
+         <CreatePostModal
+           isOpen={isModalOpen}
+           onClose={handleCloseModal}
+           onSubmit={post => setPosts(prev => [post, ...prev])}
+         />
+       )} {/* Render modal conditionally */}
     </div>
   );
 };
