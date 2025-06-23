@@ -31,17 +31,23 @@ const EditCoverPhotoModal: React.FC<EditCoverPhotoModalProps> = ({ onClose, user
     try {
       // 1. Upload file
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('files', file);
       const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
         method: 'POST',
-        body: formData,
         headers: {
           'Authorization': `Bearer ${accessToken}`
-        }
+        },
+        body: formData,
       });
       const uploadData = await uploadRes.json();
-      if (!uploadData.path) throw new Error('Không nhận được path từ API upload');
-      const imageUrl = `http://localhost:3301/${uploadData.path}`;
+      let imageUrl = '';
+      if (Array.isArray(uploadData.paths) && uploadData.paths.length > 0) {
+        imageUrl = `http://localhost:3301/${uploadData.paths[0].replace(/^\/+/,'')}`;
+      } else if (uploadData.path) {
+        imageUrl = `http://localhost:3301/${uploadData.path.replace(/^\/+/,'')}`;
+      } else {
+        throw new Error('Không nhận được path từ API upload');
+      }
       // 2. Gọi API update coverpic
       const updateRes = await fetch(`http://localhost:3301/backend/user/${userId}`, {
         method: 'PUT',

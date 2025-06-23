@@ -51,7 +51,7 @@ const ReceivedFriendRequests = () => {
     fetchReceivedRequests();
   }, []);
 
-  const handleResponse = async (senderId: number, status: 'accepted' | 'declined') => {
+  const handleResponse = async (senderId: number, status: 'accept' | 'reject') => {
     const accessToken = sessionStorage.getItem('accessToken');
     try {
       const res = await fetch('http://localhost:3301/backend/friendrequest/respond', {
@@ -86,7 +86,7 @@ const ReceivedFriendRequests = () => {
         <div className="text-center text-gray-500">Loading...</div>
       ) : mappedRequests.length > 0 ? (
         <div className="space-y-4">
-          {mappedRequests.filter(req => req && req.sender).map((req) => (
+          {mappedRequests.filter(req => req && req.sender && req.sender.id).map((req) => (
             <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
               <Link href={`/profile/${req.sender.id}`}>
                 <div className="w-10 h-10 relative">
@@ -104,13 +104,13 @@ const ReceivedFriendRequests = () => {
                 </Link>
                 <div className="flex gap-2 mt-1">
                   <button
-                    onClick={() => handleResponse(req.sender.id, 'accepted')}
+                    onClick={() => handleResponse(req.sender.id, 'accept')}
                     className="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
                   >
                     Confirm
                   </button>
                   <button
-                    onClick={() => handleResponse(req.sender.id, 'declined')}
+                    onClick={() => handleResponse(req.sender.id, 'reject')}
                     className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
                   >
                     Delete
