@@ -1,3 +1,4 @@
+console.log('FriendsLayout mounted');
 import Header from '@/components/layout/Header';
 
 export default function FriendsLayout({

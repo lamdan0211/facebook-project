@@ -21,26 +21,25 @@ const ReceivedFriendRequests = () => {
 
   const fetchReceivedRequests = async () => {
     const storedUser = sessionStorage.getItem('user');
+    const accessToken = sessionStorage.getItem('accessToken');
+    console.log('ReceivedFriendRequests: user:', storedUser, 'accessToken:', accessToken);
     if (!storedUser) {
       setLoading(false);
       return;
     }
     const currentUser = JSON.parse(storedUser);
-    const accessToken = sessionStorage.getItem('accessToken');
-
     setLoading(true);
     try {
+      console.log('ReceivedFriendRequests: Bắt đầu fetch pending requests');
       const res = await fetch(`http://localhost:3301/backend/friendrequest/pending/${currentUser.id}`, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setRequests(data.received || []);
-      } else {
-        setRequests([]);
-      }
+      console.log('ReceivedFriendRequests: Đã fetch xong, status:', res.status);
+      const data = await res.json();
+      console.log('ReceivedFriendRequests: DATA:', data);
+      setRequests(data.received || []);
     } catch (error) {
-      console.error("Failed to fetch received friend requests:", error);
+      console.error('ReceivedFriendRequests: FETCH ERROR:', error);
       setRequests([]);
     } finally {
       setLoading(false);
@@ -48,6 +47,7 @@ const ReceivedFriendRequests = () => {
   };
 
   useEffect(() => {
+    console.log('ReceivedFriendRequests mounted');
     fetchReceivedRequests();
   }, []);
 
@@ -73,49 +73,55 @@ const ReceivedFriendRequests = () => {
     }
   };
 
+  // Map lại dữ liệu cho đúng API mới
+  const mappedRequests = requests.map((req: any) => ({
+    id: req.requestId,
+    sender: req.from,
+    status: req.status,
+  }));
+
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h1 className="text-2xl font-bold mb-6">Friend Requests</h1>
+    <div>
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
-      ) : requests.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          {requests.filter(req => req && req.sender).map((req) => (
-             <div key={req.id} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center">
-                <Link href={`/profile/${req.sender.id}`}>
-                    <div className="w-24 h-24 relative mb-3 cursor-pointer">
-                    <Image
-                        src={req.sender.profilepic || '/avatars/default-avatar.png'}
-                        alt={req.sender.fullname}
-                        fill
-                        className="rounded-full object-cover"
-                    />
-                    </div>
-                </Link>
-                <Link href={`/profile/${req.sender.id}`}>
-                    <h2 className="text-md font-semibold text-gray-900 hover:underline truncate w-full">{req.sender.fullname}</h2>
-                </Link>
-                <div className="w-full flex flex-col gap-2 mt-4">
-                    <button
-                    onClick={() => handleResponse(req.sender.id, 'accepted')}
-                    className="w-full px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600"
-                    >
-                    Confirm
-                    </button>
-                    <button
-                    onClick={() => handleResponse(req.sender.id, 'declined')}
-                    className="w-full px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-gray-200 text-black hover:bg-gray-300"
-                    >
-                    Delete
-                    </button>
+      ) : mappedRequests.length > 0 ? (
+        <div className="space-y-4">
+          {mappedRequests.filter(req => req && req.sender).map((req) => (
+            <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+              <Link href={`/profile/${req.sender.id}`}>
+                <div className="w-10 h-10 relative">
+                  <Image
+                    src={req.sender.profilepic || '/avatars/default-avatar.png'}
+                    alt={req.sender.fullname}
+                    fill
+                    className="rounded-full object-cover"
+                  />
                 </div>
+              </Link>
+              <div className="flex-1 min-w-0">
+                <Link href={`/profile/${req.sender.id}`}>
+                  <h3 className="font-semibold text-sm truncate hover:underline">{req.sender.fullname}</h3>
+                </Link>
+                <div className="flex gap-2 mt-1">
+                  <button
+                    onClick={() => handleResponse(req.sender.id, 'accepted')}
+                    className="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    onClick={() => handleResponse(req.sender.id, 'declined')}
+                    className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-500 mt-10 bg-white p-6 rounded-lg shadow">
-            <p className="text-lg">No new friend requests.</p>
-        </div>
+        <div className="text-center text-gray-500 mt-2">No new friend requests.</div>
       )}
     </div>
   );

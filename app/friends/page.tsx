@@ -5,7 +5,12 @@ import Link from 'next/link';
 import useRequireAuth from '@/lib/useRequireAuth';
 import FriendRequests from '@/components/friends/FriendRequests';
 import SentRequestsPlaceholder from '@/components/friends/SentRequestsPlaceholder';
+import SentFriendRequests from '@/components/friends/SentFriendRequests';
+import ReceivedFriendRequests from '@/components/friends/ReceivedFriendRequests';
 import { usePathname } from 'next/navigation';
+import LeftSidebar from '@/components/layout/LeftSidebar';
+import RightSidebar from '@/components/layout/RightSidebar';
+import Header from '@/components/layout/Header';
 
 interface User {
   id: number;
@@ -131,30 +136,16 @@ const FriendsPage = () => {
   );
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4 py-6">
-      <div className="flex gap-6">
-        {/* Left Sidebar */}
-        <div className="w-80 flex-shrink-0 hidden lg:block">
-          <div className="bg-white rounded-lg shadow p-4 sticky top-20">
-            <h2 className="text-xl font-bold mb-4">Friends</h2>
-            <nav className="space-y-1">
-              <Link href="/dashboard" className={`flex items-center px-4 py-2 rounded-lg font-medium ${pathname === '/dashboard' ? 'bg-gray-100' : 'hover:bg-gray-100'}`}>
-                <span className="text-2xl mr-3">🏠</span> Trang chủ
-              </Link>
-              <Link href="/friends" className={`flex items-center px-4 py-2 rounded-lg font-medium ${pathname === '/friends' ? 'bg-gray-100' : 'hover:bg-gray-100'}`}>
-                <span className="text-2xl mr-3">👥</span> Lời mời kết bạn
-              </Link>
-              <Link href="/saved" className={`flex items-center px-4 py-2 rounded-lg font-medium ${pathname === '/saved' ? 'bg-gray-100' : 'hover:bg-gray-100'}`}>
-                <span className="text-2xl mr-3">🔖</span> Đã lưu
-              </Link>
-            </nav>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 min-w-0">
+    <div className="flex bg-gray-100 min-h-screen">
+      {/* Left Sidebar */}
+      <aside className="hidden md:block w-64 flex-shrink-0 border-r border-gray-200 min-h-screen bg-white">
+        <LeftSidebar />
+      </aside>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center py-8 px-2 min-h-screen">
+        <div className="w-full max-w-2xl">
           <div className="bg-white rounded-lg shadow p-4 mb-6">
-            <h1 className="text-2xl font-bold">People You May Know</h1>
+            <h1 className="text-2xl font-bold mb-2">People You May Know</h1>
           </div>
           {loading ? (
             <div className="text-center text-gray-500">Loading...</div>
@@ -169,15 +160,18 @@ const FriendsPage = () => {
             </div>
           )}
         </div>
-
-        {/* Right Sidebar */}
-        <div className="w-80 flex-shrink-0 hidden xl:block">
-          <div className="space-y-4 sticky top-20">
-            <FriendRequests />
-            <SentRequestsPlaceholder />
-          </div>
+      </main>
+      {/* Right Sidebar: Friend Requests */}
+      <aside className="hidden lg:block w-96 flex-shrink-0 p-6 space-y-8">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+          <h2 className="text-xl font-bold mb-4 text-green-700">Received Friend Requests</h2>
+          <ReceivedFriendRequests />
         </div>
-      </div>
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+          <h2 className="text-xl font-bold mb-4 text-purple-700">Sent Friend Requests</h2>
+          <SentFriendRequests />
+        </div>
+      </aside>
     </div>
   );
 };

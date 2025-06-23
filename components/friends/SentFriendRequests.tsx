@@ -21,26 +21,25 @@ const SentFriendRequests = () => {
 
   const fetchSentRequests = async () => {
     const storedUser = sessionStorage.getItem('user');
+    const accessToken = sessionStorage.getItem('accessToken');
+    console.log('SentFriendRequests: user:', storedUser, 'accessToken:', accessToken);
     if (!storedUser) {
       setLoading(false);
       return;
     }
     const currentUser = JSON.parse(storedUser);
-    const accessToken = sessionStorage.getItem('accessToken');
-
     setLoading(true);
     try {
+      console.log('SentFriendRequests: Bắt đầu fetch pending requests');
       const res = await fetch(`http://localhost:3301/backend/friendrequest/pending/${currentUser.id}`, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setRequests(data.sent || []);
-      } else {
-        setRequests([]);
-      }
+      console.log('SentFriendRequests: Đã fetch xong, status:', res.status);
+      const data = await res.json();
+      console.log('SentFriendRequests: DATA:', data);
+      setRequests(data.sent || []);
     } catch (error) {
-      console.error("Failed to fetch sent friend requests:", error);
+      console.error('SentFriendRequests: FETCH ERROR:', error);
       setRequests([]);
     } finally {
       setLoading(false);
@@ -48,6 +47,7 @@ const SentFriendRequests = () => {
   };
 
   useEffect(() => {
+    console.log('SentFriendRequests mounted');
     fetchSentRequests();
   }, []);
 
@@ -77,35 +77,41 @@ const SentFriendRequests = () => {
     }
   };
 
+  // Map lại dữ liệu cho đúng API mới
+  const mappedRequests = requests.map((req: any) => ({
+    id: req.requestId,
+    receiver: req.to,
+    status: req.status,
+  }));
+
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-xl font-bold mb-4">Sent Friend Requests</h2>
+    <div>
       {loading ? (
         <div className="text-center text-gray-500">Loading requests...</div>
-      ) : requests.length === 0 ? (
+      ) : mappedRequests.length === 0 ? (
         <p className="text-gray-500 text-sm">No sent requests.</p>
       ) : (
-        <div className="space-y-3">
-          {requests.filter(req => req && req.receiver).map((req) => (
-            <div key={req.id} className="flex items-center gap-3">
+        <div className="space-y-4">
+          {mappedRequests.filter(req => req && req.receiver).map((req) => (
+            <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
               <Link href={`/profile/${req.receiver.id}`}>
-                <div className="w-12 h-12 relative">
-                    <Image
+                <div className="w-10 h-10 relative">
+                  <Image
                     src={req.receiver.profilepic || '/avatars/default-avatar.png'}
                     alt={req.receiver.fullname}
                     fill
                     className="rounded-full object-cover"
-                    />
+                  />
                 </div>
               </Link>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <Link href={`/profile/${req.receiver.id}`}>
-                    <h3 className="font-semibold text-sm hover:underline">{req.receiver.fullname}</h3>
+                  <h3 className="font-semibold text-sm truncate hover:underline">{req.receiver.fullname}</h3>
                 </Link>
                 <div className="flex gap-2 mt-1">
                   <button
                     onClick={() => handleCancelRequest(req.receiver.id)}
-                    className="flex-1 px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
+                    className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
                   >
                     Cancel Request
                   </button>
