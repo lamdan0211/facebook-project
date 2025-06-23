@@ -34,7 +34,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   }, [onClose]);
 
   const [postContent, setPostContent] = useState('');
-  const [selectedAudience, setSelectedAudience] = useState('Only me');
+  const [selectedAudience, setSelectedAudience] = useState(0); // 0: Public, 1: Only me, 2: Friends
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTagPeopleModal, setShowTagPeopleModal] = useState(false);
@@ -43,6 +43,19 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  const getAudienceLabel = (audience: number) => {
+    switch (audience) {
+      case 0:
+        return <><span role="img" aria-label="public">🌍</span> Public</>;
+      case 1:
+        return <><span role="img" aria-label="only me">🔒</span> Only me</>;
+      case 2:
+        return <><span role="img" aria-label="friends">��</span> Friends</>;
+      default:
+        return <><span role="img" aria-label="public">🌍</span> Public</>;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,9 +92,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
       }
 
       // 2. CREATE POST
-      let isType = 0; // default: Only me
-      if (selectedAudience === 'Public') isType = 1;
-      else if (selectedAudience === 'Friends') isType = 2;
+      const isType = selectedAudience;
 
       const payload = {
         content: postContent,
@@ -143,7 +154,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
     setShowEmojiPicker(false);
   };
 
-  const selectAudience = (audience: string) => {
+  const selectAudience = (audience: number) => {
     setSelectedAudience(audience);
     setIsAudienceDropdownOpen(false);
   };
@@ -297,11 +308,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                     onClick={toggleAudienceDropdown}
                     className="flex items-center space-x-1 text-xs bg-gray-200 px-2 py-1 rounded-md hover:bg-gray-300"
                   >
-                    <span>🔒</span>
-                    <span>{selectedAudience}</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    {getAudienceLabel(selectedAudience)}
                   </button>
 
                   {isAudienceDropdownOpen && (
@@ -310,23 +317,23 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
                         <button
                           type="button"
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Public')}
+                          onClick={() => selectAudience(0)}
                         >
-                          🌍 Public
+                          <span role="img" aria-label="public">🌍</span> Public
                         </button>
                         <button
                           type="button"
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Friends')}
+                          onClick={() => selectAudience(2)}
                         >
-                          👥 Friends
+                          <span role="img" aria-label="friends">👥</span> Friends
                         </button>
                         <button
                           type="button"
                           className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Only me')}
+                          onClick={() => selectAudience(1)}
                         >
-                          🔒 Only me
+                          <span role="img" aria-label="only me">🔒</span> Only me
                         </button>
                       </div>
                     </div>
