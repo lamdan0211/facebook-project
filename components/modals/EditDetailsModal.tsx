@@ -19,6 +19,10 @@ export interface DetailsData {
   birthplace: string;
   workingPlace: string;
   isActive: boolean;
+  studiedAt?: string;
+  workAt?: string;
+  livesIn?: string;
+  from?: string;
 }
 
 const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSave, initialData, userId, accessToken }) => {
@@ -39,8 +43,12 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
   if (!open) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    const { name, value, type } = e.target;
+    if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+      setForm({ ...form, [name]: e.target.checked });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +81,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-screen overflow-y-auto">
         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-3xl cursor-pointer" onClick={onClose}>&times;</button>
         <h2 className="text-xl font-bold mb-4">Edit Details</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,6 +104,22 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
           <div>
             <label className="block text-sm font-medium mb-1">Bio</label>
             <textarea name="bio" value={form.bio} onChange={handleChange} className="w-full border rounded px-3 py-2" rows={3} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Studied at</label>
+            <input type="text" name="studiedAt" value={form.studiedAt || ''} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Work at</label>
+            <input type="text" name="workAt" value={form.workAt || ''} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Lives in</label>
+            <input type="text" name="livesIn" value={form.livesIn || ''} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">From</label>
+            <input type="text" name="from" value={form.from || ''} onChange={handleChange} className="w-full border rounded px-3 py-2" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Birthplace</label>

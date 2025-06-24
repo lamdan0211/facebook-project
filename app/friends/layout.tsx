@@ -11,7 +11,7 @@ export default function FriendsLayout({
       <div className="sticky top-0 z-50">
         <Header />
       </div>
-      <div className="pt-14">
+      <div>
         {children}
       </div>
     </div>

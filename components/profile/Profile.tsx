@@ -13,7 +13,7 @@ const Profile = () => {
   };
 
   // Placeholder for navigation tabs
-  const profileTabs = ['Posts', 'About', 'Friends', 'Photos', 'More'];
+  const profileTabs = ['Posts', 'Friends', 'Photos', 'More'];
 
   return (
     <div className="w-full">
@@ -69,7 +69,7 @@ const Profile = () => {
       {/* Content Area (Placeholder for Posts, About, etc.) */}
       <div className="max-w-3xl mx-auto mt-6">
          {/* We can potentially render the NewsFeed component here for the Posts tab */}
-         <p className="text-gray-700">Profile content goes here (e.g., Posts, About section)</p>
+         <p className="text-gray-700">Profile content goes here (e.g., Posts, Friends, etc.)</p>
       </div>
 
     </div>

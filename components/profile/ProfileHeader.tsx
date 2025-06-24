@@ -1,12 +1,11 @@
-'use client';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useAuth } from '../auth/AuthContext';
+import { FolderDot, UserPlus, UserCog } from 'lucide-react';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import EditAvatarModal from '../modals/EditAvatarModal';
-import { FolderDot, UserPlus } from 'lucide-react';
 import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
+import { useAuth } from '../auth/AuthContext';
+import { createPortal } from 'react-dom';
 
 interface ProfileHeaderProps {
   coverPhotoUrl: string;
@@ -15,14 +14,18 @@ interface ProfileHeaderProps {
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
+  profile?: any;
 }
 
 const defaultDetails: DetailsData = {
-  workAt: '',
-  studiedAt: '',
-  livesIn: '',
-  from: '',
+  fullname: '',
+  phone: '',
+  profilepic: '',
+  coverpic: '',
   bio: '',
+  birthplace: '',
+  workingPlace: '',
+  isActive: false,
 };
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -32,14 +35,35 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileId,
   currentUserId,
   onProfileUpdated,
+  profile,
 }) => {
   const { user } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [details, setDetails] = useState<DetailsData>(defaultDetails);
+  const [details, setDetails] = useState<DetailsData>({
+    fullname: userName || '',
+    phone: '',
+    profilepic: profilePictureUrl || '',
+    coverpic: coverPhotoUrl || '',
+    bio: '',
+    birthplace: '',
+    workingPlace: '',
+    isActive: true,
+  });
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
   const [isAddingFriend, setIsAddingFriend] = useState(false);
   const [friendRequestSent, setFriendRequestSent] = useState(false);
+  const [coverVersion, setCoverVersion] = useState(Date.now());
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // Khi prop coverPhotoUrl thay đổi (profile mới), reset version
+    if (!isFirstRender.current) {
+      setCoverVersion(Date.now());
+    } else {
+      isFirstRender.current = false;
+    }
+  }, [coverPhotoUrl]);
 
   const isOwner = profileId === currentUserId;
 
@@ -52,7 +76,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const handleAddFriend = async () => {
     if (isAddingFriend || friendRequestSent) return;
-    
     setIsAddingFriend(true);
     try {
       const accessToken = sessionStorage.getItem('accessToken');
@@ -63,7 +86,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           'Content-Type': 'application/json',
         },
       });
-
       if (res.ok) {
         setFriendRequestSent(true);
         alert('Đã gửi lời mời kết bạn thành công!');
@@ -84,7 +106,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Cover Photo */}
       <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group">
         <Image
-          src={coverPhoto}
+          src={coverPhoto + '?v=' + coverVersion}
           alt="Cover Photo"
           layout="fill"
           objectFit="cover"
@@ -99,7 +121,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </button>
         )}
       </div>
-
       {/* Profile Info and Buttons */}
       <div className="flex flex-col md:flex-row items-center gap-4 px-6 py-4">
         {/* Profile Picture */}
@@ -121,22 +142,24 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </button>
           )}
         </div>
-
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{userName}</h1>
           <p className="text-gray-600 text-sm mt-1">54 friends</p>
         </div>
-
         {/* Action Buttons */}
         {isOwner ? (
-          <button className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer">
-            <span><span className="font-bold text-white text-[15]">+</span> Add to Story</span>
+          <button
+            className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer gap-2"
+            onClick={() => setShowEditModal(true)}
+          >
+            <UserCog className="w-5 h-5 mr-1" />
+            <span>Edit Profile</span>
           </button>
         ) : (
-          <button 
+          <button
             className={`flex items-center px-3 py-2 font-semibold rounded-md shadow-sm transition duration-300 text-sm cursor-pointer ${
-              friendRequestSent 
-                ? 'bg-gray-500 text-white cursor-not-allowed' 
+              friendRequestSent
+                ? 'bg-gray-500 text-white cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
             onClick={handleAddFriend}
@@ -144,23 +167,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           >
             <UserPlus className="w-4 h-4 mr-1" />
             <span>
-              {isAddingFriend 
-                ? 'Đang gửi...' 
-                : friendRequestSent 
-                  ? 'Đã gửi lời mời' 
+              {isAddingFriend
+                ? 'Đang gửi...'
+                : friendRequestSent
+                  ? 'Đã gửi lời mời'
                   : 'Add Friend'
               }
             </span>
           </button>
         )}
       </div>
-
       {/* Navigation Menu */}
       <div className="mt-2">
         <nav className="-mb-px flex space-x-6 px-4 md:px-6 text-sm overflow-x-auto hide-scrollbar">
           {[
             { name: 'Posts', href: '/profile' },
-            { name: 'About', href: '/profile/about' },
             { name: 'Friends', href: '/friends' },
             { name: 'Videos', href: '/watch' }
           ].map((item, index) => (
@@ -174,20 +195,37 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           ))}
         </nav>
       </div>
-
       {/* Modal sẽ được render qua portal ra ngoài root layout để tránh bị che */}
       {typeof window !== 'undefined' && createPortal(
         <EditDetailsModal
           open={showEditModal}
           onClose={() => setShowEditModal(false)}
-          onSave={(data) => { setDetails(data); setShowEditModal(false); }}
-          initialData={details}
-          userId={currentUserId}
+          onSave={(data) => {
+            setDetails(data);
+            setShowEditModal(false);
+            if (typeof onProfileUpdated === 'function') onProfileUpdated();
+            if (profileId === currentUserId && typeof window !== 'undefined') {
+              const userStr = sessionStorage.getItem('user');
+              if (userStr) {
+                const userObj = JSON.parse(userStr);
+                userObj.fullname = data.fullname;
+                sessionStorage.setItem('user', JSON.stringify(userObj));
+              }
+            }
+          }}
+          initialData={{
+            fullname: profile?.fullname || userName || '',
+            phone: profile?.phone || '',
+            profilepic: profile?.profilepic || profilePictureUrl || '',
+            coverpic: profile?.coverpic || coverPhotoUrl || '',
+            bio: profile?.bio || '',
+            birthplace: profile?.birthplace || '',
+            workingPlace: profile?.workingPlace || '',
+            isActive: typeof profile?.isActive === 'boolean' ? profile.isActive : true,
+          }}
+          userId={profileId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
-        />,
-        document.body
-      )}
-
+        />, document.body)}
       {showAvatarModal && (
         <EditAvatarModal 
           onClose={() => setShowAvatarModal(false)}
@@ -196,17 +234,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onUploaded={typeof onProfileUpdated === 'function' ? onProfileUpdated : undefined}
         />
       )}
-
       {showCoverModal && (
         <EditCoverPhotoModal 
           onClose={() => setShowCoverModal(false)}
           userId={currentUserId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
-          onUploaded={typeof onProfileUpdated === 'function' ? onProfileUpdated : undefined}
+          onUploaded={() => {
+            if (typeof onProfileUpdated === 'function') onProfileUpdated();
+            setCoverVersion(Date.now());
+          }}
         />
       )}
     </div>
   );
 };
 
-export default ProfileHeader; 
+export default ProfileHeader;

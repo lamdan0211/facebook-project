@@ -1,11 +1,11 @@
 'use client';
 import { useAuth } from '@/components/auth/AuthContext';
-import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import ProfileContent from '@/components/profile/ProfileContent';
 import { PostProvider } from '@/context/PostContext';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import ProfileHeader from '@/components/profile/ProfileHeader';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -58,10 +58,10 @@ export default function ProfilePage() {
   return (
     <PostProvider>
       <div className="bg-gray-100 min-h-screen">
-        <ProfileHeader {...userData} profileId={profile.id} currentUserId={user?.id} />
+        <ProfileHeader {...userData} profile={profile} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} />
         <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-4">
           <div className="flex flex-col md:flex-row mt-4 lg:mt-6 mx-auto max-w-[1200px]">
-            <ProfileSidebar profile={profile} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} />
+            <ProfileSidebar profile={profile} profileId={profile.id} currentUserId={user?.id} />
             <ProfileContent profile={profile} profileId={profile.id} currentUserId={user?.id} />
           </div>
         </div>

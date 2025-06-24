@@ -343,11 +343,11 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                     </span>
                   </button>
                 )}
-                <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => setShowDropdown(false)}>
-                  <span className="text-lg mr-3">🔖</span>
+                <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm cursor-pointer" onClick={() => { setShowShareModal(true); setShowDropdown(false); }}>
+                  <span className="text-lg mr-3">🔗</span>
                   <span>
-                    <span className="font-semibold">Save Post</span>
-                    <div className="text-xs text-gray-500 whitespace-nowrap">Add this to your saved items.</div>
+                    <span className="font-semibold">Share</span>
+                    <div className="text-xs text-gray-500 whitespace-nowrap">Share this post.</div>
                   </span>
                 </button>
               </div>
@@ -522,6 +522,16 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           comments={allComments}
           onClose={() => setShowMediaViewer(false)}
           onComment={handleAddComment}
+        />
+      )}
+
+      {/* Share Post Modal */}
+      {showShareModal && (
+        <SharePostModal
+          onClose={() => setShowShareModal(false)}
+          author={{ name: author.name, avatar: author.avatar }}
+          content={content}
+          imageUrl={media && media.length > 0 ? media[0].url : undefined}
         />
       )}
 

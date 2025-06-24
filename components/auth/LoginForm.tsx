@@ -54,7 +54,7 @@ const LoginForm = () => {
                 Log in
               </button>
               <div className="text-center">
-                <Link href="#" className="text-blue-600 hover:underline">
+                <Link href="/forgot-password" className="text-blue-600 hover:underline">
                   Forgotten password?
                 </Link>
               </div>

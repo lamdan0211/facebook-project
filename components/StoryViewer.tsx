@@ -64,7 +64,7 @@ export default function StoryViewer({ stories, initialStoryIndex = 0, onClose }:
   const handlers = useSwipeable({
     onSwipedLeft: handleNext,
     onSwipedRight: handlePrevious,
-    preventDefaultTouchmoveEvent: true,
+    preventScrollOnSwipe: true,
     trackMouse: true
   });
 
