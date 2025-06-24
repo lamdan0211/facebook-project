@@ -35,17 +35,32 @@ const ChangePasswordForm = () => {
     setError(null);
     if (!validate()) return;
     setLoading(true);
-    // TODO: Gọi API đổi mật khẩu thật nếu có backend
-    setTimeout(() => {
+    try {
+      const token = sessionStorage.getItem('accessToken');
+      if (!token) throw new Error('Bạn chưa đăng nhập!');
+      const res = await fetch('http://localhost:3301/backend/user/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: formData.oldPassword,
+          newPassword: formData.newPassword,
+          confirmNewPassword: formData.confirmPassword,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) throw new Error(data.message || 'Đổi mật khẩu thất bại!');
+      setSuccess('Đổi mật khẩu thành công!');
+      setFormData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => router.push('/login'), 1500);
+    } catch (err: any) {
+      setError(err.message || 'Đổi mật khẩu thất bại!');
+    } finally {
       setLoading(false);
-      if (formData.oldPassword === '123456') { // giả lập đúng mật khẩu cũ
-        setSuccess('Đổi mật khẩu thành công!');
-        setFormData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-        setTimeout(() => router.push('/login'), 1500);
-      } else {
-        setError('Mật khẩu cũ không đúng!');
-      }
-    }, 1000);
+    }
   };
 
   return (
