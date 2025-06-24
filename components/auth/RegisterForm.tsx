@@ -111,7 +111,7 @@ const RegisterForm = () => {
     setLoading(true);
     try {
       
-      const response = await fetch('http://localhost:3301/backend/auth/register', {
+      const response = await fetch('http://localhost:3301/backend/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ const RegisterForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Mật khẩu mới"
+              placeholder="Mật khẩu"
               className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               }`}

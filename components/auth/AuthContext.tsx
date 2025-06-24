@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   logout: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  loginGoogle: (accessToken: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   logout: async () => {},
   login: async () => {},
+  loginGoogle: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -61,7 +63,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     }
   };
-
+  const loginGoogle = async (accessToken:string) => {
+    try {
+      const res = await fetch('http://localhost:3301/backend/auth/login-google-firebase', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      // console.log('API response:', res);
+      const data = await res.json().catch(() => null);
+      // console.log('API response data:', data);
+      if (!res.ok) throw new Error(data?.message || 'Login failed');
+      setUser(data.user);
+      sessionStorage.setItem('user', JSON.stringify(data.user));
+      sessionStorage.setItem('accessToken', data.accessToken);
+      sessionStorage.setItem('refreshToken', data.refreshToken);
+      // console.log('Đăng nhập thành công:', data);
+      router.replace('/dashboard');
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      alert(errMsg || 'Đăng nhập thất bại!');
+    } finally {
+      setLoading(false);
+    }
+  }
   const logout = async () => {
     setUser(null);
     sessionStorage.removeItem('user');
@@ -70,7 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, login }}>
+    <AuthContext.Provider value={{ user, loading, logout, login, loginGoogle }}>
       {children}
     </AuthContext.Provider>
   );
