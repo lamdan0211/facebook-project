@@ -43,7 +43,7 @@ const UserDropdown = () => {
     <div className="relative" ref={dropdownRef}>
       <div className="flex items-center gap-2 focus:outline-none cursor-pointer" onClick={() => setOpen((o) => !o)}>
        <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname || "User"}} />
-        <span className="font-medium">{user.fullname || "No Name"}</span>
+        <span className="font-medium md:block hidden">{user.fullname || "No Name"}</span>
       </div>
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-md z-50">
@@ -57,15 +57,15 @@ const UserDropdown = () => {
             href="/change-password"
             className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer block py-4 border-b border-b-[#f0f0f0]"
           >
-            <UserPen className="w-6 h-6 text-blue-700" />
-            <span className="text-md whitespace-nowrap text-blue-700">Change Password</span>
+            <UserPen className="w-6 h-6 text-gray-700" />
+            <span className="text-md whitespace-nowrap text-gray-700">Change Password</span>
           </Link>
           <button
             onClick={handleLogout}
             className=" flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer py-4"
           >
-            <LogOut className="w-6 h-6 text-blue-700" />
-            <span className="text-md whitespace-nowrap text-blue-700">Logout</span>
+            <LogOut className="w-6 h-6 text-gray-700" />
+            <span className="text-md whitespace-nowrap text-gray-700">Logout</span>
           </button>
         </div>
       )}
