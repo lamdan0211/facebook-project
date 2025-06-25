@@ -73,10 +73,11 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative max-h-screen overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative max-h-screen">
         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-3xl cursor-pointer" onClick={onClose}>&times;</button>
         <h2 className="text-xl font-bold mb-4">Edit Details</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+       <div className='overflow-y-auto h-[550px]'>
+       <form onSubmit={handleSubmit} className="space-y-4 mr-[20px]">
           <div>
             <label className="block text-sm font-medium mb-1">Full name</label>
             <input type="text" name="fullname" value={form.fullname} onChange={handleChange} className="w-full border rounded px-3 py-2" />
@@ -116,6 +117,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
             <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" disabled={loading}>{loading ? 'Saving...' : 'Save'}</button>
           </div>
         </form>
+       </div>
       </div>
     </div>
   );
