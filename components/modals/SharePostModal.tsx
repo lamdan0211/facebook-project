@@ -69,13 +69,13 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
           <div className="p-4">
             {/* User Info and Audience Selector */}
             <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+              <div className=" rounded-full overflow-hidden mr-3">
                 <Image
                   src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
                   alt="Your Avatar"
                   width={40}
                   height={40}
-                  className="object-cover"
+                  className="object-cover w-10 h-10"
                 />
               </div>
               <div className="flex-1">
@@ -136,13 +136,13 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
             {/* Original Post Preview */}
             <div className="border border-[#dedede] rounded-lg p-3 mb-4">
               <div className="flex items-center mb-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden mr-2">
+                <div className="rounded-full overflow-hidden mr-2">
                   <Image
                     src={author.avatar}
                     alt={author.name}
                     width={32}
                     height={32}
-                    className="object-cover"
+                    className="object-cover w-8 h-8"
                   />
                 </div>
                 <div>
