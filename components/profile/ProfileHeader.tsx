@@ -14,7 +14,6 @@ interface ProfileHeaderProps {
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
-  profile?: any;
 }
 
 const defaultDetails: DetailsData = {
@@ -35,7 +34,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileId,
   currentUserId,
   onProfileUpdated,
-  profile,
 }) => {
   const { user } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -214,14 +212,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }
           }}
           initialData={{
-            fullname: profile?.fullname || userName || '',
-            phone: profile?.phone || '',
-            profilepic: profile?.profilepic || profilePictureUrl || '',
-            coverpic: profile?.coverpic || coverPhotoUrl || '',
-            bio: profile?.bio || '',
-            birthplace: profile?.birthplace || '',
-            workingPlace: profile?.workingPlace || '',
-            isActive: typeof profile?.isActive === 'boolean' ? profile.isActive : true,
+            fullname: userName || '',
+            phone: '',
+            profilepic: profilePictureUrl || '',
+            coverpic: coverPhotoUrl || '',
+            bio: '',
+            birthplace: '',
+            workingPlace: '',
+            isActive: true,
           }}
           userId={profileId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}

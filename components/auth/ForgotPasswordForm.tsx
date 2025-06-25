@@ -17,15 +17,7 @@ const ForgotPasswordForm = () => {
     setError(null);
     // TODO: Replace with real API call
     try {
-      const res = await fetch('http://localhost:3301/backend/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json().catch(() => null);
-      console.log(data)
+      // await sendResetEmail(email);
       setSubmitted(true);
     } catch (err: any) {
       setError('Failed to send reset email.');
