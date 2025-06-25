@@ -20,6 +20,7 @@ const Header = () => {
    const { user } = useAuth();
    const { setSearchQuery } = useSearch();
    const [localSearch, setLocalSearch] = useState('');
+   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
    const toggleDropdown = () => {
       setIsDropdownOpen(!isDropdownOpen);
@@ -59,18 +60,45 @@ const Header = () => {
                FB
             </Link>
             {/* Search Bar */}
-            <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-               {/* Search Icon inside input */}
+            <form onSubmit={handleSearchSubmit} className="relative items-center hidden md:flex">
                <svg className="absolute left-3 text-gray-500 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                <input
                   type="text"
                   placeholder="Search Facebook"
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
-                  className="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm hidden md:inline-block"
+                  className="bg-gray-100 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm"
                   style={{ minWidth: '180px' }}
                />
             </form>
+            {/* Mobile search icon */}
+            <button
+               type="button"
+               className="md:hidden flex items-center justify-center p-2 rounded-full hover:bg-gray-200 focus:outline-none"
+               onClick={() => setShowMobileSearch((v) => !v)}
+               aria-label="Open search"
+            >
+               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </button>
+            {/* Mobile floating search input */}
+            {showMobileSearch && (
+               <div className="fixed top-0 left-0 w-full z-50 bg-white flex items-center p-2 shadow-md md:hidden">
+                  <form onSubmit={handleSearchSubmit} className="flex items-center w-full">
+                     <svg className="w-7 h-7 text-gray-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                     <input
+                        type="text"
+                        placeholder="Search Facebook"
+                        value={localSearch}
+                        onChange={(e) => setLocalSearch(e.target.value)}
+                        className="bg-gray-100 rounded-full py-2 px-4 ml-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm"
+                        autoFocus
+                     />
+                     <button type="button" className="ml-2 text-gray-500" onClick={() => setShowMobileSearch(false)} aria-label="Close search">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                     </button>
+                  </form>
+               </div>
+            )}
          </div>
 
          {/* Center section: Navigation Icons */}
