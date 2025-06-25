@@ -120,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         )}
       </div>
       {/* Profile Info and Buttons */}
-      <div className="flex flex-col md:flex-row items-center gap-4 px-6 py-4">
+      <div className="flex flex-col md:flex-row items-center gap-4 px-6 py-4 mt-[-40px]">
         {/* Profile Picture */}
         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group">
           <Image
