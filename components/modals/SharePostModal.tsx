@@ -56,7 +56,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
           <h1 className="text-xl font-semibold">Share post</h1>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full"
+            className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -84,7 +84,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
                   <button
                     type="button"
                     onClick={toggleAudienceDropdown}
-                    className="flex items-center space-x-1 text-sm bg-gray-100 px-3 py-1 rounded-md"
+                    className="flex items-center space-x-1 text-sm bg-gray-100 px-3 py-1 rounded-md cursor-pointer"
                   >
                     <span>{selectedAudience}</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
               )}
             </div>
 
-            {/* Share Options */}
+            {/* Share Options
             <div className="flex items-center space-x-2 mb-4">
               <button
                 type="button"
@@ -179,14 +179,14 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
                 <span className="text-md whitespace-nowrap">Share to Story</span>
               </button>
              
-            </div>
+            </div> */}
           </div>
 
           {/* Share Button */}
           <div className="px-4 py-3">
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200"
+              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200 cursor-pointer"
             >
               Share now
             </button>
