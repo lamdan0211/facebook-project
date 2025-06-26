@@ -39,7 +39,7 @@ const notifications = [
 
 const NotificationDropdown = () => {
   return (
-    <div className="absolute right-0 top-14 w-96 md:w-50 bg-white rounded-lg shadow-lg py-2 z-30 border border-gray-200">
+    <div className="absolute right-0 top-14 w-80 md:w-50 bg-white rounded-lg shadow-lg py-2 z-30 border border-gray-200">
       <div className="px-4 py-2 border-b border-gray-100 font-bold text-lg text-gray-800">Notifications</div>
       <div className="max-h-96 overflow-y-auto">
         {notifications.map((notif) => (
