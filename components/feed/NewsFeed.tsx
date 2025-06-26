@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import Post from '@/components/posts/Post';
+import PostCard from '@/components/profile/PostCard';
 import Image from 'next/image';
 import { PostData } from '@/lib/dummyData';
 import Stories from '@/components/stories/Stories';
@@ -76,7 +76,12 @@ const NewsFeed = () => {
         timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
         content: item.content || '',
         media: Array.isArray(item.mediaUrl)
-          ? item.mediaUrl.map((url: string) => ({ type: 'image', url }))
+          ? item.mediaUrl.map((url: string) => {
+              const ext = url.split('.').pop()?.toLowerCase();
+              let type: 'image'|'video' = 'image';
+              if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+              return { type, url };
+            })
           : [],
         reactions: item.reactions || { like: 0 },
         comments: item.comments || [],
@@ -121,10 +126,12 @@ const NewsFeed = () => {
     setPosts(prev => prev.filter(post => post.id !== postId));
   };
 
-  const handleEditPost = (postId: number, updatedContent: string) => {
-    setPosts(prev => prev.map(post => 
-      post.id === postId ? { ...post, content: updatedContent } : post
-    ));
+  const handleEditPost = (updatedPost: PostData) => {
+    setPosts(prev =>
+      prev.map(post =>
+        post.id === updatedPost.id ? { ...post, ...updatedPost } : post
+      )
+    );
   };
   
   useEffect(() => {
@@ -198,12 +205,12 @@ const NewsFeed = () => {
         <div className="text-center text-gray-400 py-8">No posts found.</div>
       ) : (
         <div className="space-y-4 mt-4">
-          {posts.map((post) => (
-            <Post
-              key={post.id}
-              {...post}
-              onDelete={() => handleDeletePost(post.id)}
-              onEdit={(updatedContent) => handleEditPost(post.id, updatedContent)}
+          {posts.map((post, index) => (
+            <PostCard
+              key={post.id || String(index)}
+              post={post}
+              index={index}
+              onEdit={handleEditPost}
             />
           ))}
         </div>

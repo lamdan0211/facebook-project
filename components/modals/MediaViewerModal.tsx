@@ -71,9 +71,9 @@ const MediaViewerModal: React.FC<MediaViewerModalProps> = ({ media, initialIndex
             {comments.length === 0 && <div className="text-gray-400 text-sm">No comments yet.</div>}
             {comments.map((c, i) => (
               <div key={i} className="mb-3 flex items-start gap-2">
-                <Image src={c.author.avatar} alt={c.author.name} width={32} height={32} className="rounded-full object-cover" />
+                <Image src={c.author?.avatar || '/default-avatar.png'} alt={c.author?.name || 'User'} width={32} height={32} className="rounded-full object-cover" />
                 <div>
-                  <div className="font-semibold text-sm">{c.author.name}</div>
+                  <div className="font-semibold text-sm">{c.author?.name || 'User'}</div>
                   <div className="text-gray-700 text-sm">{c.content}</div>
                   <div className="text-xs text-gray-400 mt-1">{c.timeAgo}</div>
                 </div>

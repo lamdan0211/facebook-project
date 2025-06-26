@@ -70,9 +70,17 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   isOnSavedPage = false,
   onUnsave,
 }) => {
-  const safeReactions = reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
-  const initialTotalReactions = safeReactions.like + safeReactions.love + safeReactions.haha + safeReactions.wow + safeReactions.sad + safeReactions.angry;
-  const [currentTotalReactions, setCurrentTotalReactions] = useState(initialTotalReactions);
+  const safeReactions = {
+    like: reactions?.like || 0,
+    love: reactions?.love || 0,
+    haha: reactions?.haha || 0,
+    wow: reactions?.wow || 0,
+    sad: reactions?.sad || 0,
+    angry: reactions?.angry || 0,
+  };
+  const [currentTotalReactions, setCurrentTotalReactions] = useState(
+    Object.values(safeReactions).reduce((a, b) => a + b, 0)
+  );
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [showReactionMenu, setShowReactionMenu] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -94,6 +102,19 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
+  useEffect(() => {
+    setCurrentTotalReactions(
+      Object.values({
+        like: reactions?.like || 0,
+        love: reactions?.love || 0,
+        haha: reactions?.haha || 0,
+        wow: reactions?.wow || 0,
+        sad: reactions?.sad || 0,
+        angry: reactions?.angry || 0,
+      }).reduce((a, b) => a + b, 0)
+    );
+  }, [reactions]);
+
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -111,34 +132,81 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     };
   }, [showDropdown]);
 
-  const handleReaction = (reactionType: string) => {
-    if (userReaction === reactionType) {
-      setUserReaction(null);
-      setCurrentTotalReactions(currentTotalReactions - 1);
-    } else {
-      if (userReaction === null) {
-        setCurrentTotalReactions(currentTotalReactions + 1);
+  const handleReaction = async (reactionType: string) => {
+    const accessToken = sessionStorage.getItem('accessToken');
+    try {
+      const response = await fetch('http://localhost:3301/backend/reaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          type: reactionType,
+          postId: id,
+        }),
+      });
+      if (response.ok) {
+        const updatedPost = await response.json();
+        if (onEdit && updatedPost) {
+          onEdit(updatedPost);
+        }
+        if (userReaction === reactionType) {
+          setUserReaction(null);
+          setCurrentTotalReactions(currentTotalReactions - 1);
+        } else {
+          if (userReaction === null) {
+            setCurrentTotalReactions(currentTotalReactions + 1);
+          }
+          setUserReaction(reactionType);
+        }
+      } else {
+        const data = await response.json();
+        alert(data?.message || 'Gửi reaction thất bại');
       }
-      setUserReaction(reactionType);
+    } catch (err) {
+      alert('Gửi reaction thất bại');
     }
     setShowReactionMenu(false);
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (commentText.trim()) {
-      const newComment: CommentData = {
-        author: {
-          name: user?.displayName || 'User',
-          avatar: user?.photoURL || "/default-avatar.png",
-          email: user?.email || '',
-        },
-        content: commentText,
-        timeAgo: 'Just now',
-        likes: 0
-      };
-      setAllComments(prev => [newComment, ...prev]);
-      setCommentText('');
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const response = await fetch('http://localhost:3301/backend/comment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            content: commentText,
+            postId: id,
+          }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          const newComment: CommentData = {
+            author: {
+              name: user?.displayName || 'User',
+              avatar: user?.photoURL || "/default-avatar.png",
+              email: user?.email || '',
+            },
+            content: commentText,
+            timeAgo: 'Just now',
+            likes: 0
+          };
+          setAllComments(prev => [newComment, ...prev]);
+          setCommentText('');
+        } else {
+          // Xử lý lỗi nếu cần
+          alert(data?.message || 'Gửi bình luận thất bại');
+        }
+      } catch (err) {
+        alert('Gửi bình luận thất bại');
+      }
     }
   };
 
@@ -536,13 +604,23 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       )}
 
       {/* Edit Modal */}
-      {showEditModal && user && user.email && author.email && user.email === author.email && (
+      {showEditModal && (
         <EditPostModal
-          post={{ id, author, timeAgo, content, media, reactions, comments, shares, taggedPeople }}
+          post={{
+            id,
+            author,
+            timeAgo,
+            content,
+            media,
+            reactions,
+            comments,
+            shares,
+            taggedPeople,
+          }}
           onClose={() => setShowEditModal(false)}
-          onEdit={(updatedPost) => {
-            if (typeof index === 'number' && onEdit) onEdit(updatedPost);
+          onEdit={updatedPost => {
             setShowEditModal(false);
+            if (onEdit) onEdit(updatedPost);
           }}
         />
       )}

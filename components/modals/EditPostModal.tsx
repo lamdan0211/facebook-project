@@ -19,48 +19,133 @@ interface EditPostModalProps {
 }
 
 const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) => {
+  
   const [postContent, setPostContent] = useState(post.content || '');
-  const [selectedAudience, setSelectedAudience] = useState('Only me'); // Optional: can be extended
-  const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showTagPeopleModal, setShowTagPeopleModal] = useState(false);
-  const [taggedPeople, setTaggedPeople] = useState<Person[]>(post.taggedPeople || []);
   const [previewMedia, setPreviewMedia] = useState<{type: 'image'|'video', url: string, file?: File}[]>(
     (post.media || []).map(m => ({ type: m.type, url: m.url }))
   );
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onClose();
-    onEdit({
-      ...post,
-      content: postContent,
-      media: previewMedia.map(m => ({ type: m.type, url: m.url })),
-      taggedPeople: taggedPeople,
-    });
-  };
+    setToast(null);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      let mediaUrl: string[] = [];
 
-  const toggleAudienceDropdown = () => {
-    setIsAudienceDropdownOpen(!isAudienceDropdownOpen);
-    setShowEmojiPicker(false);
-  };
+      // 1. UPLOAD MEDIA
+      if (previewMedia.length > 0) {
+        const images = previewMedia.filter(media => media.type === 'image' && media.file);
+        const videos = previewMedia.filter(media => media.type === 'video' && media.file);
+        // Upload images
+        if (images.length > 0) {
+          const formData = new FormData();
+          images.forEach(media => {
+            if (media.file) {
+              formData.append('files', media.file);
+            }
+          });
+          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadRes.ok && Array.isArray(uploadData?.paths)) {
+            mediaUrl = mediaUrl.concat(uploadData.paths.map((p: string) => `http://localhost:3301/${p.replace(/^\/+/,'')}`));
+          } else {
+            throw new Error(uploadData?.message || 'Upload file thất bại.');
+          }
+        }
+        // Upload videos
+        if (videos.length > 0) {
+          const formData = new FormData();
+          videos.forEach(media => {
+            if (media.file) {
+              formData.append('files', media.file);
+            }
+          });
+          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-videos', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+          const uploadData = await uploadRes.json();
+          
+          if (uploadRes.ok) {
+            mediaUrl = mediaUrl.concat(uploadData.files.map((file: { path: string }) => `http://localhost:3301/${file.path.replace(/^[/\\]+/, '')}`));
+          } else {
+            throw new Error(uploadData?.message || 'Upload file thất bại.');
+          }
+        }
+      }
 
-  const selectAudience = (audience: string) => {
-    setSelectedAudience(audience);
-    setIsAudienceDropdownOpen(false);
-  };
+      // Lấy media cũ không có file (chỉ có url)
+      const oldMediaUrls = previewMedia.filter(m => !m.file).map(m => m.url);
+      // mediaUrl là media cũ + media mới upload
+      mediaUrl = oldMediaUrls.concat(mediaUrl);
 
-  const handleEmojiClick = (emojiData: any) => {
-    setPostContent(prevContent => prevContent + emojiData.emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const toggleEmojiPicker = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowEmojiPicker(!showEmojiPicker);
-    setIsAudienceDropdownOpen(false);
+      // 2. EDIT POST
+      const payload: any = {
+        content: postContent,
+      };
+      if (mediaUrl.length > 0) {
+        payload.mediaUrl = mediaUrl;
+      }
+      console.log(payload.mediaUrl)
+      const res = await fetch(`http://localhost:3301/backend/post/${post.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      const result = await res.json().catch(() => null);
+      console.log(result  )
+      if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
+      const mappedPost: PostData = {
+        id: result.id,
+        author: {
+          name: user?.fullname || user?.email || 'User',
+          avatar: user?.profilepic || '/default-avatar.png',
+          email: user?.email || '',
+        },
+        timeAgo: result.createdAt ? new Date(result.createdAt).toLocaleString() : '',
+        content: result.content || '',
+        media: Array.isArray(result.mediaUrl)
+          ? result.mediaUrl.map((url: string) => {
+              const ext = url.split('.').pop()?.toLowerCase();
+              let type: 'image'|'video' = 'image';
+              if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+              return { type, url };
+            })
+          : [],
+        reactions: result.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+        comments: result.comments || [],
+        shares: result.shares || 0,
+        taggedPeople: result.taggedPeople || [],
+      };
+      onEdit(mappedPost);
+      setToast('Đăng bài thành công!');
+      setPostContent('');
+      setPreviewMedia([]);
+      setTimeout(() => {
+        setToast(null);
+        onClose();
+      }, 1500);
+    } catch (err: any) {
+      console.error('Error when posting:', err);
+      setToast(err.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+      setTimeout(() => setToast(null), 3000);
+    }
   };
 
   const handleFileSelect = () => {
@@ -82,11 +167,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
       URL.revokeObjectURL(previewMedia[index].url);
     }
     setPreviewMedia(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleTagPeople = (people: Person[]) => {
-    setTaggedPeople(people);
-    setShowTagPeopleModal(false);
   };
 
   // Clean up preview URLs when component unmounts
@@ -116,12 +196,11 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
 
         <form onSubmit={handleSubmit}>
           <div className="p-4">
-            {/* User Info and Privacy Selector */}
+            {/* User Info */}
             <div className="flex items-center mb-4 gap-2">
-            <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
+              <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
               <div>
                 <p className="font-semibold text-sm">{user?.displayName || post.author.name || "User"}</p>
-                {/* Audience dropdown (optional) */}
               </div>
             </div>
 
@@ -132,31 +211,6 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
               placeholder="What's on your mind?"
               className="w-full min-h-[120px] text-lg resize-none border-0 focus:outline-none focus:ring-0 p-0"
             />
-
-            {/* Tagged People Display */}
-            {taggedPeople.length > 0 && (
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-2">
-                  {taggedPeople.map((person, idx) => (
-                    <div
-                      key={person.id || person.name + idx}
-                      className="flex items-center bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-sm"
-                    >
-                      <span>{person.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => setTaggedPeople(prev => prev.filter((_, i) => i !== idx))}
-                        className="ml-1 hover:bg-blue-100 rounded-full p-0.5"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Media Preview */}
             {previewMedia.length > 0 && (
@@ -180,7 +234,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
               </div>
             )}
 
-            {/* Add to Post Options */}
+            {/* Add Media */}
             <div className='flex items-center justify-between'>
               <span className="text-sm font-medium text-gray-500 whitespace-nowrap">Add to your post</span>
               <div className="flex items-center space-x-1.5">
@@ -189,23 +243,8 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
                     <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer" onClick={() => setShowTagPeopleModal(true)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1B74E4" className="w-6 h-6">
-                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                <button type="button" className="p-1.5 hover:bg-gray-100 rounded-full cursor-pointer" onClick={toggleEmojiPicker}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#EAB026" className="w-6 h-6">
-                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6c-.54 0-.828.419-.936.634a1.96 1.96 0 00-.189.866c0 .298.059.605.189.866.108.215.395.634.936.634.54 0 .828-.419.936-.634.13-.26.189-.568.189-.866 0-.298-.059-.605-.189-.866-.108-.215-.395-.634-.936-.634zm4.314.634c.108-.215.395-.634.936-.634.54 0 .828.419.936.634.13.26.189.568.189.866 0 .298-.059.605-.189.866-.108.215-.395.634-.936.634-.54 0-.828-.419-.936-.634a1.96 1.96 0 01-.189-.866c0-.298.059-.605.189-.866zm2.023 6.828a.75.75 0 10-1.06-1.06 3.75 3.75 0 01-5.304 0 .75.75 0 00-1.06 1.06 5.25 5.25 0 007.424 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
               </div>
             </div>
-            {showEmojiPicker && (
-              <div className="absolute bottom-[180px] right-4 z-50" onClick={(e) => e.stopPropagation()}>
-                <EmojiPicker onEmojiClick={handleEmojiClick} />
-              </div>
-            )}
             {/* Hidden File Input */}
             <input
               type="file"
@@ -227,12 +266,10 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
           </button>
         </form>
 
-        {/* Tag People Modal */}
-        {showTagPeopleModal && (
-          <TagPeopleModal
-            onClose={() => setShowTagPeopleModal(false)}
-            onTagPeople={handleTagPeople}
-          />
+        {toast && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-[9999]">
+            {toast}
+          </div>
         )}
       </div>
     </div>

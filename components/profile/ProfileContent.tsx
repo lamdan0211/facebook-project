@@ -38,7 +38,12 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
             timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
             content: item.content || '',
             media: Array.isArray(item.mediaUrl)
-              ? item.mediaUrl.map((url: string) => ({ type: 'image', url }))
+              ? item.mediaUrl.map((url: string) => {
+                  const ext = url.split('.').pop()?.toLowerCase();
+                  let type: 'image'|'video' = 'image';
+                  if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+                  return { type, url };
+                })
               : [],
             reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
             comments: item.comments || [],
@@ -58,6 +63,10 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleEditPost = (updatedPost: PostData) => {
+    setPosts(prev => prev.map(post => post.id === updatedPost.id ? { ...post, ...updatedPost } : post));
   };
 
   return (
@@ -118,6 +127,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
               key={post.id || String(index)}
               post={post}
               index={index}
+              onEdit={handleEditPost}
             />
           ))
         )}

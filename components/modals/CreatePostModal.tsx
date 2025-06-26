@@ -51,7 +51,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
       case 1:
         return <><span role="img" aria-label="only me">🔒</span> Only me</>;
       case 2:
-        return <><span role="img" aria-label="friends">��</span> Friends</>;
+        return <><span role="img" aria-label="friends">👥</span> Friends</>;
       default:
         return <><span role="img" aria-label="public">🌍</span> Public</>;
     }
@@ -60,42 +60,80 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setToast(null);
+
+    // Nếu không có text và không có media thì không cho đăng
+    if (!postContent.trim() && previewMedia.length === 0) {
+      setToast('Vui lòng nhập nội dung hoặc chọn ảnh/video.');
+      setTimeout(() => setToast(null), 2000);
+      return;
+    }
+
     try {
       const accessToken = sessionStorage.getItem('accessToken');
       let mediaUrl: string[] = [];
 
       // 1. UPLOAD MEDIA
       if (previewMedia.length > 0) {
-        // Tạo một FormData duy nhất
-        const formData = new FormData();
-        // Thêm tất cả các file vào cùng một trường 'files'
-        previewMedia.forEach(media => {
-          formData.append('files', media.file);
-        });
-        
-        const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            // Không set Content-Type, để trình duyệt tự xử lý
-          },
-          body: formData,
-        });
-
-        const uploadData = await uploadRes.json();
-
-        if (uploadRes.ok && Array.isArray(uploadData?.paths)) {
-          mediaUrl = uploadData.paths.map((p: string) => `http://localhost:3301/${p.replace(/^\/+/, '')}`);
-        } else {
-          throw new Error(uploadData?.message || 'Upload file thất bại.');
+        const images = previewMedia.filter(media => media.type === 'image' && media.file);
+        const videos = previewMedia.filter(media => media.type === 'video' && media.file);
+        // Upload images
+        if (images.length > 0) {
+          const formData = new FormData();
+          images.forEach(media => {
+            if (media.file) {
+              formData.append('files', media.file);
+            }
+          });
+          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-image', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadRes.ok && Array.isArray(uploadData?.paths)) {
+            mediaUrl = mediaUrl.concat(uploadData.paths.map((p: string) => `http://localhost:3301/${p.replace(/^\/+/,'')}`));
+          } else {
+            throw new Error(uploadData?.message || 'Upload file thất bại.');
+          }
+        }
+        // Upload videos
+        if (videos.length > 0) {
+          const formData = new FormData();
+          videos.forEach(media => {
+            if (media.file) {
+              formData.append('files', media.file);
+            }
+          });
+          const uploadRes = await fetch('http://localhost:3301/backend/common/upload-videos', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+          const uploadData = await uploadRes.json();
+          
+          if (uploadRes.ok) {
+            mediaUrl = mediaUrl.concat(uploadData.files.map((file: { path: string }) => `http://localhost:3301/${file.path.replace(/^[/\\]+/, '')}`));
+          } else {
+            throw new Error(uploadData?.message || 'Upload file thất bại.');
+          }
         }
       }
+
+      // Lấy media cũ không có file (chỉ có url)
+      const oldMediaUrls = previewMedia.filter(m => !m.file).map(m => m.url);
+      // mediaUrl là media cũ + media mới upload
+      mediaUrl = oldMediaUrls.concat(mediaUrl);
 
       // 2. CREATE POST
       const isType = selectedAudience;
 
+      // Nếu không có text, nhưng có media, gửi content là 'media'
       const payload = {
-        content: postContent,
+        content: postContent.trim() || 'media',
         userId: user?.id,
         isType,
         mediaUrl,
@@ -124,7 +162,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         timeAgo: result.createdAt ? new Date(result.createdAt).toLocaleString() : '',
         content: result.content || '',
         media: Array.isArray(result.mediaUrl)
-          ? result.mediaUrl.map((url: string) => ({ type: 'image', url }))
+          ? result.mediaUrl.map((url: string) => {
+              const ext = url.split('.').pop()?.toLowerCase();
+              let type: 'image'|'video' = 'image';
+              if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+              return { type, url };
+            })
           : [],
         reactions: result.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
         comments: result.comments || [],

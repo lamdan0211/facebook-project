@@ -1,28 +1,20 @@
 "use client";
 import React from 'react';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth/AuthContext';
 
 const GoogleSignInButton = () => {
   const router = useRouter();
-  const { login } = useAuth();
+  const { loginGoogle } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const email = result.user.email;
-      const name = result.user.displayName || 'Google User';
-      if (!email) throw new Error('Không lấy được email từ Google');
-      // Gọi API register (nếu tài khoản đã tồn tại thì backend sẽ xử lý)
-      await fetch('http://localhost:3301/backend/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: '123456', fullname: name })
-      });
-      // Sau đó gọi login để lấy token và lưu session
-      await login(email, '123456');
+      const token = await result.user.getIdToken()
+      if (!token) throw new Error('Không lấy được accessToken từ Google');
+      await loginGoogle(token);
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
     }
