@@ -1,36 +1,47 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import RightSidebar from "@/components/layout/RightSidebar";
 import Image from "next/image";
 
-const demoPages = [
-  {
-    id: 1,
-    name: "M-TP",
-    desc: "Nghệ sỹ/Bạn nhạc",
-    avatar: "https://i.imgur.com/1.jpg",
-    cover: "https://i.imgur.com/cover1.jpg",
-    liked: false,
-    likes: "50 người thích Trang này",
-    sub: "Quang Hoàng và 50 người khác thích Trang này",
-  },
-  {
-    id: 2,
-    name: "Đặng Thành Kiên",
-    desc: "Thể thao & giải trí",
-    avatar: "https://i.imgur.com/2.jpg",
-    cover: "https://i.imgur.com/cover2.jpg",
-    liked: false,
-    likes: "94,6K người thích Trang này",
-    sub: "",
-  },
-  // ... thêm các page khác tương tự
-];
-
 export default function Pages() {
-  const [pages, setPages] = useState(demoPages);
+  const [pages, setPages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPages = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch('http://localhost:3301/pages/suggested', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) throw new Error('Không thể lấy danh sách page!');
+        const data = await res.json();
+        // Map API data sang format card
+        const mapped = (Array.isArray(data) ? data : []).map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          desc: item.description,
+          avatar: item.pagePicture,
+          liked: false,
+          likes: '', // Nếu API có trường likes thì map vào đây
+          sub: '',
+        }));
+        setPages(mapped);
+      } catch (err: any) {
+        setError(err.message || 'Đã có lỗi xảy ra!');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPages();
+  }, []);
 
   const handleLike = (id: number) => {
     setPages((prev) =>
@@ -52,17 +63,16 @@ export default function Pages() {
           <div className="w-full max-w-6xl">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Khám phá Trang</h2>
             <h3 className="text-lg text-gray-600 mb-6">Gợi ý cho bạn</h3>
+            {loading ? (
+              <div className="text-center text-gray-500 py-8">Đang tải danh sách page...</div>
+            ) : error ? (
+              <div className="text-center text-red-500 py-8">{error}</div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {pages.map((page) => (
                 <div key={page.id} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden flex flex-col">
                   {/* Close button */}
-                  <button
-                    className="absolute top-2 right-2 bg-black bg-opacity-40 rounded-full p-1 hover:bg-opacity-70 z-10"
-                    onClick={() => handleClose(page.id)}
-                    title="Ẩn gợi ý này"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M6 14L14 6" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
-                  </button>
+                  
                   {/* Avatar + Info */}
                   <div className="flex flex-col items-center gap-2 px-4 pt-6 pb-2">
                     <Image
@@ -94,6 +104,7 @@ export default function Pages() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </main>
         <aside className="hidden lg:block lg:w-72 bg-gray-100 p-4 overflow-y-auto flex-shrink-0">
