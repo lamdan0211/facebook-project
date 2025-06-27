@@ -9,6 +9,9 @@ export default function Pages() {
   const [pages, setPages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [likedPages, setLikedPages] = useState<any[]>([]);
+  const [loadingLiked, setLoadingLiked] = useState(true);
+  const [errorLiked, setErrorLiked] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPages = async () => {
@@ -43,6 +46,35 @@ export default function Pages() {
     fetchPages();
   }, []);
 
+  useEffect(() => {
+    const fetchLikedPages = async () => {
+      setLoadingLiked(true);
+      setErrorLiked(null);
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch('http://localhost:3301/pages/liked', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) throw new Error('Không thể lấy danh sách page đã thích!');
+        const data = await res.json();
+        const mapped = (Array.isArray(data) ? data : []).map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          desc: item.description,
+          avatar: item.pagePicture,
+        }));
+        setLikedPages(mapped);
+      } catch (err: any) {
+        setErrorLiked(err.message || 'Đã có lỗi xảy ra!');
+      } finally {
+        setLoadingLiked(false);
+      }
+    };
+    fetchLikedPages();
+  }, []);
+
   const handleLike = (id: number) => {
     setPages((prev) =>
       prev.map((p) => (p.id === id ? { ...p, liked: !p.liked } : p))
@@ -61,10 +93,36 @@ export default function Pages() {
         </aside>
         <main className="flex-1 overflow-auto scrollbar-hide p-4 flex flex-col items-center">
           <div className="w-full max-w-6xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Khám phá Trang</h2>
-            <h3 className="text-lg text-gray-600 mb-6">Gợi ý cho bạn</h3>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Liked Pages</h2>
+            {loadingLiked ? (
+              <div className="text-center text-gray-500 py-4">Loading...</div>
+            ) : errorLiked ? (
+              <div className="text-center text-red-500 py-4">{errorLiked}</div>
+            ) : likedPages.length === 0 ? (
+              <div className="text-center text-gray-400 py-4">You haven't liked any pages yet.</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                {likedPages.map((page) => (
+                  <div key={page.id} className="relative bg-white rounded-xl shadow border border-gray-200 overflow-hidden flex flex-col">
+                    <div className="flex flex-col items-center gap-2 px-4 pt-6 pb-2">
+                      <Image
+                        src={page.avatar}
+                        alt={page.name}
+                        width={64}
+                        height={64}
+                        className="rounded-full border-4 border-white bg-white shadow"
+                      />
+                      <span className="font-bold text-gray-900 leading-tight text-base mt-2">{page.name}</span>
+                      <span className="text-xs text-gray-600">{page.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Discover Pages</h2>
+            <h3 className="text-lg text-gray-600 mb-6">Suggested for you</h3>
             {loading ? (
-              <div className="text-center text-gray-500 py-8">Đang tải danh sách page...</div>
+              <div className="text-center text-gray-500 py-8">Loading pages...</div>
             ) : error ? (
               <div className="text-center text-red-500 py-8">{error}</div>
             ) : (
