@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/layout/Header";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import RightSidebar from "@/components/layout/RightSidebar";
 import Image from "next/image";
+import { Camera } from 'lucide-react';
 
 export default function Pages() {
   const [pages, setPages] = useState<any[]>([]);
@@ -12,6 +13,15 @@ export default function Pages() {
   const [likedPages, setLikedPages] = useState<any[]>([]);
   const [loadingLiked, setLoadingLiked] = useState(true);
   const [errorLiked, setErrorLiked] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploadingImg, setUploadingImg] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPages = async () => {
@@ -135,6 +145,108 @@ export default function Pages() {
     setPages((prev) => prev.filter((p) => p.id !== id));
   };
 
+  const handleOpenCreate = () => {
+    setShowCreateModal(true);
+    setCreateError(null);
+    setImageFile(null);
+    setImageUrl(null);
+  };
+
+  const handleCloseCreate = () => {
+    setShowCreateModal(false);
+    setCreateError(null);
+    setImageFile(null);
+    setImageUrl(null);
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setImageFile(file);
+    // Always preview immediately
+    setPreviewUrl(URL.createObjectURL(file));
+    setUploadingImg(true);
+    try {
+      const formData = new FormData();
+      if (file) formData.append('files', file as Blob);
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3301/backend/common/upload-image', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        body: formData,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      let imageUrl = '';
+      if (Array.isArray(data.paths) && data.paths.length > 0) {
+        imageUrl = `http://localhost:3301/${data.paths[0].replace(/^\/+/,'')}`;
+      } else if (data.path) {
+        imageUrl = `http://localhost:3301/${data.path.replace(/^\/+/,'')}`;
+      } else {
+        throw new Error('No image path returned');
+      }
+      setImageUrl(imageUrl);
+    } catch (err) {
+      setCreateError('Failed to upload image');
+    } finally {
+      setUploadingImg(false);
+    }
+  };
+
+  // Reset preview and imageUrl when modal close
+  useEffect(() => { if (!showCreateModal) { setPreviewUrl(null); setImageUrl(null); } }, [showCreateModal]);
+
+  const handleCreatePage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    setCreateError(null);
+    try {
+      const name = nameRef.current?.value?.trim();
+      const description = descRef.current?.value?.trim();
+      if (!name || !imageUrl) {
+        setCreateError('Name and image are required');
+        setCreateLoading(false);
+        return;
+      }
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3301/pages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          pagePicture: imageUrl,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to create page');
+      const data = await res.json();
+      // Like the page after creation
+      try {
+        const likeRes = await fetch(`http://localhost:3301/pages/${data.id}/like`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        if (!likeRes.ok) throw new Error('Failed to like page after creation');
+      } catch (err) {
+        // Optional: show error, but still add to likedPages
+      }
+      setLikedPages(prev => [{
+        id: data.id,
+        name: data.name,
+        desc: data.description,
+        avatar: data.pagePicture,
+      }, ...prev]);
+      handleCloseCreate();
+    } catch (err: any) {
+      setCreateError(err.message || 'Failed to create page');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <Header />
@@ -232,6 +344,76 @@ export default function Pages() {
           <RightSidebar />
         </aside>
       </div>
+      {/* Floating create page button */}
+      <button
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg font-semibold text-base"
+        onClick={handleOpenCreate}
+      >
+        <span className="text-2xl leading-none">+</span> Create your page
+      </button>
+
+      {/* Create Page Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <form onSubmit={handleCreatePage} className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
+            <button type="button" className="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onClick={handleCloseCreate}>
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="#333" strokeWidth="2" strokeLinecap="round"/></svg>
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Create Page</h2>
+            <div className="mb-3">
+              <label className="block text-gray-700 font-medium mb-1">Page Name <span className="text-red-500">*</span></label>
+              <input ref={nameRef} type="text" className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" required maxLength={100} />
+            </div>
+            <div className="mb-3">
+              <label className="block text-gray-700 font-medium mb-1">Description</label>
+              <textarea ref={descRef} className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500" rows={3} maxLength={500} />
+            </div>
+            <div className="mb-3">
+              <label className="block text-gray-700 font-medium mb-1">Page Picture <span className="text-red-500">*</span></label>
+              <div className="flex flex-col items-center">
+                <label htmlFor="page-image-upload" className="relative group cursor-pointer">
+                  <input
+                    id="page-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <div className={`w-28 h-28 rounded-full border-2 border-dashed flex items-center justify-center bg-gray-100 overflow-hidden transition-all duration-200 group-hover:border-blue-400 group-hover:bg-blue-50 ${previewUrl || imageUrl ? '' : 'border-gray-300'}`}>
+                    {previewUrl || imageUrl ? (
+                      <img
+                        src={previewUrl || imageUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center text-gray-400">
+                        <Camera className="w-10 h-10 mb-1" />
+                        <span className="text-xs">Upload</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-full transition-all duration-200"></div>
+                  </div>
+                </label>
+                {(previewUrl || imageUrl) && (
+                  <button
+                    type="button"
+                    className="mt-2 text-xs text-blue-600 hover:underline"
+                    onClick={() => { setImageFile(null); setImageUrl(null); setPreviewUrl(null); }}
+                  >
+                    Choose another image
+                  </button>
+                )}
+                {uploadingImg && <div className="text-xs text-gray-500 mt-1">Uploading...</div>}
+              </div>
+            </div>
+            {createError && <div className="text-red-500 text-sm mb-2">{createError}</div>}
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold mt-2 disabled:opacity-60" disabled={createLoading || uploadingImg}>
+              {createLoading ? 'Creating...' : 'Create Page'}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 } 
