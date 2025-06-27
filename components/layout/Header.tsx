@@ -104,7 +104,7 @@ const Header = () => {
 
          {/* Center section: Navigation Icons */}
          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="flex items-center justify-between w-[180px]">
+            <div className="flex items-center justify-between w-[240px]">
                {/* Navigation Tabs */}
                <Link href="/dashboard"
                  className={`flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg cursor-pointer h-[55px] border-b-2 transition-colors duration-200
@@ -118,6 +118,17 @@ const Header = () => {
                >
                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                    <path d="M6.75 23.25C6.336 23.25 6 22.914 6 22.5C6 22.086 6.336 21.75 6.75 21.75H17.25C17.664 21.75 18 22.086 18 22.5C18 22.914 17.664 23.25 17.25 23.25H6.75ZM15.163 10.846L10.055 13.923C9.591 14.202 9 13.869 9 13.327V7.172C9 6.631 9.591 6.297 10.055 6.576L15.163 9.654C15.612 9.924 15.612 10.575 15.163 10.846ZM19.75 18.25C20.992 18.25 22 17.242 22 16V4.5C22 3.258 20.992 2.25 19.75 2.25H4.25C3.008 2.25 2 3.258 2 4.5V16C2 17.242 3.008 18.25 4.25 18.25H19.75ZM19.75 19.75H4.25C2.179 19.75 0.5 18.071 0.5 16V4.5C0.5 2.429 2.179 0.75 4.25 0.75H19.75C21.821 0.75 23.5 2.429 23.5 4.5V16C23.5 18.071 21.821 19.75 19.75 19.75Z" fill="currentColor" />
+                 </svg>
+               </Link>
+               <Link href="/pages"
+                 className={`flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg cursor-pointer h-[55px] border-b-2 transition-colors duration-200
+                   ${pathname === '/pages' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300'}`}
+               >
+                 {/* Orange flag icon */}
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <rect x="3" y="3" width="3" height="18" rx="1.5" fill="#2196F3"/>
+                   <rect x="7" y="5" width="10" height="6" rx="2" fill="#FF6D1B"/>
+                   <rect x="9" y="11" width="10" height="6" rx="2" fill="#FF9139"/>
                  </svg>
                </Link>
                <Link href="/friends"
