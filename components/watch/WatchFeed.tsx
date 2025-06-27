@@ -1,17 +1,120 @@
-import React, { useRef, useState } from 'react';
-import { watchVideos } from '@/lib/dummyData';
+import React, { useEffect, useRef, useState } from 'react';
+// import { watchVideos } from '@/lib/dummyData';
+
+interface ApiVideo {
+  id: number;
+  isType: number;
+  name: string;
+  url: string;
+  createdAt: string;
+  post: {
+    id: number;
+    isType: number;
+    content: string;
+    mediaUrl: string[];
+    friends: any[];
+    createdAt: string;
+    updatedAt: string;
+    user?: {
+      fullname?: string;
+      profilepic?: string;
+      email?: string;
+    };
+  };
+}
+
+interface VideoCardProps {
+  video: {
+    id: number;
+    videoUrl: string;
+    title: string;
+    timeAgo: string;
+    author: {
+      name: string;
+      avatar: string;
+    };
+    reactions: {
+      like: number;
+      love: number;
+      haha: number;
+      wow: number;
+      sad: number;
+      angry: number;
+    };
+    shares: number;
+    thumbnail?: string;
+  };
+}
 
 const WatchFeed = () => {
+  const [videos, setVideos] = useState<VideoCardProps["video"][]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const userStr = sessionStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        const userId = user?.id;
+        if (!userId) {
+          setError('Bạn cần đăng nhập để xem video!');
+          setLoading(false);
+          return;
+        }
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch(`http://localhost:3301/backend/photo/user?user_id=${userId}&type=1&page=1&limit=30`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) {
+          throw new Error('Không thể lấy dữ liệu video!');
+        }
+        const data: ApiVideo[] = await res.json();
+        // Map API data sang format VideoCard
+        const mapped = data.map(item => ({
+          id: item.id,
+          videoUrl: item.url,
+          title: item.name || item.post?.content || 'Video',
+          timeAgo: new Date(item.createdAt).toLocaleString(),
+          author: {
+            name: item.post?.user?.fullname || 'User',
+            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
+          },
+          reactions: {
+            like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0, // backend chưa trả về reactions
+          },
+          shares: 0, // backend chưa trả về shares
+          thumbnail: '', // nếu backend có trường thumbnail thì map vào đây
+        }));
+        setVideos(mapped);
+      } catch (err: any) {
+        setError(err.message || 'Đã có lỗi xảy ra!');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVideos();
+  }, []);
+
   return (
     <div className="max-w-3xl mx-auto mt-6 space-y-6">
-      {watchVideos.map(video => (
+      {loading && <div className="text-center text-gray-500 py-8">Đang tải video...</div>}
+      {error && <div className="text-center text-red-500 py-8">{error}</div>}
+      {!loading && !error && videos.length === 0 && (
+        <div className="text-center text-gray-500 py-8">Chưa có video nào!</div>
+      )}
+      {videos.map(video => (
         <VideoCard key={video.id} video={video} />
       ))}
     </div>
   );
 };
 
-const VideoCard = ({ video }: { video: any }) => {
+const VideoCard = ({ video }: VideoCardProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -21,7 +124,6 @@ const VideoCard = ({ video }: { video: any }) => {
 
   const handlePlayPause = () => {
     if (!videoRef.current) return;
-
     if (videoRef.current.paused) {
       videoRef.current.play();
       setIsPlaying(true);
@@ -97,7 +199,6 @@ const VideoCard = ({ video }: { video: any }) => {
           muted={isMuted}
           onTimeUpdate={handleTimeUpdate}
         />
-
         {/* Nút Play/Pause overlay */}
         <button
           className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -117,7 +218,6 @@ const VideoCard = ({ video }: { video: any }) => {
             </svg>
           </div>
         </button>
-
         {/* Thanh điều khiển */}
         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 px-4 py-2 flex items-center gap-3 text-white text-sm">
           {/* Thời gian */}
@@ -132,7 +232,6 @@ const VideoCard = ({ video }: { video: any }) => {
             className="flex-1 h-1 accent-white"
           />
           <span className="w-10">{formatTime(duration)}</span>
-
           {/* Nút âm lượng */}
           <button onClick={handleMuteToggle} title="Tắt/Bật tiếng">
             {isMuted ? (
@@ -141,29 +240,15 @@ const VideoCard = ({ video }: { video: any }) => {
               <span className="text-lg">🔊</span>
             )}
           </button>
-
           {/* Nút fullscreen */}
           <button onClick={handleFullScreen} title="Toàn màn hình">
             <span className="text-lg">⛶</span>
           </button>
         </div>
       </div>
-
       <div className="p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <img
-            src={video.author.avatar}
-            alt={video.author.name}
-            width={32}
-            height={32}
-            className="rounded-full w-8 h-8 object-cover"
-          />
-          <span className="font-semibold">{video.author.name}</span>
-          <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
-        </div>
-
+        <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
         <h2 className="text-lg font-bold mb-2">{video.title}</h2>
-
         <div className="flex items-center gap-4 mt-2 text-lg">
           <span>👍 {video.reactions.like}</span>
           <span>❤️ {video.reactions.love}</span>
@@ -175,6 +260,5 @@ const VideoCard = ({ video }: { video: any }) => {
     </div>
   );
 };
-
 
 export default WatchFeed;
