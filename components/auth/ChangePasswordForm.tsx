@@ -13,6 +13,9 @@ const ChangePasswordForm = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = () => {
     const errs: { [key: string]: string } = {};
@@ -72,38 +75,89 @@ const ChangePasswordForm = () => {
         {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{success}</div>}
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showOldPassword ? "text" : "password"}
               name="oldPassword"
               value={formData.oldPassword}
               onChange={handleChange}
               placeholder="Mật khẩu cũ"
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 ${errors.oldPassword ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 pr-12 ${errors.oldPassword ? 'border-red-500' : 'border-gray-300'}`}
             />
-            {errors.oldPassword && <p className="text-red-500 text-sm mt-1">{errors.oldPassword}</p>}
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              tabIndex={-1}
+              onClick={() => setShowOldPassword((v) => !v)}
+              aria-label={showOldPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            >
+              {showOldPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88m-4.24-4.24A3 3 0 0 1 12 9a3 3 0 0 1 2.12.88m-4.24 4.24L3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                </svg>
+              )}
+            </button>
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showNewPassword ? "text" : "password"}
               name="newPassword"
               value={formData.newPassword}
               onChange={handleChange}
               placeholder="Mật khẩu mới"
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 ${errors.newPassword ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 pr-12 ${errors.newPassword ? 'border-red-500' : 'border-gray-300'}`}
             />
-            {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              tabIndex={-1}
+              onClick={() => setShowNewPassword((v) => !v)}
+              aria-label={showNewPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            >
+              {showNewPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88m-4.24-4.24A3 3 0 0 1 12 9a3 3 0 0 1 2.12.88m-4.24 4.24L3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                </svg>
+              )}
+            </button>
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Xác nhận mật khẩu mới"
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:border-blue-500 pr-12 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
             />
-            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              tabIndex={-1}
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              aria-label={showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            >
+              {showConfirmPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88m-4.24-4.24A3 3 0 0 1 12 9a3 3 0 0 1 2.12.88m-4.24 4.24L3.98 8.223A10.477 10.477 0 0 0 2.25 12c2.036 3.662 5.61 6 9.75 6 2.042 0 3.97-.492 5.617-1.357M21.75 12c-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12C16.07 6.492 14.142 6 12.1 6c-4.14 0-7.714 2.338-9.75 6 .512.885 1.13 1.712 1.844 2.464m2.12 2.12C7.93 17.508 9.858 18 11.9 18c4.14 0 7.714-2.338 9.75-6-.512-.885-1.13-1.712-1.844-2.464m-2.12-2.12z" />
+                </svg>
+              )}
+            </button>
           </div>
           <button
             type="submit"
