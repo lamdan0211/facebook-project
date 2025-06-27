@@ -75,11 +75,62 @@ export default function Pages() {
     fetchLikedPages();
   }, []);
 
-  const handleLike = (id: number) => {
+  const handleLike = async (id: number) => {
     setPages((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, liked: !p.liked } : p))
+      prev.map((p) => (p.id === id ? { ...p, likeLoading: true } : p))
     );
+    const page = pages.find((p) => p.id === id);
+    const accessToken = sessionStorage.getItem('accessToken');
+    try {
+      const res = await fetch(`http://localhost:3301/pages/${id}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (!res.ok) throw new Error('Action failed');
+      // Move page to likedPages
+      setPages((prev) => prev.filter((p) => p.id !== id));
+      setLikedPages((prev) => [
+        { ...page, liked: true, likeLoading: false },
+        ...prev,
+      ]);
+    } catch (err) {
+      setPages((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, likeLoading: false } : p))
+      );
+      alert('Failed to like page');
+    }
   };
+
+  const handleUnlike = async (id: number) => {
+    setLikedPages((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, likeLoading: true } : p))
+    );
+    const page = likedPages.find((p) => p.id === id);
+    const accessToken = sessionStorage.getItem('accessToken');
+    try {
+      const res = await fetch(`http://localhost:3301/pages/${id}/unlike`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (!res.ok) throw new Error('Action failed');
+      // Move page to suggested
+      setLikedPages((prev) => prev.filter((p) => p.id !== id));
+      setPages((prev) => [
+        { ...page, liked: false, likeLoading: false },
+        ...prev,
+      ]);
+    } catch (err) {
+      setLikedPages((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, likeLoading: false } : p))
+      );
+      alert('Failed to unlike page');
+    }
+  };
+
   const handleClose = (id: number) => {
     setPages((prev) => prev.filter((p) => p.id !== id));
   };
@@ -115,6 +166,17 @@ export default function Pages() {
                       <span className="font-bold text-gray-900 leading-tight text-base mt-2">{page.name}</span>
                       <span className="text-xs text-gray-600">{page.desc}</span>
                     </div>
+                    {/* Unlike button */}
+                    <div className="px-4 pb-4 mt-auto">
+                      <button
+                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700 ${page.likeLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        onClick={() => !page.likeLoading && handleUnlike(page.id)}
+                        disabled={page.likeLoading}
+                      >
+                        <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6.5 10.5l2 2 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="#fff" strokeWidth="2"/></svg>
+                        Unlike
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -149,14 +211,15 @@ export default function Pages() {
                   </div>
                   {/* Likes */}
                   <div className="px-4 text-xs text-gray-500 mb-2">{page.likes}</div>
-                  {/* Like button */}
+                  {/* Like/Unlike button */}
                   <div className="px-4 pb-4 mt-auto">
                     <button
-                      className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-semibold transition-colors ${page.liked ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                      onClick={() => handleLike(page.id)}
+                      className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-semibold transition-colors ${page.liked ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} ${page.likeLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      onClick={() => !page.likeLoading && handleLike(page.id)}
+                      disabled={page.likeLoading}
                     >
                       <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M6.5 10.5l2 2 5-5" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="#2563eb" strokeWidth="2"/></svg>
-                      {page.liked ? 'Đã thích' : 'Thích'}
+                      {page.liked ? 'Unlike' : 'Like'}
                     </button>
                   </div>
                 </div>
