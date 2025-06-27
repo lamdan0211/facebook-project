@@ -115,6 +115,35 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     );
   }, [reactions]);
 
+  useEffect(() => {
+    // Fetch comments from API when post mounts
+    const fetchComments = async () => {
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch(`http://localhost:3301/backend/comment/post/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        // Map API data to CommentList format
+        const mapped = (data.data || []).map((item: any) => ({
+          author: {
+            name: item.post?.user?.fullname || 'User',
+            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
+          },
+          content: item.content,
+          timeAgo: new Date(item.createdAt).toLocaleString(),
+        }));
+        setAllComments(mapped);
+      } catch (err) {
+        // fallback: do nothing
+      }
+    };
+    fetchComments();
+  }, [id]);
+
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
