@@ -26,19 +26,48 @@ const SavedPage = () => {
         }
         const data = await res.json();
         // Backend trả về mảng các object PostSaved, mỗi object có chứa 'post'
-        const extractedPosts = data.map((item: any) => ({
-          ...item.post, // Lấy toàn bộ dữ liệu của bài post
-          author: { // Map lại author để đảm bảo đúng cấu trúc
-            name: item.post.user?.fullname || item.post.user?.email || 'User',
-            avatar: item.post.user?.profilepic || '/default-avatar.png',
-            email: item.post.user?.email || '',
-          },
-          // Cung cấp giá trị mặc định cho các thuộc tính còn thiếu
-          reactions: item.post.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
-          comments: item.post.comments || [],
-          shares: item.post.shares || 0,
-          timeAgo: item.post.timeAgo || new Date(item.post.createdAt).toLocaleDateString(),
-        }));
+        const extractedPosts = data.map((item: any) => {
+          const post = item.post;
+          // Map media: ưu tiên photos, nếu không có thì map từ mediaUrl
+          let media: { type: 'image' | 'video'; url: string }[] = [];
+          if (Array.isArray(post.photos) && post.photos.length > 0) {
+            media = post.photos.map((photo: any) => ({
+              type: photo.isType === 1 ? 'video' : 'image',
+              url: photo.url,
+            }));
+          } else if (Array.isArray(post.mediaUrl)) {
+            media = post.mediaUrl.map((url: string) => ({
+              type: /\.(mp4|mov|avi|wmv|flv|webm)$/i.test(url) ? 'video' : 'image',
+              url,
+            }));
+          }
+          // Map comments như cũ
+          const comments = Array.isArray(post.comments)
+            ? post.comments.map((c: any) => ({
+                author: {
+                  name: c.author?.fullname || c.author?.email || 'User',
+                  avatar: c.author?.profilepic || '/default-avatar.png',
+                  email: c.author?.email || '',
+                },
+                content: c.content,
+                timeAgo: c.createdAt ? new Date(c.createdAt).toLocaleString() : '',
+                likes: 0,
+              }))
+            : [];
+          return {
+            ...post,
+            author: {
+              name: post.user?.fullname || post.user?.email || 'User',
+              avatar: post.user?.profilepic || '/default-avatar.png',
+              email: post.user?.email || '',
+            },
+            media,
+            comments,
+            reactions: post.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+            shares: post.shares || 0,
+            timeAgo: post.timeAgo || new Date(post.createdAt).toLocaleDateString(),
+          };
+        });
         setSavedPosts(extractedPosts);
       } catch (error) {
         console.error("Error fetching saved posts:", error);
