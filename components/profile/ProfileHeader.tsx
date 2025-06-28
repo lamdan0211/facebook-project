@@ -1,11 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { FolderDot, UserPlus, UserCog } from 'lucide-react';
+import { FolderDot, UserPlus, UserCog, UserCheck, UserX, UserMinus } from 'lucide-react';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import EditAvatarModal from '../modals/EditAvatarModal';
 import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
 import { useAuth } from '../auth/AuthContext';
 import { createPortal } from 'react-dom';
+
+enum FriendStatus {
+  FRIEND = 0,
+  PENDING_SENT = 1,
+  PENDING_RECEIVED = 2,
+  NONE = 3,
+}
 
 interface ProfileHeaderProps {
   coverPhotoUrl: string;
@@ -50,9 +57,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
   const [isAddingFriend, setIsAddingFriend] = useState(false);
-  const [friendRequestSent, setFriendRequestSent] = useState(false);
+  const [friendStatus, setFriendStatus] = useState<FriendStatus>(FriendStatus.NONE);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [coverVersion, setCoverVersion] = useState(Date.now());
   const isFirstRender = useRef(true);
+
+  const isOwner = profileId === currentUserId;
+
+  // Check friend status when component mounts or profileId changes
+  useEffect(() => {
+    const checkFriendStatus = async () => {
+      if (isOwner || !profileId) {
+        setIsLoadingStatus(false);
+        return;
+      }
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch(`http://localhost:3301/backend/friendrequest/status/${profileId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setFriendStatus(data.status);
+        }
+      } catch (error) {
+        console.error('Error checking friend status:', error);
+      } finally {
+        setIsLoadingStatus(false);
+      }
+    };
+    checkFriendStatus();
+  }, [profileId, isOwner]);
 
   useEffect(() => {
     // Khi prop coverPhotoUrl thay đổi (profile mới), reset version
@@ -63,8 +100,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }, [coverPhotoUrl]);
 
-  const isOwner = profileId === currentUserId;
-
   // Lấy cover photo tạm nếu có
   let coverPhoto = coverPhotoUrl;
   if (typeof window !== 'undefined') {
@@ -73,7 +108,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   }
 
   const handleAddFriend = async () => {
-    if (isAddingFriend || friendRequestSent) return;
+    if (isAddingFriend || friendStatus !== FriendStatus.NONE) return;
     setIsAddingFriend(true);
     try {
       const accessToken = sessionStorage.getItem('accessToken');
@@ -85,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         },
       });
       if (res.ok) {
-        setFriendRequestSent(true);
+        setFriendStatus(FriendStatus.PENDING_SENT);
         alert('Đã gửi lời mời kết bạn thành công!');
       } else {
         const errorData = await res.json().catch(() => ({}));
@@ -96,6 +131,121 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       alert('Có lỗi xảy ra khi gửi lời mời kết bạn!');
     } finally {
       setIsAddingFriend(false);
+    }
+  };
+
+  const handleAcceptFriend = async () => {
+    if (isAddingFriend) return;
+    setIsAddingFriend(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/respond`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          senderId: profileId,
+          status: 'accept',
+        }),
+      });
+      if (res.ok) {
+        setFriendStatus(FriendStatus.FRIEND);
+        alert('Đã chấp nhận lời mời kết bạn!');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || 'Chấp nhận lời mời kết bạn thất bại!');
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      alert('Có lỗi xảy ra khi chấp nhận lời mời kết bạn!');
+    } finally {
+      setIsAddingFriend(false);
+    }
+  };
+
+  const handleCancelOrUnfriend = async () => {
+    if (isAddingFriend) return;
+    setIsAddingFriend(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/unfriend/${currentUserId}/${profileId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (res.ok) {
+        setFriendStatus(FriendStatus.NONE);
+        const message = friendStatus === FriendStatus.FRIEND ? 'Đã hủy kết bạn!' : 'Đã hủy lời mời kết bạn!';
+        alert(message);
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.message || 'Thao tác thất bại!');
+      }
+    } catch (error) {
+      console.error('Error canceling/unfriending:', error);
+      alert('Có lỗi xảy ra!');
+    } finally {
+      setIsAddingFriend(false);
+    }
+  };
+
+  const renderActionButton = () => {
+    if (isLoadingStatus) {
+      return (
+        <button className="flex items-center px-3 py-2 bg-gray-400 text-white font-semibold rounded-md shadow-sm cursor-not-allowed text-sm">
+          <span>Đang tải...</span>
+        </button>
+      );
+    }
+    
+    switch (friendStatus) {
+      case FriendStatus.FRIEND:
+        return (
+          <button
+            className="flex items-center px-3 py-2 bg-red-600 text-white font-semibold rounded-md shadow-sm hover:bg-red-700 transition duration-300 text-sm cursor-pointer gap-2"
+            onClick={handleCancelOrUnfriend}
+            disabled={isAddingFriend}
+          >
+            <UserMinus className="w-4 h-4 mr-1" />
+            <span>Hủy kết bạn</span>
+          </button>
+        );
+      case FriendStatus.PENDING_SENT:
+        return (
+          <button
+            className="flex items-center px-3 py-2 bg-gray-500 text-white font-semibold rounded-md shadow-sm cursor-not-allowed text-sm"
+            disabled={true}
+          >
+            <UserPlus className="w-4 h-4 mr-1" />
+            <span>Đã gửi lời mời</span>
+          </button>
+        );
+      case FriendStatus.PENDING_RECEIVED:
+        return (
+          <button
+            className="flex items-center px-3 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 transition duration-300 text-sm cursor-pointer gap-2"
+            onClick={handleAcceptFriend}
+            disabled={isAddingFriend}
+          >
+            <UserCheck className="w-4 h-4 mr-1" />
+            <span>Chấp nhận</span>
+          </button>
+        );
+      case FriendStatus.NONE:
+      default:
+        return (
+          <button
+            className="flex items-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 transition duration-300 text-sm cursor-pointer gap-2"
+            onClick={handleAddFriend}
+            disabled={isAddingFriend}
+          >
+            <UserPlus className="w-4 h-4 mr-1" />
+            <span>{isAddingFriend ? 'Đang gửi...' : 'Add Friend'}</span>
+          </button>
+        );
     }
   };
 
@@ -154,25 +304,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <span>Edit Profile</span>
           </button>
         ) : (
-          <button
-            className={`flex items-center px-3 py-2 font-semibold rounded-md shadow-sm transition duration-300 text-sm cursor-pointer ${
-              friendRequestSent
-                ? 'bg-gray-500 text-white cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            }`}
-            onClick={handleAddFriend}
-            disabled={isAddingFriend || friendRequestSent}
-          >
-            <UserPlus className="w-4 h-4 mr-1" />
-            <span>
-              {isAddingFriend
-                ? 'Đang gửi...'
-                : friendRequestSent
-                  ? 'Đã gửi lời mời'
-                  : 'Add Friend'
-              }
-            </span>
-          </button>
+          renderActionButton()
         )}
       </div>
       {/* Navigation Menu */}
