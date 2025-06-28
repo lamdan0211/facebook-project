@@ -5,14 +5,24 @@ import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import { useAuth } from '../auth/AuthContext';
 
 const defaultDetails: DetailsData = {
-  workAt: 'Your Company',
-  studiedAt: 'Your University',
-  livesIn: 'Your City',
-  from: 'Your Hometown',
+  fullname: '',
+  phone: '',
+  profilepic: '',
+  coverpic: '',
   bio: '',
+  birthplace: '',
+  workingPlace: '',
+  isActive: true,
 };
 
-const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, currentUserId: number, profileId: number }) => {
+interface ProfileSidebarProps {
+  profile?: any;
+  currentUserId: number;
+  profileId: number;
+  onProfileUpdated?: () => void;
+}
+
+const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }: ProfileSidebarProps) => {
   const { user } = useAuth();
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
@@ -20,14 +30,17 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
   useEffect(() => {
     if (profile) {
       setDetails({
-        workAt: profile.workingPlace || '',
-        studiedAt: profile.studiedAt || '',
-        livesIn: profile.birthplace || '',
-        from: profile.birthplace || '',
+        fullname: profile.fullname || '',
+        phone: profile.phone || '',
+        profilepic: profile.profilepic || '',
+        coverpic: profile.coverpic || '',
         bio: profile.bio || '',
+        birthplace: profile.birthplace || '',
+        workingPlace: profile.workingPlace || '',
+        isActive: profile.isActive ?? true,
       });
     }
-  }, [profile]);
+  }, [profile?.workingPlace, profile?.phone, profile?.birthplace, profile?.bio, profile?.fullname, profile?.profilepic, profile?.coverpic, profile?.isActive]);
 
   // Fetch photos from backend
   const [photos, setPhotos] = useState<string[]>([]);
@@ -95,10 +108,10 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
       <div className="bg-white p-4 rounded-lg shadow-sm text-gray-700 text-sm">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Intro</h2>
         <div className="space-y-2">
-          <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workAt || profile?.workingPlace}</p>
-          <p className="flex items-center"><span className="font-semibold mr-1">Phone:</span> {profile?.phone}</p>
-          <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.livesIn || profile?.birthplace}</p>
-          <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.from || profile?.birthplace}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Works at:</span> {details.workingPlace}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Phone:</span> {details.phone}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">Lives in:</span> {details.birthplace}</p>
+          <p className="flex items-center"><span className="font-semibold mr-1">From:</span> {details.birthplace}</p>
           {details.bio && <p className="flex items-center"><span className="font-semibold mr-1">Bio:</span> {details.bio}</p>}
         </div>
         {isOwner && (
@@ -108,7 +121,6 @@ const ProfileSidebar = ({ profile, currentUserId, profileId }: { profile?: any, 
               open={showModal}
               onClose={() => setShowModal(false)}
               onSave={(data) => {
-                setDetails(data);
                 setShowModal(false);
                 if (onProfileUpdated) onProfileUpdated();
                 if (profileId === currentUserId && typeof window !== 'undefined') {

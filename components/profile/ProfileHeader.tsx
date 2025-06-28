@@ -44,6 +44,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 }) => {
   const { user } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState(userName);
+  const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profilePictureUrl);
   const [details, setDetails] = useState<DetailsData>({
     fullname: userName || '',
     phone: '',
@@ -63,6 +65,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const isFirstRender = useRef(true);
 
   const isOwner = profileId === currentUserId;
+
+  // Cập nhật state khi props thay đổi
+  useEffect(() => {
+    setCurrentUserName(userName);
+    setCurrentProfilePictureUrl(profilePictureUrl);
+  }, [userName, profilePictureUrl]);
 
   // Check friend status when component mounts or profileId changes
   useEffect(() => {
@@ -274,7 +282,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {/* Profile Picture */}
         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group">
           <Image
-            src={profilePictureUrl}
+            src={currentProfilePictureUrl}
             alt="Profile Picture"
             layout="fill"
             objectFit="cover"
@@ -291,7 +299,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </div>
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{userName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{currentUserName}</h1>
           <p className="text-gray-600 text-sm mt-1">54 friends</p>
         </div>
         {/* Action Buttons */}
@@ -332,6 +340,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowEditModal(false)}
           onSave={(data) => {
             setDetails(data);
+            setCurrentUserName(data.fullname);
+            setCurrentProfilePictureUrl(data.profilepic);
             setShowEditModal(false);
             if (typeof onProfileUpdated === 'function') onProfileUpdated();
             if (profileId === currentUserId && typeof window !== 'undefined') {
@@ -344,9 +354,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }
           }}
           initialData={{
-            fullname: userName || '',
+            fullname: currentUserName || '',
             phone: '',
-            profilepic: profilePictureUrl || '',
+            profilepic: currentProfilePictureUrl || '',
             coverpic: coverPhotoUrl || '',
             bio: '',
             birthplace: '',
@@ -361,7 +371,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowAvatarModal(false)}
           userId={currentUserId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
-          onUploaded={typeof onProfileUpdated === 'function' ? onProfileUpdated : undefined}
+          onUploaded={() => {
+            if (typeof onProfileUpdated === 'function') onProfileUpdated();
+            setCurrentProfilePictureUrl(profilePictureUrl + '?v=' + Date.now());
+          }}
         />
       )}
       {showCoverModal && (
