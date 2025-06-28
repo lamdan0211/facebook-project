@@ -121,6 +121,27 @@ const VideoCard = ({ video }: VideoCardProps) => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  const [reactionSummary, setReactionSummary] = useState<any>({});
+
+  useEffect(() => {
+    // Gọi API tổng hợp reaction dựa vào postId
+    const fetchReactions = async () => {
+      console.log(video);
+      if (!video) return;
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        const res = await fetch(`http://localhost:3301/backend/reaction/${video.id}`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          console.log(res);
+          const data = await res.json();
+          setReactionSummary(data);
+        }
+      } catch {}
+    };
+    fetchReactions();
+  }, [video]);
 
   const handlePlayPause = () => {
     if (!videoRef.current) return;
@@ -183,6 +204,19 @@ const VideoCard = ({ video }: VideoCardProps) => {
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
+
+  // Hàm trả về icon reaction
+  function getReactionIcon(type: string) {
+    switch (type) {
+      case 'like': return '👍';
+      case 'love': return '❤️';
+      case 'haha': return '😂';
+      case 'wow': return '😮';
+      case 'sad': return '😢';
+      case 'angry': return '😡';
+      default: return '';
+    }
+  }
 
   return (
     <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow duration-300 mb-8">
@@ -253,12 +287,13 @@ const VideoCard = ({ video }: VideoCardProps) => {
           <span className="font-semibold text-lg">{video.title}</span>
         </div>
         <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
-        <div className="flex items-center gap-4 mt-2 text-lg">
-          <span>👍 {video.reactions.like}</span>
-          <span>❤️ {video.reactions.love}</span>
-          <span>😂 {video.reactions.haha}</span>
-          <span>😮 {video.reactions.wow}</span>
-          <span className="ml-auto text-sm text-gray-600">🔁 {video.shares} chia sẻ</span>
+        {/* Hiển thị tổng hợp reaction */}
+        <div className="flex gap-2 mt-2">
+          {Object.entries(reactionSummary).map(([type, count]) => (
+            <span key={type} className="flex items-center text-xs text-gray-600">
+              {getReactionIcon(type)} {Number(count)}
+            </span>
+          ))}
         </div>
       </div>
     </div>
