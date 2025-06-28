@@ -81,7 +81,11 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [currentTotalReactions, setCurrentTotalReactions] = useState(
     Object.values(safeReactions).reduce((a, b) => a + b, 0)
   );
+  const [reactionSummary, setReactionSummary] = useState<any>({});
   const [userReaction, setUserReaction] = useState<string | null>(null);
+  const [userReactionId, setUserReactionId] = useState<number | null>(null);
+  const [showUserReacted, setShowUserReacted] = useState(false);
+  const [usersReacted, setUsersReacted] = useState<any[]>([]);
   const [showReactionMenu, setShowReactionMenu] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState('');
@@ -161,42 +165,110 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     };
   }, [showDropdown]);
 
+  // Fetch tổng hợp reactions và trạng thái reaction của user hiện tại
+  useEffect(() => {
+    const fetchReactions = async () => {
+      try {
+        const accessToken = sessionStorage.getItem('accessToken');
+        // Tổng hợp reactions
+        const res = await fetch(`http://localhost:3301/backend/reaction/${id}`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setReactionSummary(data);
+        }
+        // Danh sách user đã react
+        const res2 = await fetch(`http://localhost:3301/backend/reaction/post/${id}/users`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        if (res2.ok) {
+          const data2 = await res2.json();
+          setUsersReacted(data2);
+          // Xác định reaction của user hiện tại
+          const myReact = Array.isArray(data2) ? data2.find((r:any) => r.userName === user?.fullname) : null;
+          setUserReaction(myReact?.type || null);
+          setUserReactionId(myReact?.id || null);
+        }
+      } catch (err) {
+        // fallback: do nothing
+      }
+    };
+    fetchReactions();
+  }, [id, user?.fullname]);
+
+  // Xử lý khi user bấm reaction
   const handleReaction = async (reactionType: string) => {
     const accessToken = sessionStorage.getItem('accessToken');
     try {
-      const response = await fetch('http://localhost:3301/backend/reaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          type: reactionType,
-          postId: id,
-        }),
-      });
-      if (response.ok) {
-        const updatedPost = await response.json();
-        if (onEdit && updatedPost) {
-          onEdit(updatedPost);
-        }
-        if (userReaction === reactionType) {
+      if (userReaction && userReaction === reactionType && userReactionId) {
+        // Nếu đã có reaction cùng loại, gọi DELETE để bỏ reaction
+        const res = await fetch(`http://localhost:3301/backend/reaction/${userReactionId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
           setUserReaction(null);
-          setCurrentTotalReactions(currentTotalReactions - 1);
-        } else {
-          if (userReaction === null) {
-            setCurrentTotalReactions(currentTotalReactions + 1);
-          }
-          setUserReaction(reactionType);
+          setUserReactionId(null);
         }
       } else {
-        const data = await response.json();
-        alert(data?.message || 'Gửi reaction thất bại');
+        // Nếu chưa có hoặc khác loại, gọi POST để tạo/cập nhật reaction
+        const res = await fetch('http://localhost:3301/backend/reaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            type: reactionType,
+            postId: id,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUserReaction(reactionType);
+          setUserReactionId(data.id); // backend trả về reaction mới
+        }
       }
     } catch (err) {
       alert('Gửi reaction thất bại');
     }
+    // Sau mỗi thao tác, fetch lại tổng hợp reactions và trạng thái user
+    setTimeout(() => {
+      // Đảm bảo backend đã cập nhật xong
+      const fetchReactions = async () => {
+        try {
+          const accessToken = sessionStorage.getItem('accessToken');
+          const res = await fetch(`http://localhost:3301/backend/reaction/${id}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setReactionSummary(data);
+          }
+          const res2 = await fetch(`http://localhost:3301/backend/reaction/post/${id}/users`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+          });
+          if (res2.ok) {
+            const data2 = await res2.json();
+            setUsersReacted(data2);
+            const myReact = Array.isArray(data2) ? data2.find((r:any) => r.userName === user?.fullname) : null;
+            setUserReaction(myReact?.type || null);
+            setUserReactionId(myReact?.id || null);
+          }
+        } catch {}
+      };
+      fetchReactions();
+    }, 300);
     setShowReactionMenu(false);
+  };
+
+  // Khi click vào tổng số reaction, show danh sách user đã react
+  const handleShowUserReacted = () => {
+    setShowUserReacted(true);
+  };
+  const handleCloseUserReacted = () => {
+    setShowUserReacted(false);
   };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
