@@ -31,7 +31,7 @@ const RightSidebar = () => {
 
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:3301/backend/friendrequest/friends/${currentUser.id}`, {
+        const res = await fetch(`http://localhost:3301/backend/friendrequest/${currentUser.id}`, {
           headers: { 'Authorization': `Bearer ${accessToken}` },
         });
         if (res.ok) {
