@@ -15,7 +15,11 @@ interface SentRequest {
   status: string;
 }
 
-const SentFriendRequests = () => {
+interface SentFriendRequestsProps {
+  sentChanged?: number;
+}
+
+const SentFriendRequests = ({ sentChanged }: SentFriendRequestsProps) => {
   const [requests, setRequests] = useState<SentRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,9 +51,8 @@ const SentFriendRequests = () => {
   };
 
   useEffect(() => {
-    console.log('SentFriendRequests mounted');
     fetchSentRequests();
-  }, []);
+  }, [sentChanged]);
 
   const handleCancelRequest = async (receiverId: number) => {
     const accessToken = sessionStorage.getItem('accessToken');

@@ -29,8 +29,10 @@ const FriendsPage = () => {
   useRequireAuth();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [sentRequests, setSentRequests] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [requestStatus, setRequestStatus] = useState<Record<number, FriendRequestStatus>>({});
+  const [sentChanged, setSentChanged] = useState(0);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -72,46 +74,24 @@ const FriendsPage = () => {
   }, []);
 
   const handleAddFriend = async (receiverId: number) => {
-    if (!currentUser) return;
-
+    const userToSend = users.find(u => u.id === receiverId);
+    if (!userToSend) return;
     setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Sending }));
-
     try {
       const accessToken = sessionStorage.getItem('accessToken');
       const res = await fetch(`http://localhost:3301/backend/friendrequest/${receiverId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
-
       if (res.ok) {
         setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Sent }));
-        // Gửi thành công thì load lại suggestions
-        const fetchSuggestions = async () => {
-          setLoading(true);
-          try {
-            const res = await fetch('http://localhost:3301/backend/friendrequest/suggestions?page=1&limit=100', {
-              headers: { 'Authorization': `Bearer ${accessToken}` },
-            });
-            if (res.ok) {
-              const responseData = await res.json();
-              const suggestions: User[] = Array.isArray(responseData) ? responseData : responseData.data || [];
-              setUsers(suggestions);
-            } else {
-              setUsers([]);
-            }
-          } catch {
-            setUsers([]);
-          } finally {
-            setLoading(false);
-          }
-        };
-        fetchSuggestions();
+        setUsers(prev => prev.filter(u => u.id !== receiverId));
+        setSentRequests(prev => [...prev, userToSend]);
+        setSentChanged(c => c + 1);
       } else {
-        console.error('Failed to send friend request');
         setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Default }));
       }
     } catch (error) {
-      console.error('Error sending friend request:', error);
       setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Default }));
     }
   };
@@ -172,6 +152,7 @@ const FriendsPage = () => {
               <p>Check back later!</p>
             </div>
           )}
+          
         </div>
       </main>
       {/* Right Sidebar: Friend Requests */}
@@ -182,7 +163,7 @@ const FriendsPage = () => {
         </div>
         <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
           <h2 className="text-xl font-bold mb-4 text-purple-700">Sent Friend Requests</h2>
-          <SentFriendRequests />
+          <SentFriendRequests sentChanged={sentChanged} />
         </div>
       </aside>
     </div>
