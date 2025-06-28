@@ -176,6 +176,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         });
         if (res.ok) {
           const data = await res.json();
+          console.log(data);
           setReactionSummary(data);
         }
         // Danh sách user đã react
@@ -457,6 +458,22 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     }
   };
 
+  // Tính tổng số reaction từ reactionSummary
+  const totalReactions = Object.values(reactionSummary).reduce((sum, count) => Number(sum) + Number(count), 0);
+
+  // Hàm trả về icon reaction
+  function getReactionIcon(type: string) {
+    switch (type) {
+      case 'like': return '👍';
+      case 'love': return '❤️';
+      case 'haha': return '😂';
+      case 'wow': return '😮';
+      case 'sad': return '😢';
+      case 'angry': return '😡';
+      default: return '';
+    }
+  }
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
@@ -559,7 +576,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                 })}
             </div>
           )}
-          <span className="ml-1">{currentTotalReactions} peoples</span>
         </div>
         <div>
           {comments.length > 0 && <span className="mr-2">{comments.length} comments</span>}
@@ -735,6 +751,15 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           ↑
         </button>
       )}
+
+      {/* Hiển thị chi tiết từng loại reaction ở vị trí mong muốn */}
+      <div className="flex gap-2 ml-1">
+        {Object.entries(reactionSummary).map(([type, count]) => (
+          <span key={type} className="flex items-center text-xs text-gray-600">
+            {getReactionIcon(type)} {Number(count)}
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
