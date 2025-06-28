@@ -26,6 +26,7 @@ interface ApiVideo {
 interface VideoCardProps {
   video: {
     id: number;
+    postId: number;
     videoUrl: string;
     title: string;
     timeAgo: string;
@@ -77,12 +78,13 @@ const WatchFeed = () => {
         // Map API data sang format VideoCard
         const mapped = data.map(item => ({
           id: item.id,
+          postId: item.post?.id,
           videoUrl: item.url,
-          title: item.user?.fullname || item.post?.user?.fullname || 'User',
+          title: item.post?.user?.fullname || 'User',
           timeAgo: new Date(item.createdAt).toLocaleString(),
           author: {
-            name: item.user?.fullname || item.post?.user?.fullname || 'User',
-            avatar: item.user?.profilepic || item.post?.user?.profilepic || '/avatars/default-avatar.png',
+            name: item.post?.user?.fullname || 'User',
+            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
           },
           reactions: {
             like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0, // backend chưa trả về reactions
@@ -126,16 +128,15 @@ const VideoCard = ({ video }: VideoCardProps) => {
   useEffect(() => {
     // Gọi API tổng hợp reaction dựa vào postId
     const fetchReactions = async () => {
-      console.log(video);
-      if (!video) return;
+      if (!video || !video.postId) return;
       try {
         const accessToken = sessionStorage.getItem('accessToken');
-        const res = await fetch(`http://localhost:3301/backend/reaction/${video.id}`, {
+        const res = await fetch(`http://localhost:3301/backend/reaction/${video.postId}`, {
           headers: { 'Authorization': `Bearer ${accessToken}` },
         });
         if (res.ok) {
-          console.log(res);
           const data = await res.json();
+          console.log(data);
           setReactionSummary(data);
         }
       } catch {}
