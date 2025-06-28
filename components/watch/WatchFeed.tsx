@@ -78,11 +78,11 @@ const WatchFeed = () => {
         const mapped = data.map(item => ({
           id: item.id,
           videoUrl: item.url,
-          title: item.name || item.post?.content || 'Video',
+          title: item.user?.fullname || item.post?.user?.fullname || 'User',
           timeAgo: new Date(item.createdAt).toLocaleString(),
           author: {
-            name: item.post?.user?.fullname || 'User',
-            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
+            name: item.user?.fullname || item.post?.user?.fullname || 'User',
+            avatar: item.user?.profilepic || item.post?.user?.profilepic || '/avatars/default-avatar.png',
           },
           reactions: {
             like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0, // backend chưa trả về reactions
@@ -185,12 +185,8 @@ const VideoCard = ({ video }: VideoCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow duration-300">
-      <div
-        className="relative w-full h-64 bg-black"
-        onMouseEnter={handleHoverPlay}
-        onMouseLeave={handleMouseLeave}
-      >
+    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow duration-300 mb-8">
+      <div className="relative w-full h-64 bg-black">
         <video
           ref={videoRef}
           poster={video.thumbnail}
@@ -247,8 +243,16 @@ const VideoCard = ({ video }: VideoCardProps) => {
         </div>
       </div>
       <div className="p-4">
+        {/* Hiển thị avatar và tên user thay cho tên file */}
+        <div className="flex items-center gap-2 mb-2">
+          <img
+            src={video.author.avatar}
+            alt={video.author.name}
+            className="w-8 h-8 rounded-full object-cover border"
+          />
+          <span className="font-semibold text-lg">{video.title}</span>
+        </div>
         <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
-        <h2 className="text-lg font-bold mb-2">{video.title}</h2>
         <div className="flex items-center gap-4 mt-2 text-lg">
           <span>👍 {video.reactions.like}</span>
           <span>❤️ {video.reactions.love}</span>
