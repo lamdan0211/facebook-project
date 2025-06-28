@@ -44,8 +44,7 @@ const FriendsPage = () => {
 
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (!currentUser) return;
+    const fetchSuggestions = async () => {
       setLoading(true);
       const accessToken = sessionStorage.getItem('accessToken');
       if (!accessToken) {
@@ -54,30 +53,23 @@ const FriendsPage = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:3301/backend/user', {
+        const res = await fetch('http://localhost:3301/backend/friendrequest/suggestions?page=1&limit=100', {
           headers: { 'Authorization': `Bearer ${accessToken}` },
         });
-        if (res.ok) {
-          const responseData = await res.json();
-          const userList: User[] = Array.isArray(responseData) ? responseData : responseData.data || [];
-          const filteredUsers = userList.filter(u => u.id !== currentUser.id);
-          setUsers(filteredUsers);
-        } else {
-          console.error('Failed to fetch users', res);
-          setUsers([]);
-        }
+        const responseData = await res.json();
+        console.log('Suggestions API response:', responseData);
+        const suggestions: User[] = Array.isArray(responseData) ? responseData : responseData.users || [];
+        setUsers(suggestions);
+        console.log('users state after setUsers:', suggestions);
       } catch (error) {
-        console.error('Error fetching users:', error);
         setUsers([]);
       } finally {
         setLoading(false);
       }
     };
 
-    if (currentUser) {
-      fetchUsers();
-    }
-  }, [currentUser]);
+    fetchSuggestions();
+  }, []);
 
   const handleAddFriend = async (receiverId: number) => {
     if (!currentUser) return;
@@ -86,13 +78,34 @@ const FriendsPage = () => {
 
     try {
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/friendrequest/send/${currentUser.id}/${receiverId}`, {
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/${receiverId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
 
       if (res.ok) {
         setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Sent }));
+        // Gửi thành công thì load lại suggestions
+        const fetchSuggestions = async () => {
+          setLoading(true);
+          try {
+            const res = await fetch('http://localhost:3301/backend/friendrequest/suggestions?page=1&limit=100', {
+              headers: { 'Authorization': `Bearer ${accessToken}` },
+            });
+            if (res.ok) {
+              const responseData = await res.json();
+              const suggestions: User[] = Array.isArray(responseData) ? responseData : responseData.data || [];
+              setUsers(suggestions);
+            } else {
+              setUsers([]);
+            }
+          } catch {
+            setUsers([]);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchSuggestions();
       } else {
         console.error('Failed to send friend request');
         setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Default }));

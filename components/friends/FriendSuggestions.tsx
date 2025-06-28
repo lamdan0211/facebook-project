@@ -13,14 +13,15 @@ export default function FriendSuggestions() {
       setError(null);
       try {
         const accessToken = sessionStorage.getItem('accessToken');
-        const res = await fetch('http://localhost:3301/backend/friendrequest/friends/suggestions', {
+        const res = await fetch('http://localhost:3301/backend/friendrequest/suggestions?page=1&limit=100', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
         if (!res.ok) throw new Error('Failed to fetch suggestions');
         const data = await res.json();
-        setSuggestions(Array.isArray(data) ? data : []);
+        const suggestionsData = Array.isArray(data) ? data : (data.data || []);
+        setSuggestions(suggestionsData);
       } catch (err: any) {
         setError(err.message || 'Error fetching suggestions');
       } finally {
@@ -38,15 +39,24 @@ export default function FriendSuggestions() {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         },
       });
+
+      const data = await res.json().catch(() => null);
+
       if (res.ok) {
+        const user = suggestions.find(s => s.id === receiverId);
+        const userName = user?.fullname || user?.name || 'User';
+        alert(`Friend request sent successfully to ${userName}!`);
         setSuggestions(prev => prev.filter(s => s.id !== receiverId));
       } else {
-        alert('Failed to send friend request');
+        const errorMessage = data?.message || 'Failed to send friend request';
+        alert(errorMessage);
       }
     } catch (err) {
-      alert('Error sending friend request');
+      console.error('Error sending friend request:', err);
+      alert('Error sending friend request. Please try again.');
     } finally {
       setLoadingId(null);
     }
