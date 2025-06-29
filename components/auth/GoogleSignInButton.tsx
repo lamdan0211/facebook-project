@@ -15,8 +15,12 @@ const GoogleSignInButton = () => {
       const token = await result.user.getIdToken()
       if (!token) throw new Error('Không lấy được accessToken từ Google');
       await loginGoogle(token);
-    } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.log('Sign-in popup was closed before completing sign-in.');
+      } else {
+        console.error('Lỗi đăng nhập:', error);
+      }
     }
   };
 

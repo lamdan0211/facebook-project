@@ -108,7 +108,7 @@ const Stories = () => {
             {/* User Avatar on Story */}
             <div className="absolute top-2 left-2 w-8 h-8 rounded-full overflow-hidden border-2 border-blue-500 group-hover:scale-105 transition-transform z-10">
                <Image
-                src={story.user.avatar}
+                src={story.user.avatar || '/avatars/default-avatar.png'}
                 alt={`${story.user.name}'s avatar`}
                 width={32}
                 height={32}
@@ -125,12 +125,12 @@ const Stories = () => {
 
       {/* Navigation Arrow Right */}
       {canScrollRight && (
-         <div
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md cursor-pointer z-20 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() => scroll('right')}
-         >
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-         </div>
+        <div
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md cursor-pointer z-20 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={() => scroll('right')}
+        >
+          <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+        </div>
       )}
 
       {/* Story Viewer Modal */}
@@ -147,4 +147,4 @@ const Stories = () => {
   );
 };
 
-export default Stories; 
+export default Stories;

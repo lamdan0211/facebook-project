@@ -281,7 +281,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
         {/* Hiển thị avatar và tên user thay cho tên file */}
         <div className="flex items-center gap-2 mb-2">
           <img
-            src={video.author.avatar}
+            src={video.author.avatar || '/avatars/default-avatar.png'}
             alt={video.author.name}
             className="w-8 h-8 rounded-full object-cover border"
           />

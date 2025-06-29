@@ -35,7 +35,7 @@ export default function FriendSuggestions() {
     setLoadingId(receiverId);
     try {
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/friendrequest/${receiverId}`, {
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/send/${receiverId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

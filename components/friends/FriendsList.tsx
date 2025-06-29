@@ -47,7 +47,7 @@ export default function FriendsList() {
         <div key={friend.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow">
           <div className="relative h-48">
             <Image
-              src={friend.avatar}
+              src={friend.avatar || '/avatars/default-avatar.png'}
               alt={friend.name}
               fill
               className="object-cover"

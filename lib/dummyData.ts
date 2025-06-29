@@ -36,10 +36,12 @@ export interface PostData {
   comments: CommentData[];
   shares: number;
   taggedPeople?: {
+    id: string;
     name: string;
     avatar: string;
   }[];
   isSaved?: boolean;
+  myReaction?: string | null;
 }
 
 export interface WatchVideoData {
@@ -66,6 +68,7 @@ export interface WatchVideoData {
 
 export const initialPosts: PostData[] = [
   {
+    id: 1,
     author: { name: 'Facebook User', avatar: 'https://randomuser.me/api/portraits/men/99.jpg', email: 'facebookuser@example.com' },
     timeAgo: '1 min ago',
     content: 'This is a saved post! 🎉',
@@ -80,11 +83,12 @@ export const initialPosts: PostData[] = [
     ],
     shares: 10,
     taggedPeople: [
-      { name: 'Tag One', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' }
+      { id: 'tag1', name: 'Tag One', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' }
     ],
     isSaved: true,
   },
   {
+    id: 2,
     author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'anna@example.com' },
     timeAgo: '2 hours ago',
     content: 'Another saved post for testing.',
@@ -97,6 +101,7 @@ export const initialPosts: PostData[] = [
     isSaved: true,
   },
   {
+    id: 3,
     author: { name: ' Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'russo@example.com' },
     timeAgo: '5 mins',
     content: 'Not having fun at all 😂',
@@ -110,13 +115,14 @@ export const initialPosts: PostData[] = [
     ],
     shares: 100,
     taggedPeople: [
-      { name: 'Thành Minh', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' },
-      { name: 'Quý Phú', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
-      { name: 'Lan Anh', avatar: 'https://randomuser.me/api/portraits/women/13.jpg' },
+      { id: 'thànhminh', name: 'Thành Minh', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' },
+      { id: 'quýphú', name: 'Quý Phú', avatar: 'https://randomuser.me/api/portraits/men/12.jpg' },
+      { id: 'lananh', name: 'Lan Anh', avatar: 'https://randomuser.me/api/portraits/women/13.jpg' },
     ],
     isSaved: false,
   },
   {
+    id: 4,
     author: { name: 'Anna Becklund', avatar: 'https://images.pexels.com/photos/1031081/pexels-photo-1031081.jpeg', email: 'anna@example.com' },
     timeAgo: '1 hour ago',
     content: 'Loving this view!',
@@ -129,11 +135,12 @@ export const initialPosts: PostData[] = [
     ],
     shares: 20,
     taggedPeople: [
-      { name: 'Nguyễn Nguyên', avatar: 'https://randomuser.me/api/portraits/men/14.jpg' },
+      { id: 'nguyennguyên', name: 'Nguyễn Nguyên', avatar: 'https://randomuser.me/api/portraits/men/14.jpg' },
     ],
     isSaved: false,
   },
    {
+    id: 5,
     author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'dennis@example.com' },
     timeAgo: '3 hours ago',
     content: 'Just a thought...',
@@ -143,6 +150,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
+    id: 6,
     author: { name: 'Lam Dan', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', email: 'lamdan@example.com' },
     timeAgo: '4 hours ago',
     content: 'Check out this awesome sunset!',
@@ -155,6 +163,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
+    id: 7,
     author: { name: 'Jenny Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', email: 'jenny@example.com' },
     timeAgo: '5 hours ago',
     content: 'Coffee time ☕',
@@ -167,6 +176,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
+    id: 8,
     author: { name: 'Tom Russo', avatar: 'https://randomuser.me/api/portraits/men/45.jpg', email: 'tomrusso@example.com' },
     timeAgo: '6 hours ago',
     content: 'Just finished a 10k run!',
@@ -179,6 +189,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
+    id: 9,
     author: { name: 'Anna Becklund', avatar: 'https://randomuser.me/api/portraits/women/65.jpg', email: 'anna@example.com' },
     timeAgo: '7 hours ago',
     content: 'Reading a new book today.',
@@ -191,6 +202,7 @@ export const initialPosts: PostData[] = [
     isSaved: false,
   },
   {
+    id: 10,
     author: { name: 'Dennis Han', avatar: 'https://randomuser.me/api/portraits/men/12.jpg', email: 'dennis@example.com' },
     timeAgo: '8 hours ago',
     content: 'Nature walk in the park.',

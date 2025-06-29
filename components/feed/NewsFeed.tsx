@@ -11,6 +11,7 @@ import { useAuth } from '../auth/AuthContext';
 import useRequireAuth from '@/lib/useRequireAuth';
 import Avatar from '../user/Avatar';
 import { useSearch } from '@/context/SearchContext';
+import { fetchTaggedPeople } from '@/lib/utils/taggedPeople';
 
 const PAGE_SIZE = 10;
 
@@ -34,9 +35,11 @@ const NewsFeed = () => {
 
   const fetchPosts = async (pageNum: number, reset: boolean = false) => {
     if (loading) return;
+    setLoading(true);
+    
     if (reset) {
-      setLoading(true);
       setPage(1);
+      setPosts([]);
     }
     
     try {
@@ -60,33 +63,44 @@ const NewsFeed = () => {
       }
 
       const data = await res.json();
-      
+      console.log(data)
       let mappedPosts: any[] = [];
       
       const items = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
 
-      mappedPosts = items.map((item: any) => ({
-        id: item.id,
-        author: {
-          id: item.user?.id,
-          name: item.user?.fullname || item.user?.email || 'User',
-          avatar: item.user?.profilepic || '/avatars/default-avatar.png',
-          email: item.user?.email || '',
-        },
-        timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
-        content: item.content || '',
-        media: Array.isArray(item.mediaUrl)
-          ? item.mediaUrl.map((url: string) => {
-              const ext = url.split('.').pop()?.toLowerCase();
-              let type: 'image'|'video' = 'image';
-              if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
-              return { type, url };
-            })
-          : [],
-        reactions: item.reactions || { like: 0 },
-        comments: item.comments || [],
-        shares: item.shares || 0,
-        taggedPeople: item.taggedPeople || [],
+      // Process posts and fetch tagged people information
+      mappedPosts = await Promise.all(items.map(async (item: any) => {
+        let taggedPeople: any[] = [];
+        
+        // If friends array exists, fetch user information for each friend ID
+        if (item.friends && Array.isArray(item.friends) && item.friends.length > 0 && accessToken) {
+          taggedPeople = await fetchTaggedPeople(item.friends, accessToken);
+        }
+
+        return {
+          id: item.id,
+          author: {
+            id: item.user?.id,
+            name: item.user?.fullname || item.user?.email || 'User',
+            avatar: item.user?.profilepic || '/avatars/default-avatar.png',
+            email: item.user?.email || '',
+          },
+          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
+          content: item.content || '',
+          media: Array.isArray(item.mediaUrl)
+            ? item.mediaUrl.map((url: string) => {
+                const ext = url.split('.').pop()?.toLowerCase();
+                let type: 'image'|'video' = 'image';
+                if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+                return { type, url };
+              })
+            : [],
+          reactions: item.reactions || { like: 0 },
+          comments: item.comments || [],
+          shares: item.shares || 0,
+          taggedPeople: taggedPeople,
+          myReaction: item.myReaction || null,
+        };
       }));
       
       if (reset) {
@@ -207,10 +221,12 @@ const NewsFeed = () => {
         <div className="space-y-4 mt-4">
           {posts.map((post, index) => (
             <PostCard
-              key={post.id || String(index)}
+              key={post.id ? String(post.id) : `fallback-${index}`}
               post={post}
               index={index}
               onEdit={handleEditPost}
+              onDelete={handleDeletePost}
+              myReaction={post.myReaction}
             />
           ))}
         </div>

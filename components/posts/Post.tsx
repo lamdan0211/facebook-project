@@ -23,6 +23,7 @@ import EmojiPicker from 'emoji-picker-react';
 
 
 interface Person {
+  id: string;
   name: string;
   avatar: string;
 }
@@ -52,6 +53,7 @@ export interface PostProps {
   onEdit?: (updatedPost: any) => void;
   isOnSavedPage?: boolean;
   onUnsave?: () => void;
+  myReaction?: string | null;
 }
 
 const Post: React.FC<PostProps & { index?: number }> = ({
@@ -69,6 +71,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   index,
   isOnSavedPage = false,
   onUnsave,
+  myReaction = null,
 }) => {
   const safeReactions = {
     like: reactions?.like || 0,
@@ -81,8 +84,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [currentTotalReactions, setCurrentTotalReactions] = useState(
     Object.values(safeReactions).reduce((a, b) => a + b, 0)
   );
-  const [reactionSummary, setReactionSummary] = useState<any>({});
-  const [userReaction, setUserReaction] = useState<string | null>(null);
+  const [reactionSummary, setReactionSummary] = useState<any>(reactions);
+  const [userReaction, setUserReaction] = useState<string | null>(myReaction);
   const [userReactionId, setUserReactionId] = useState<number | null>(null);
   const [showUserReacted, setShowUserReacted] = useState(false);
   const [usersReacted, setUsersReacted] = useState<any[]>([]);
@@ -119,35 +122,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     );
   }, [reactions]);
 
-  useEffect(() => {
-    // Fetch comments from API when post mounts
-    const fetchComments = async () => {
-      try {
-        const accessToken = sessionStorage.getItem('accessToken');
-        const res = await fetch(`http://localhost:3301/backend/comment/post/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        // Map API data to CommentList format
-        const mapped = (data.data || []).map((item: any) => ({
-          author: {
-            name: item.post?.user?.fullname || 'User',
-            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
-          },
-          content: item.content,
-          timeAgo: new Date(item.createdAt).toLocaleString(),
-        }));
-        setAllComments(mapped);
-      } catch (err) {
-        // fallback: do nothing
-      }
-    };
-    fetchComments();
-  }, [id]);
-
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -164,39 +138,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showDropdown]);
-
-  // Fetch tổng hợp reactions và trạng thái reaction của user hiện tại
-  useEffect(() => {
-    const fetchReactions = async () => {
-      try {
-        const accessToken = sessionStorage.getItem('accessToken');
-        // Tổng hợp reactions
-        const res = await fetch(`http://localhost:3301/backend/reaction/${id}`, {
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          console.log(data);
-          setReactionSummary(data);
-        }
-        // Danh sách user đã react
-        const res2 = await fetch(`http://localhost:3301/backend/reaction/post/${id}/users`, {
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-        });
-        if (res2.ok) {
-          const data2 = await res2.json();
-          setUsersReacted(data2);
-          // Xác định reaction của user hiện tại
-          const myReact = Array.isArray(data2) ? data2.find((r:any) => r.userName === user?.fullname) : null;
-          setUserReaction(myReact?.type || null);
-          setUserReactionId(myReact?.id || null);
-        }
-      } catch (err) {
-        // fallback: do nothing
-      }
-    };
-    fetchReactions();
-  }, [id, user?.fullname]);
 
   // Xử lý khi user bấm reaction
   const handleReaction = async (reactionType: string) => {
@@ -458,6 +399,41 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     }
   };
 
+  // Hàm xóa bài post
+  const handleDeletePost = async () => {
+    if (!user || !id) return;
+    
+    // Xác nhận trước khi xóa
+    if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      return;
+    }
+
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const response = await fetch(`http://localhost:3301/backend/post/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        // Gọi callback onDelete để cập nhật UI
+        if (onDelete) {
+          onDelete();
+        }
+        // Có thể thêm toast/notification thành công ở đây
+        console.log('Bài viết đã được xóa thành công');
+      } else {
+        const errorData = await response.json();
+        alert(errorData?.message || 'Xóa bài viết thất bại');
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa bài viết:', error);
+      alert('Có lỗi xảy ra khi xóa bài viết');
+    }
+  };
+
   // Tính tổng số reaction từ reactionSummary
   const totalReactions = Object.values(reactionSummary).reduce((sum, count) => Number(sum) + Number(count), 0);
 
@@ -478,16 +454,16 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
       <div className="flex items-center mb-3 gap-2">
-        <Avatar author={{name:user?.fullname, avatar: "from-red-600 to-red-300"}} />
+        <Avatar author={{name:author.name, avatar: author.avatar}} />
         <div>
           <div className="flex items-center gap-1">
-            <span className="font-semibold text-gray-800 text-sm">{user?.fullname}</span>
+            <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
             
             {/* Tag people display */}
             {taggedPeople && taggedPeople.length > 0 && (
               <span className="text-xs text-gray-500">
                 is with {taggedPeople.slice(0,2).map((p, i) => (
-                  <span key={p.name} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
+                  <span key={p.id || (p.name + '-' + i)} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
                 ))}
                 {taggedPeople.length > 2 && (
                   <>
@@ -539,15 +515,18 @@ const Post: React.FC<PostProps & { index?: number }> = ({
               </div>
             )}
           </div>
-          <button
-            className="p-1 hover:bg-gray-100 rounded-full"
-            onClick={onDelete}
-            aria-label="Delete post"
-          >
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {/* Chỉ hiện nút xóa khi là bài viết của user hiện tại */}
+          {user && user.email && author.email && user.email === author.email && (
+            <button
+              className="p-1 hover:bg-gray-100 rounded-full"
+              onClick={handleDeletePost}
+              aria-label="Delete post"
+            >
+              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 

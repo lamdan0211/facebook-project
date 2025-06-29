@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { PostData } from '@/lib/dummyData';
 import { useAuth } from '@/components/auth/AuthContext';
 import Avatar from '../user/Avatar';
+import { fetchTaggedPeople } from '@/lib/utils/taggedPeople';
 
 const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, currentUserId: number, profileId: number }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,31 +27,40 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
         },
       });
       const data = await res.json();
-      // Map backend data to PostData[]
-      const mappedPosts = Array.isArray(data.data)
-        ? data.data.map((item: any) => ({
-            id: item.id,
-            author: {
-              name: item.user?.fullname || item.user?.email || 'User',
-              avatar: item.user?.profilepic || '/default-avatar.png',
-              email: item.user?.email || '',
-            },
-            timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
-            content: item.content || '',
-            media: Array.isArray(item.mediaUrl)
-              ? item.mediaUrl.map((url: string) => {
-                  const ext = url.split('.').pop()?.toLowerCase();
-                  let type: 'image'|'video' = 'image';
-                  if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
-                  return { type, url };
-                })
-              : [],
-            reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
-            comments: item.comments || [],
-            shares: item.shares || 0,
-            taggedPeople: item.taggedPeople || [],
-          }))
-        : [];
+      
+      // Process posts and fetch tagged people information
+      const mappedPosts = await Promise.all((Array.isArray(data.data) ? data.data : []).map(async (item: any) => {
+        let taggedPeople: any[] = [];
+        
+        // If friends array exists, fetch user information for each friend ID
+        if (item.friends && Array.isArray(item.friends) && item.friends.length > 0 && accessToken) {
+          taggedPeople = await fetchTaggedPeople(item.friends, accessToken);
+        }
+
+        return {
+          id: item.id,
+          author: {
+            name: item.user?.fullname || item.user?.email || 'User',
+            avatar: item.user?.profilepic || '/default-avatar.png',
+            email: item.user?.email || '',
+          },
+          timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
+          content: item.content || '',
+          media: Array.isArray(item.mediaUrl)
+            ? item.mediaUrl.map((url: string) => {
+                const ext = url.split('.').pop()?.toLowerCase();
+                let type: 'image'|'video' = 'image';
+                if(['mp4','mov','avi','webm'].includes(ext||'')) type = 'video';
+                return { type, url };
+              })
+            : [],
+          reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+          comments: item.comments || [],
+          shares: item.shares || 0,
+          taggedPeople: taggedPeople,
+        };
+      }));
+      
       setPosts(mappedPosts);
       setLoading(false);
     };
@@ -67,6 +77,10 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
 
   const handleEditPost = (updatedPost: PostData) => {
     setPosts(prev => prev.map(post => post.id === updatedPost.id ? { ...post, ...updatedPost } : post));
+  };
+
+  const handleDeletePost = (postId: number) => {
+    setPosts(prev => prev.filter(post => post.id !== postId));
   };
 
   return (
@@ -128,6 +142,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
               post={post}
               index={index}
               onEdit={handleEditPost}
+              onDelete={handleDeletePost}
             />
           ))
         )}

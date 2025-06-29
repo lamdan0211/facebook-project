@@ -67,8 +67,8 @@ const RightSidebar = () => {
           <p className="text-sm text-gray-500">Loading contacts...</p>
         ) : friends.length > 0 ? (
           <ul className="space-y-2">
-            {friends.map((friend) => (
-              <li key={friend.id}>
+            {friends.map((friend, idx) => (
+              <li key={`${friend.id}-${idx}`}>
                 <Link href={`/profile/${friend.id}`} className="flex items-center p-2 rounded-md hover:bg-gray-200 cursor-pointer text-gray-700 -ml-2 -mr-2">
                   <div className="relative mr-3 w-8 h-8">
                     <Image

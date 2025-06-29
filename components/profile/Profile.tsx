@@ -32,7 +32,7 @@ const Profile = () => {
          {/* Profile Picture */}
          <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-lg">
             <Image
-             src={userProfile.avatar}
+             src={userProfile.avatar || '/avatars/default-avatar.png'}
              alt={`${userProfile.name}'s avatar`}
              width={160}
              height={160}

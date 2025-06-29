@@ -120,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setIsAddingFriend(true);
     try {
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/friendrequest/${profileId}`, {
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/send/${profileId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

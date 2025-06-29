@@ -73,12 +73,14 @@ const ReceivedFriendRequests = () => {
     }
   };
 
-  // Map lại dữ liệu cho đúng API mới
-  const mappedRequests = requests.map((req: any) => ({
-    id: req.requestId,
-    sender: req.from,
-    status: req.status,
-  }));
+  // Map lại dữ liệu cho đúng API mới, loại bỏ phần tử không hợp lệ
+  const mappedRequests = ((requests as any[]) || [])
+    .filter(req => req && req.from && typeof req.from.id !== 'undefined')
+    .map((req: any) => ({
+      id: req.requestId,
+      sender: req.from,
+      // status: req.status, // Không có status trong API mẫu
+    }));
 
   return (
     <div>
@@ -86,7 +88,7 @@ const ReceivedFriendRequests = () => {
         <div className="text-center text-gray-500">Loading...</div>
       ) : mappedRequests.length > 0 ? (
         <div className="space-y-4">
-          {mappedRequests.filter(req => req && req.sender && req.sender.id).map((req) => (
+          {mappedRequests.map((req) => (
             <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
               <Link href={`/profile/${req.sender.id}`}>
                 <div className="w-10 h-10 relative">

@@ -138,7 +138,7 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
               <div className="flex items-center mb-2">
                 <div className="rounded-full overflow-hidden mr-2">
                   <Image
-                    src={author.avatar}
+                    src={author.avatar || '/avatars/default-avatar.png'}
                     alt={author.name}
                     width={32}
                     height={32}

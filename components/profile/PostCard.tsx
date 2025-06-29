@@ -8,11 +8,12 @@ import Post from '@/components/posts/Post';
 interface PostCardProps {
   post: PostData;
   onEdit?: (updatedPost: PostData) => void;
-  onDelete?: () => void;
+  onDelete?: (postId: number) => void;
   index?: number;
+  myReaction?: string | null;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, index }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, index, myReaction }) => {
   const [showReactionMenu, setShowReactionMenu] = useState(false);
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -62,7 +63,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete, index }) =>
 
   const reactionButtonProps = getReactionButtonProps();
 
-  return <Post {...post} onEdit={onEdit} onDelete={onDelete} index={index} />;
+  // Wrapper function để gọi onDelete với postId
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(post.id);
+    }
+  };
+
+  return <Post {...post} onEdit={onEdit} onDelete={handleDelete} index={index} myReaction={myReaction ?? post.myReaction} />;
 };
 
 export default PostCard; 

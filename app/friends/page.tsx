@@ -79,7 +79,7 @@ const FriendsPage = () => {
     setRequestStatus(prev => ({ ...prev, [receiverId]: FriendRequestStatus.Sending }));
     try {
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/friendrequest/${receiverId}`, {
+      const res = await fetch(`http://localhost:3301/backend/friendrequest/send/${receiverId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });

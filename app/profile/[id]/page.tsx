@@ -50,8 +50,8 @@ export default function ProfilePage() {
   if (!profile) return <div className="text-center py-10 text-red-500">Không tìm thấy thông tin người dùng.</div>;
 
   const userData = {
-    coverPhotoUrl: profile.coverpic || '',
-    profilePictureUrl: profile.profilepic || '',
+    coverPhotoUrl: profile.coverpic || '/avatars/default-avatar.png',
+    profilePictureUrl: profile.profilepic || '/avatars/default-avatar.png',
     userName: profile.fullname || profile.email || '',
   };
 

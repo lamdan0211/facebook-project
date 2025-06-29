@@ -11,15 +11,16 @@ function getInitials(name: string | undefined | null): string {
 }
 
 const Avatar = ({ author }: { author: { avatar: string, name: string } }) => {
+    const avatarUrl = author.avatar || '/avatars/default-avatar.png';
     return (
         <>
-            {author.avatar?.startsWith("from") ? (
-                <div className={`w-9 h-9 bg-gradient-to-br ${author.avatar} rounded-full flex items-center justify-center flex-shrink-0`}>
+            {avatarUrl.startsWith("from") ? (
+                <div className={`w-9 h-9 bg-gradient-to-br ${avatarUrl} rounded-full flex items-center justify-center flex-shrink-0`}>
                     <span className="text-white text-xs font-semibold">{getInitials(author.name)}</span>
                 </div>
             ) : (
                 <Image
-                    src={author.avatar}
+                    src={avatarUrl}
                     alt={author.name}
                     width={40}
                     height={40}

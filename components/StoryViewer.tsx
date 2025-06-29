@@ -94,7 +94,7 @@ export default function StoryViewer({ stories, initialStoryIndex = 0, onClose }:
       {/* User info */}
       <div className="absolute top-6 left-6 flex items-center text-white">
         <img
-          src={currentStory.userAvatar}
+          src={currentStory.userAvatar || '/avatars/default-avatar.png'}
           alt={currentStory.username}
           className="w-10 h-10 rounded-full border-2 border-white"
         />

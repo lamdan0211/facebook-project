@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface Person {
@@ -12,19 +12,58 @@ interface TagPeopleModalProps {
   onTagPeople: (taggedPeople: Person[]) => void;
 }
 
-const DUMMY_FRIENDS: Person[] = [
-  { id: '1', name: 'John Doe', avatar: 'https://i.pravatar.cc/150?img=1' },
-  { id: '2', name: 'Jane Smith', avatar: 'https://i.pravatar.cc/150?img=2' },
-  { id: '3', name: 'Mike Johnson', avatar: 'https://i.pravatar.cc/150?img=3' },
-  { id: '4', name: 'Sarah Williams', avatar: 'https://i.pravatar.cc/150?img=4' },
-  { id: '5', name: 'David Brown', avatar: 'https://i.pravatar.cc/150?img=5' },
-];
-
 const TagPeopleModal: React.FC<TagPeopleModalProps> = ({ onClose, onTagPeople }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPeople, setSelectedPeople] = useState<Person[]>([]);
+  const [friends, setFriends] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredFriends = DUMMY_FRIENDS.filter(friend =>
+  // Fetch friends from API
+  useEffect(() => {
+    const fetchFriends = async () => {
+      const storedUser = sessionStorage.getItem('user');
+      const accessToken = sessionStorage.getItem('accessToken');
+      
+      if (!storedUser || !accessToken) {
+        setError('User not authenticated');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const currentUser = JSON.parse(storedUser);
+        const res = await fetch(`http://localhost:3301/backend/friendrequest/${currentUser.id}`, {
+          headers: { 
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Transform the API response to match our Person interface
+          const friendsList = data.map((friend: any) => ({
+            id: friend.id.toString(),
+            name: friend.fullname,
+            avatar: friend.profilepic || '/avatars/default-avatar.png'
+          }));
+          setFriends(friendsList);
+        } else {
+          setError('Failed to fetch friends');
+        }
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+        setError('Failed to fetch friends');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFriends();
+  }, []);
+
+  const filteredFriends = friends.filter(friend =>
     friend.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     !selectedPeople.find(p => p.id === friend.id)
   );
@@ -98,24 +137,38 @@ const TagPeopleModal: React.FC<TagPeopleModalProps> = ({ onClose, onTagPeople })
 
         {/* Friends List */}
         <div className="max-h-64 overflow-y-auto">
-          {filteredFriends.map(friend => (
-            <div
-              key={friend.id}
-              onClick={() => handleSelectPerson(friend)}
-              className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-            >
-              <div className="w-12 h-12 rounded-full overflow-hidden">
-                <Image
-                  src={friend.avatar}
-                  alt={friend.name}
-                  width={48}
-                  height={48}
-                  className="object-cover"
-                />
-              </div>
-              <span className="ml-3 font-medium">{friend.name}</span>
+          {loading ? (
+            <div className="p-4 text-center text-gray-500">
+              Loading friends...
             </div>
-          ))}
+          ) : error ? (
+            <div className="p-4 text-center text-red-500">
+              {error}
+            </div>
+          ) : filteredFriends.length > 0 ? (
+            filteredFriends.map(friend => (
+              <div
+                key={friend.id}
+                onClick={() => handleSelectPerson(friend)}
+                className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-full overflow-hidden relative">
+                  <Image
+                    src={friend.avatar || '/avatars/default-avatar.png'}
+                    alt={friend.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+                <span className="ml-3 font-medium">{friend.name}</span>
+              </div>
+            ))
+          ) : (
+            <div className="p-4 text-center text-gray-500">
+              {searchTerm ? 'No friends found matching your search.' : 'No friends available to tag.'}
+            </div>
+          )}
         </div>
 
         {/* Done Button */}
