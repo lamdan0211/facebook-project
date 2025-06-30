@@ -59,7 +59,7 @@ export default function ProfilePage() {
   return (
     <PostProvider>
       <div className="bg-gray-100 min-h-screen">
-        <ProfileHeader {...userData} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} friendsCount={friendsCount} />
+        <ProfileHeader {...userData} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} friendsCount={friendsCount} profile={profile} />
         <div className="container mx-auto px-4 md:px-6 lg:px-8 mt-4">
           <div className="flex flex-col md:flex-row mt-4 lg:mt-6 mx-auto max-w-[1200px]">
             <ProfileSidebar profile={profile} profileId={profile.id} currentUserId={user?.id} onProfileUpdated={handleProfileUpdated} setFriendsCount={setFriendsCount} />

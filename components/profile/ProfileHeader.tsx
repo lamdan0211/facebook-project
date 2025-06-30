@@ -16,9 +16,7 @@ enum FriendStatus {
 }
 
 interface ProfileHeaderProps {
-  coverPhotoUrl: string;
-  profilePictureUrl: string;
-  userName: string;
+  profile: any;
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
@@ -37,9 +35,7 @@ const defaultDetails: DetailsData = {
 };
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  coverPhotoUrl,
-  profilePictureUrl,
-  userName,
+  profile,
   profileId,
   currentUserId,
   onProfileUpdated,
@@ -47,17 +43,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 }) => {
   const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentUserName, setCurrentUserName] = useState(userName);
-  const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profilePictureUrl);
+  const [currentUserName, setCurrentUserName] = useState(profile?.fullname || profile?.email || '');
+  const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profile?.profilepic || '/avatars/default-avatar.png');
   const [details, setDetails] = useState<DetailsData>({
-    fullname: userName || '',
-    phone: '',
-    profilepic: profilePictureUrl || '',
-    coverpic: coverPhotoUrl || '',
-    bio: '',
-    birthplace: '',
-    workingPlace: '',
-    isActive: true,
+    fullname: profile?.fullname || '',
+    phone: profile?.phone || '',
+    profilepic: profile?.profilepic || '',
+    coverpic: profile?.coverpic || '',
+    bio: profile?.bio || '',
+    birthplace: profile?.birthplace || '',
+    workingPlace: profile?.workingPlace || '',
+    isActive: typeof profile?.isActive !== 'undefined' ? profile.isActive : true,
   });
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
@@ -71,9 +67,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   // Cập nhật state khi props thay đổi
   useEffect(() => {
-    setCurrentUserName(userName);
-    setCurrentProfilePictureUrl(profilePictureUrl);
-  }, [userName, profilePictureUrl]);
+    setCurrentUserName(profile?.fullname || profile?.email || '');
+    setCurrentProfilePictureUrl(profile?.profilepic || '/avatars/default-avatar.png');
+  }, [profile]);
 
   // Check friend status when component mounts or profileId changes
   useEffect(() => {
@@ -109,10 +105,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     } else {
       isFirstRender.current = false;
     }
-  }, [coverPhotoUrl]);
+  }, [profile?.coverpic]);
 
   // Lấy cover photo tạm nếu có
-  let coverPhoto = coverPhotoUrl;
+  let coverPhoto = profile?.coverpic || '/avatars/default-avatar.png';
   if (typeof window !== 'undefined') {
     const temp = localStorage.getItem('temp_cover_photo');
     if (temp) coverPhoto = temp;
@@ -359,14 +355,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }
           }}
           initialData={{
-            fullname: currentUserName || '',
-            phone: '',
-            profilepic: currentProfilePictureUrl || '',
-            coverpic: coverPhotoUrl || '',
-            bio: '',
-            birthplace: '',
-            workingPlace: '',
-            isActive: true,
+            fullname: profile?.fullname || '',
+            phone: profile?.phone || '',
+            profilepic: profile?.profilepic || '',
+            coverpic: profile?.coverpic || '',
+            bio: profile?.bio || '',
+            birthplace: profile?.birthplace || '',
+            workingPlace: profile?.workingPlace || '',
+            isActive: typeof profile?.isActive !== 'undefined' ? profile.isActive : true,
           }}
           userId={profileId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
