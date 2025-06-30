@@ -20,9 +20,10 @@ interface ProfileSidebarProps {
   currentUserId: number;
   profileId: number;
   onProfileUpdated?: () => void;
+  setFriendsCount?: (count: number) => void;
 }
 
-const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated, setFriendsCount }: ProfileSidebarProps) => {
   const { user, updateUser } = useAuth();
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
@@ -86,14 +87,17 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
         );
         const data = await res.json();
         console.log('Friends API response:', data);
-        setFriends(Array.isArray(data) ? data : []);
+        const arr = Array.isArray(data) ? data : [];
+        setFriends(arr);
+        if (setFriendsCount) setFriendsCount(arr.length);
       } catch (error) {
         console.error('Error fetching friends:', error);
         setFriends([]);
+        if (setFriendsCount) setFriendsCount(0);
       }
     };
     if (profileId) fetchFriends();
-  }, [profileId]);
+  }, [profileId, setFriendsCount]);
 
   // console.log('Photos to render:', photos);
 

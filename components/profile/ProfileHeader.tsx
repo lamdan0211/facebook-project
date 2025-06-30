@@ -22,6 +22,7 @@ interface ProfileHeaderProps {
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
+  friendsCount?: number;
 }
 
 const defaultDetails: DetailsData = {
@@ -42,6 +43,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileId,
   currentUserId,
   onProfileUpdated,
+  friendsCount = 0,
 }) => {
   const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -301,7 +303,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{currentUserName}</h1>
-          <p className="text-gray-600 text-sm mt-1">54 friends</p>
+          <p className="text-gray-600 text-sm mt-1">{friendsCount} friends</p>
         </div>
         {/* Action Buttons */}
         {isOwner ? (
