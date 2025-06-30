@@ -196,7 +196,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
                 <div key={i} className="relative w-full h-full cursor-pointer" onClick={() => { setPhotoModalIndex(i); setIsPhotoModalOpen(true); }}>
                   <Image src={url} alt={`Photo ${i+1}`} fill sizes="100vw" style={{objectFit:'cover'}} />
                   {i === 3 && count > 4 && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-2xl font-bold z-10">
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white text-2xl font-bold z-10">
                       +{count-4}
                     </div>
                   )}

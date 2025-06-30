@@ -351,7 +351,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
               <video src={m.url} controls className="w-full h-full object-cover bg-black" />
             )}
             {i === 3 && media.length > 4 && (
-              <div className="absolute inset-0 bg-gray-900/80 bg-opacity-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gray-900/90 bg-opacity-50 flex items-center justify-center">
                 <span className="text-white text-2xl font-bold">+{media.length-4}</span>
               </div>
             )}
@@ -453,32 +453,35 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
-      <div className="flex items-center mb-3 gap-2">
+      <div className="flex items-center mb-3 gap-2 justify-between">
+       <div className='flex items-center gap-2'>
         <Avatar author={{name:author.name, avatar: author.avatar}} />
-        <div>
-          <div className="flex items-center gap-1">
-            <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
-            
-            {/* Tag people display */}
-            {taggedPeople && taggedPeople.length > 0 && (
-              <span className="text-xs text-gray-500">
-                is with {taggedPeople.slice(0,2).map((p, i) => (
-                  <span key={p.id || (p.name + '-' + i)} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
-                ))}
-                {taggedPeople.length > 2 && (
-                  <>
-                    {' '} and <span className="font-semibold text-blue-600 cursor-pointer" onClick={() => setShowTaggedPeopleModal(true)}>{taggedPeople.length - 2} others</span>
-                  </>
-                )}
-              </span>
-            )}
+          <div>
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+              
+              {/* Tag people display */}
+              {taggedPeople && taggedPeople.length > 0 && (
+                <span className="text-xs text-gray-500">
+                  is with {taggedPeople.slice(0,2).map((p, i) => (
+                    <span key={p.id || (p.name + '-' + i)} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
+                  ))}
+                  {taggedPeople.length > 2 && (
+                    <>
+                      {' '} and <span className="font-semibold text-blue-600 cursor-pointer" onClick={() => setShowTaggedPeopleModal(true)}>{taggedPeople.length - 2} others</span>
+                    </>
+                  )}
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-gray-500 flex items-center">
+              {timeAgo}
+              <span className="mx-1">•</span>
+              <span>🌍</span>
+            </span>
           </div>
-          <span className="text-xs text-gray-500 flex items-center">
-            {timeAgo}
-            <span className="mx-1">•</span>
-            <span>🌍</span>
-          </span>
-        </div>
+       </div>
+
         {/* Group more (3 dots) và close (X) vào 1 flex container */}
         <div className="flex items-center gap-1 ml-auto">
           <div

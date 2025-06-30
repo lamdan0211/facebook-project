@@ -218,7 +218,7 @@ const NewsFeed = () => {
       ) : posts.length === 0 ? (
         <div className="text-center text-gray-400 py-8">No posts found.</div>
       ) : (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-4 ">
           {posts.map((post, index) => (
             <PostCard
               key={post.id ? String(post.id) : `fallback-${index}`}
