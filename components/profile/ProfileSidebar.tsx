@@ -76,7 +76,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
       const accessToken = sessionStorage.getItem('accessToken');
       try {
         const res = await fetch(
-          `http://localhost:3301/backend/friendrequest/friends/${profileId}`,
+          `http://localhost:3301/backend/friendrequest/${profileId}`,
           {
             method: 'GET',
             headers: {
@@ -85,6 +85,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
           }
         );
         const data = await res.json();
+        console.log('Friends API response:', data);
         setFriends(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching friends:', error);
