@@ -139,6 +139,14 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     };
   }, [showDropdown]);
 
+  // Khi mount, ưu tiên lấy trạng thái reaction từ sessionStorage nếu có
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(`myReaction_post_${id}`);
+      if (stored) setUserReaction(stored);
+    }
+  }, [id]);
+
   // Xử lý khi user bấm reaction
   const handleReaction = async (reactionType: string) => {
     const accessToken = sessionStorage.getItem('accessToken');
@@ -152,6 +160,13 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         if (res.ok) {
           setUserReaction(null);
           setUserReactionId(null);
+          sessionStorage.removeItem(`myReaction_post_${id}`);
+          // Cập nhật UI ngay
+          setReactionSummary((prev: any) => ({
+            ...prev,
+            [reactionType]: Math.max((prev?.[reactionType] || 1) - 1, 0)
+          }));
+          setCurrentTotalReactions((prev) => Math.max(prev - 1, 0));
         }
       } else {
         // Nếu chưa có hoặc khác loại, gọi POST để tạo/cập nhật reaction
@@ -169,15 +184,29 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         if (res.ok) {
           const data = await res.json();
           setUserReaction(reactionType);
-          setUserReactionId(data.id); // backend trả về reaction mới
+          setUserReactionId(data.id);
+          sessionStorage.setItem(`myReaction_post_${id}`, reactionType);
+          // Cập nhật UI ngay
+          setReactionSummary((prev: any) => {
+            let newSummary = { ...prev };
+            // Nếu user đã từng react loại khác, giảm loại cũ
+            if (userReaction && userReaction !== reactionType) {
+              newSummary[userReaction] = Math.max((newSummary[userReaction] || 1) - 1, 0);
+            }
+            newSummary[reactionType] = (newSummary[reactionType] || 0) + 1;
+            return newSummary;
+          });
+          setCurrentTotalReactions((prev) => {
+            // Nếu đổi loại reaction thì không tăng tổng, nếu mới thì tăng
+            if (userReaction && userReaction !== reactionType) return prev;
+            return prev + 1;
+          });
         }
       }
     } catch (err) {
       alert('Gửi reaction thất bại');
     }
-    // Sau mỗi thao tác, fetch lại tổng hợp reactions và trạng thái user
     setTimeout(() => {
-      // Đảm bảo backend đã cập nhật xong
       const fetchReactions = async () => {
         try {
           const accessToken = sessionStorage.getItem('accessToken');
@@ -195,7 +224,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             const data2 = await res2.json();
             setUsersReacted(data2);
             const myReact = Array.isArray(data2) ? data2.find((r:any) => r.userName === user?.fullname) : null;
-            setUserReaction(myReact?.type || null);
+            setUserReaction(myReact?.type || sessionStorage.getItem(`myReaction_post_${id}`) || null);
             setUserReactionId(myReact?.id || null);
           }
         } catch {}
@@ -538,31 +567,15 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         {renderMediaGrid()}
       </div>
 
-      <div className="flex items-center justify-between text-gray-500 text-xs mb-3 border-b border-gray-200 pb-2">
-        <div className="flex items-center">
-          {currentTotalReactions > 0 && (
-            <div className="flex items-center -space-x-1 mr-1">
-              {Object.entries(safeReactions)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 3)
-                .map(([type, count], index) => {
-                  if (count > 0) {
-                    const emoji = type === 'like' ? '👍' :
-                                  type === 'love' ? '❤️' :
-                                  type === 'haha' ? '😂' :
-                                  type === 'wow' ? '😮' :
-                                  type === 'sad' ? '😢' : '😡';
-                    return <span key={type} className={`z-${index + 1}0`}>{emoji}</span>;
-                  }
-                  return null;  
-                })}
-            </div>
-          )}
-        </div>
-        <div>
-          {comments.length > 0 && <span className="mr-2">{comments.length} comments</span>}
-          {shares > 0 && <span>{shares} shares</span>}
-        </div>
+      {/* Tổng hợp reaction (emoji + số lượng) - Đặt ngay trên hàng Like/Comment/Save */}
+      <div className="flex items-center gap-2 mb-2">
+        {Object.entries(reactions).map(([type, count]) =>
+          count > 0 ? (
+            <span key={type} className="flex items-center text-sm">
+              {getReactionIcon(type)} <span className="ml-0.5">{count}</span>
+            </span>
+          ) : null
+        )}
       </div>
 
       <div className="flex justify-around text-gray-600 text-sm font-semibold border-b border-gray-200 pb-2 mb-2 relative">
@@ -733,15 +746,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           ↑
         </button>
       )}
-
-      {/* Hiển thị chi tiết từng loại reaction ở vị trí mong muốn */}
-      <div className="flex gap-2 ml-1">
-        {Object.entries(reactionSummary).map(([type, count]) => (
-          <span key={type} className="flex items-center text-xs text-gray-600">
-            {getReactionIcon(type)} {Number(count)}
-          </span>
-        ))}
-      </div>
     </div>
   );
 };
