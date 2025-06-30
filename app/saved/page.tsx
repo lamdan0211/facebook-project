@@ -4,11 +4,20 @@ import Post from "@/components/posts/Post";
 import Header from "@/components/layout/Header";
 import LeftSidebar from "@/components/layout/LeftSidebar";
 import useRequireAuth from "@/lib/useRequireAuth";
-import { PostData } from "@/lib/dummyData";
+import { PostData as BasePostData } from "@/lib/dummyData";
+
+interface SavedPostData extends BasePostData {
+  user?: {
+    id: number;
+    fullname: string;
+    email: string;
+    profilepic?: string;
+  };
+}
 
 const SavedPage = () => {
   useRequireAuth();
-  const [savedPosts, setSavedPosts] = useState<PostData[]>([]);
+  const [savedPosts, setSavedPosts] = useState<SavedPostData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,6 +75,7 @@ const SavedPage = () => {
             reactions: post.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
             shares: post.shares || 0,
             timeAgo: post.timeAgo || new Date(post.createdAt).toLocaleDateString(),
+            user: item.user,
           };
         });
         setSavedPosts(extractedPosts);
@@ -103,8 +113,19 @@ const SavedPage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {savedPosts.map((post) => (
-                <Post key={post.id} {...post} isOnSavedPage={true} onUnsave={() => handleUnsave(post.id)} />
+              {savedPosts.map((post, idx) => (
+                <div key={post.id} className="relative">
+                  <Post
+                    {...post}
+                    author={{
+                      name: post.user?.fullname || post.user?.email || 'User',
+                      avatar: post.user?.profilepic || '/avatars/default-avatar.png',
+                      email: post.user?.email || '',
+                    }}
+                    isOnSavedPage={true}
+                    onUnsave={() => handleUnsave(post.id)}
+                  />
+                </div>
               ))}
             </div>
           )}
