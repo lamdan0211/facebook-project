@@ -106,7 +106,13 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const emojiList = ['😀','😂','😍','😢','😮','😡','👍','❤️','��','😆','😎','🙏'];
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem(`post_saved_${id}`);
+      if (saved !== null) return saved === 'true';
+    }
+    return isOnSavedPage || false;
+  });
   const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
@@ -385,7 +391,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
       if (res.ok) {
         setIsSaved(true);
-        // Có thể thêm toast/notification ở đây
+        sessionStorage.setItem(`post_saved_${id}`, 'true');
       } else {
         // Xử lý lỗi
         console.error("Failed to save post");
@@ -400,6 +406,33 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const handleUnsavePost = async () => {
     if (onUnsave) {
       onUnsave();
+    }
+    setSaveLoading(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3301/backend/postunsaved', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          postId: id,
+          userId: user.id,
+        }),
+      });
+
+      if (res.ok) {
+        setIsSaved(false);
+        sessionStorage.setItem(`post_saved_${id}`, 'false');
+      } else {
+        // Xử lý lỗi
+        console.error("Failed to unsave post");
+      }
+    } catch (error) {
+      console.error("Error unsaving post:", error);
+    } finally {
+      setSaveLoading(false);
     }
   };
 
