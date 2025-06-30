@@ -89,12 +89,17 @@ const NewsFeed = () => {
         if (!myReaction) {
           myReaction = sessionStorage.getItem(`myReaction_post_${item.id}`) || null;
         }
+        // Avatar fallback: nếu không có hoặc không phải URL hợp lệ, dùng default
+        let avatarUrl = item.user?.profilepic;
+        if (!avatarUrl || typeof avatarUrl !== 'string' || !(avatarUrl.startsWith('http') || avatarUrl.startsWith('https'))) {
+          avatarUrl = '/avatars/default-avatar.png';
+        }
         return {
           id: item.id,
           author: {
             id: item.user?.id,
             name: item.user?.fullname || item.user?.email || 'User',
-            avatar: item.user?.profilepic || '/avatars/default-avatar.png',
+            avatar: avatarUrl,
             email: item.user?.email || '',
           },
           timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
@@ -145,10 +150,15 @@ const NewsFeed = () => {
 
   const handleLoadMore = useCallback(() => {
     if (!hasMore || loading) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchPosts(nextPage, false);
-  }, [hasMore, loading, page, fetchPosts]);
+    setPage(prev => prev + 1);
+  }, [hasMore, loading]);
+
+  // Khi page > 1 và đã load xong auth, fetch posts tiếp theo
+  useEffect(() => {
+    if (!authLoading && page > 1) {
+      fetchPosts(page, false);
+    }
+  }, [page, authLoading, fetchPosts]);
 
   const handleOpenModal = useCallback(() => setIsModalOpen(true), []);
   const handleCloseModal = useCallback(() => setIsModalOpen(false), []);
