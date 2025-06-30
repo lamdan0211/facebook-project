@@ -82,44 +82,54 @@ const ReceivedFriendRequests = () => {
       // status: req.status, // Không có status trong API mẫu
     }));
 
+  // Nếu requests là FriendRequest[] chuẩn (có sender), thì map lại cho an toàn
+  const safeMappedRequests = Array.isArray(requests)
+    ? requests.filter(req => req && req.sender && typeof req.sender.id !== 'undefined')
+    : [];
+
+  // Ưu tiên mappedRequests nếu có, nếu không thì dùng safeMappedRequests
+  const finalRequests = mappedRequests.length > 0 ? mappedRequests : safeMappedRequests;
+
   return (
     <div>
       {loading ? (
         <div className="text-center text-gray-500">Loading...</div>
-      ) : mappedRequests.length > 0 ? (
+      ) : finalRequests.length > 0 ? (
         <div className="space-y-4">
-          {mappedRequests.map((req) => (
-            <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-              <Link href={`/profile/${req.sender.id}`}>
-                <div className="w-10 h-10 relative">
-                  <Image
-                    src={req.sender.profilepic || '/avatars/default-avatar.png'}
-                    alt={req.sender.fullname}
-                    fill
-                    className="rounded-full object-cover"
-                  />
-                </div>
-              </Link>
-              <div className="flex-1 min-w-0">
+          {finalRequests.map((req) => (
+            req && req.sender && typeof req.sender.id !== 'undefined' && (
+              <div key={req.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
                 <Link href={`/profile/${req.sender.id}`}>
-                  <h3 className="font-semibold text-sm truncate hover:underline">{req.sender.fullname}</h3>
+                  <div className="w-10 h-10 relative">
+                    <Image
+                      src={req.sender.profilepic || '/avatars/default-avatar.png'}
+                      alt={req.sender.fullname}
+                      fill
+                      className="rounded-full object-cover"
+                    />
+                  </div>
                 </Link>
-                <div className="flex gap-2 mt-1">
-                  <button
-                    onClick={() => handleResponse(req.sender.id, 'accept')}
-                    className="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    onClick={() => handleResponse(req.sender.id, 'reject')}
-                    className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
-                  >
-                    Delete
-                  </button>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/profile/${req.sender.id}`}>
+                    <h3 className="font-semibold text-sm truncate hover:underline">{req.sender.fullname}</h3>
+                  </Link>
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={() => handleResponse(req.sender.id, 'accept')}
+                      className="px-3 py-1 bg-blue-500 text-white rounded-lg text-xs font-semibold hover:bg-blue-600"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => handleResponse(req.sender.id, 'reject')}
+                      className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           ))}
         </div>
       ) : (

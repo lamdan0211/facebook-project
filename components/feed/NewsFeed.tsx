@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import PostCard from '@/components/profile/PostCard';
 import Image from 'next/image';
 import { PostData } from '@/lib/dummyData';
@@ -27,24 +27,18 @@ const NewsFeed = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    if (!authLoading) {
-      fetchPosts(1, true);
-    }
-  }, [searchQuery, authLoading]);
-
-  const fetchPosts = async (pageNum: number, reset: boolean = false) => {
+  const fetchPosts = useCallback(async (pageNum: number, reset: boolean = false) => {
     if (loading) return;
     setLoading(true);
     
     if (reset) {
-      setPage(1);
       setPosts([]);
     }
     
     try {
       const accessToken = sessionStorage.getItem('accessToken');
       let url = `http://localhost:3301/backend/post/news?page=${pageNum}&limit=${PAGE_SIZE}`;
+      console.log('URL:', url);
       if (searchQuery.trim()) {
         url += `&q=${encodeURIComponent(searchQuery)}`;
       }
@@ -63,20 +57,38 @@ const NewsFeed = () => {
       }
 
       const data = await res.json();
-      console.log(data)
+      console.log('API Response:', data);
       let mappedPosts: any[] = [];
       
       const items = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
+      console.log('Items to process:', items);
+
+      // Nếu page > 1 mà data trả về rỗng nhưng total > 0, tự động fetch lại page 1
+      if (page > 1 && items.length === 0 && data.total > 0) {
+        console.log('No data on this page, but total > 0. Refetching page 1...');
+        setPage(1);
+        fetchPosts(1, true);
+        return;
+      }
 
       // Process posts and fetch tagged people information
       mappedPosts = await Promise.all(items.map(async (item: any) => {
         let taggedPeople: any[] = [];
-        
-        // If friends array exists, fetch user information for each friend ID
         if (item.friends && Array.isArray(item.friends) && item.friends.length > 0 && accessToken) {
           taggedPeople = await fetchTaggedPeople(item.friends, accessToken);
         }
-
+        const reactionSummary: Record<string, number> = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+        let myReaction = null;
+        if (item.reactions && Array.isArray(item.reactions)) {
+          item.reactions.forEach((r: any) => {
+            const type = String(r.type);
+            if (reactionSummary[type] !== undefined) reactionSummary[type]++;
+            if (user && r.userId === user.id) myReaction = r.type;
+          });
+        }
+        if (!myReaction) {
+          myReaction = sessionStorage.getItem(`myReaction_post_${item.id}`) || null;
+        }
         return {
           id: item.id,
           author: {
@@ -95,14 +107,14 @@ const NewsFeed = () => {
                 return { type, url };
               })
             : [],
-          reactions: item.reactions || { like: 0 },
+          reactions: reactionSummary,
           comments: item.comments || [],
           shares: item.shares || 0,
           taggedPeople: taggedPeople,
-          myReaction: item.myReaction || null,
+          myReaction: myReaction,
         };
       }));
-      
+      console.log('Final mappedPosts:', mappedPosts);
       if (reset) {
         setPosts(mappedPosts);
       } else {
@@ -115,41 +127,57 @@ const NewsFeed = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, user]);
 
-  const handleLoadMore = () => {
+  // Reset page về 1 khi search hoặc authLoading xong
+  useEffect(() => {
+    if (!authLoading) {
+      setPage(1);
+    }
+  }, [searchQuery, authLoading]);
+
+  // Khi page === 1 và đã load xong auth, fetch posts
+  useEffect(() => {
+    if (!authLoading && page === 1) {
+      fetchPosts(1, true);
+    }
+  }, [page, authLoading, fetchPosts]);
+
+  const handleLoadMore = useCallback(() => {
     if (!hasMore || loading) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchPosts(nextPage, false);
-  };
+  }, [hasMore, loading, page, fetchPosts]);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = useCallback(() => setIsModalOpen(true), []);
+  const handleCloseModal = useCallback(() => setIsModalOpen(false), []);
 
-  const handlePostSubmit = (newPost: PostData) => {
+  const handlePostSubmit = useCallback((newPost: PostData) => {
     setPosts(prev => [newPost, ...prev]);
     handleCloseModal();
-  };
+  }, [handleCloseModal]);
   
-  const handleLiveVideoClick = () => handleOpenModal(); 
-  const handlePhotoVideoIconClick = () => handleOpenModal(); 
-  const handleFeelingActivityIconClick = () => handleOpenModal(); 
+  const handleLiveVideoClick = useCallback(() => handleOpenModal(), [handleOpenModal]); 
+  const handlePhotoVideoIconClick = useCallback(() => handleOpenModal(), [handleOpenModal]); 
+  const handleFeelingActivityIconClick = useCallback(() => handleOpenModal(), [handleOpenModal]); 
 
-  const handleDeletePost = (postId: number) => {
+  const handleDeletePost = useCallback((postId: number) => {
     setPosts(prev => prev.filter(post => post.id !== postId));
-  };
+  }, []);
 
-  const handleEditPost = (updatedPost: PostData) => {
+  const handleEditPost = useCallback((updatedPost: PostData) => {
     setPosts(prev =>
       prev.map(post =>
         post.id === updatedPost.id ? { ...post, ...updatedPost } : post
       )
     );
-  };
+  }, []);
   
+  // Infinite scroll observer
   useEffect(() => {
     if (loading || !hasMore) return;
+    
     const observer = new window.IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {
@@ -158,14 +186,18 @@ const NewsFeed = () => {
       },
       { threshold: 1 }
     );
+    
     if (loaderRef.current) {
       observer.observe(loaderRef.current);
     }
+    
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
+      observer.disconnect();
     };
-  }, [loading, hasMore]);
+  }, [loading, hasMore, handleLoadMore]);
 
+  // Scroll to top button
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);

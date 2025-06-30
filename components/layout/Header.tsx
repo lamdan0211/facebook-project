@@ -22,6 +22,7 @@ const Header = () => {
    const { setSearchQuery } = useSearch();
    const [localSearch, setLocalSearch] = useState('');
    const [showMobileSearch, setShowMobileSearch] = useState(false);
+   const [unreadCount, setUnreadCount] = useState(0);
 
    const toggleDropdown = () => {
       setIsDropdownOpen(!isDropdownOpen);
@@ -35,6 +36,27 @@ const Header = () => {
       setSearchQuery(localSearch);
       router.push('/dashboard');
    };
+
+   useEffect(() => {
+      const fetchUnreadCount = async () => {
+         try {
+            const accessToken = sessionStorage.getItem('accessToken');
+            const res = await fetch('http://localhost:3301/backend/notify/news', {
+               headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+               },
+            });
+            if (!res.ok) throw new Error('Failed to fetch notifications');
+            const data = await res.json();
+            const arr = Array.isArray(data.data) ? data.data : [];
+            const unread = arr.filter((item: any) => !item.read).length;
+            setUnreadCount(unread);
+         } catch (err) {
+            setUnreadCount(0);
+         }
+      };
+      fetchUnreadCount();
+   }, [user]);
 
    // Close dropdowns when clicking outside
    useEffect(() => {
@@ -150,7 +172,9 @@ const Header = () => {
                <Bell className="w-6 h-6 hover:text-blue-600 fill-current text-green-500" />
                </div>
                {isNotifOpen && <NotificationDropdown />}
-               <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
+               <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                 {unreadCount}
+               </span>
             </div>
             {/* User Avatar with Dropdown */}
             {user && <UserDropdown />}

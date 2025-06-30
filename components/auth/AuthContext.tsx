@@ -10,6 +10,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginGoogle: (accessToken: string) => Promise<void>;
+  updateUser: (userData: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   login: async () => {},
   loginGoogle: async () => {},
+  updateUser: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -89,6 +91,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     }
   }
+  const updateUser = (userData: any) => {
+    setUser(userData);
+    sessionStorage.setItem('user', JSON.stringify(userData));
+  };
   const logout = async () => {
     setUser(null);
     sessionStorage.removeItem('user');
@@ -97,7 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, login, loginGoogle }}>
+    <AuthContext.Provider value={{ user, loading, logout, login, loginGoogle, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

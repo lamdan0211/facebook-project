@@ -1,10 +1,11 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { FolderDot, UserPlus, UserCog, UserCheck, UserX, UserMinus } from 'lucide-react';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import EditAvatarModal from '../modals/EditAvatarModal';
 import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '@/components/auth/AuthContext';
 import { createPortal } from 'react-dom';
 
 enum FriendStatus {
@@ -21,6 +22,7 @@ interface ProfileHeaderProps {
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
+  friendsCount?: number;
 }
 
 const defaultDetails: DetailsData = {
@@ -41,8 +43,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileId,
   currentUserId,
   onProfileUpdated,
+  friendsCount = 0,
 }) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentUserName, setCurrentUserName] = useState(userName);
   const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profilePictureUrl);
@@ -300,7 +303,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
         <div className="flex-1 mt-4 md:ml-4 md:mt-0 text-center md:text-left">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{currentUserName}</h1>
-          <p className="text-gray-600 text-sm mt-1">54 friends</p>
+          <p className="text-gray-600 text-sm mt-1">{friendsCount} friends</p>
         </div>
         {/* Action Buttons */}
         {isOwner ? (
@@ -349,7 +352,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               if (userStr) {
                 const userObj = JSON.parse(userStr);
                 userObj.fullname = data.fullname;
+                userObj.profilepic = data.profilepic;
                 sessionStorage.setItem('user', JSON.stringify(userObj));
+                updateUser(userObj);
               }
             }
           }}
@@ -374,6 +379,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onUploaded={() => {
             if (typeof onProfileUpdated === 'function') onProfileUpdated();
             setCurrentProfilePictureUrl(profilePictureUrl + '?v=' + Date.now());
+            if (profileId === currentUserId && typeof window !== 'undefined') {
+              const userStr = sessionStorage.getItem('user');
+              if (userStr) {
+                const userObj = JSON.parse(userStr);
+                userObj.profilepic = profilePictureUrl + '?v=' + Date.now();
+                sessionStorage.setItem('user', JSON.stringify(userObj));
+                updateUser(userObj);
+              }
+            }
           }}
         />
       )}

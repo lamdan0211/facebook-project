@@ -20,10 +20,11 @@ interface ProfileSidebarProps {
   currentUserId: number;
   profileId: number;
   onProfileUpdated?: () => void;
+  setFriendsCount?: (count: number) => void;
 }
 
-const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }: ProfileSidebarProps) => {
-  const { user } = useAuth();
+const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated, setFriendsCount }: ProfileSidebarProps) => {
+  const { user, updateUser } = useAuth();
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
 
@@ -76,7 +77,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
       const accessToken = sessionStorage.getItem('accessToken');
       try {
         const res = await fetch(
-          `http://localhost:3301/backend/friendrequest/friends/${profileId}`,
+          `http://localhost:3301/backend/friendrequest/${profileId}`,
           {
             method: 'GET',
             headers: {
@@ -85,14 +86,18 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
           }
         );
         const data = await res.json();
-        setFriends(Array.isArray(data) ? data : []);
+        console.log('Friends API response:', data);
+        const arr = Array.isArray(data) ? data : [];
+        setFriends(arr);
+        if (setFriendsCount) setFriendsCount(arr.length);
       } catch (error) {
         console.error('Error fetching friends:', error);
         setFriends([]);
+        if (setFriendsCount) setFriendsCount(0);
       }
     };
     if (profileId) fetchFriends();
-  }, [profileId]);
+  }, [profileId, setFriendsCount]);
 
   // console.log('Photos to render:', photos);
 
@@ -128,7 +133,9 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
                   if (userStr) {
                     const userObj = JSON.parse(userStr);
                     userObj.fullname = data.fullname;
+                    userObj.profilepic = data.profilepic;
                     sessionStorage.setItem('user', JSON.stringify(userObj));
+                    updateUser(userObj);
                   }
                 }
               }}
