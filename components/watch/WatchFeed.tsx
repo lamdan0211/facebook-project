@@ -15,11 +15,12 @@ interface ApiVideo {
     friends: any[];
     createdAt: string;
     updatedAt: string;
-    user?: {
-      fullname?: string;
-      profilepic?: string;
-      email?: string;
-    };
+  };
+  user?: {
+    id: number;
+    fullname?: string;
+    email?: string;
+    profilepic?: string;
   };
 }
 
@@ -33,6 +34,7 @@ interface VideoCardProps {
     author: {
       name: string;
       avatar: string;
+      email: string;
     };
     reactions: {
       like: number;
@@ -80,11 +82,12 @@ const WatchFeed = () => {
           id: item.id,
           postId: item.post?.id,
           videoUrl: item.url,
-          title: item.post?.user?.fullname || 'User',
+          title: item.user?.fullname || 'User',
           timeAgo: new Date(item.createdAt).toLocaleString(),
           author: {
-            name: item.post?.user?.fullname || 'User',
-            avatar: item.post?.user?.profilepic || '/avatars/default-avatar.png',
+            name: item.user?.fullname || item.user?.email || 'User',
+            avatar: item.user?.profilepic || '/avatars/default-avatar.png',
+            email: '', // Không hiển thị email nữa
           },
           reactions: {
             like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0, // backend chưa trả về reactions
@@ -285,9 +288,11 @@ const VideoCard = ({ video }: VideoCardProps) => {
             alt={video.author.name}
             className="w-8 h-8 rounded-full object-cover border"
           />
-          <span className="font-semibold text-lg">{video.title}</span>
+          <div>
+            <span className="font-semibold text-base">{video.author.name}</span>
+            <span className="text-xs text-gray-500 block">{video.timeAgo}</span>
+          </div>
         </div>
-        <span className="text-xs text-gray-500 ml-2">{video.timeAgo}</span>
         {/* Hiển thị tổng hợp reaction */}
         <div className="flex gap-2 mt-2">
           {Object.entries(reactionSummary).map(([type, count]) => (
