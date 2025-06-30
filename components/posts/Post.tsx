@@ -107,6 +107,9 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [showReactionPopup, setShowReactionPopup] = useState(false);
+  const [reactionUsers, setReactionUsers] = useState<any[]>([]);
+  const [loadingReactionUsers, setLoadingReactionUsers] = useState(false);
 
   useEffect(() => {
     setCurrentTotalReactions(
@@ -489,6 +492,32 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     }
   }
 
+  const handleOpenReactionPopup = async () => {
+    setShowReactionPopup(true);
+    setLoadingReactionUsers(true);
+    try {
+      const accessToken = sessionStorage.getItem('accessToken');
+      const res = await fetch(`http://localhost:3301/backend/reaction/post/${id}/users`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReactionUsers(data);
+      } else {
+        setReactionUsers([]);
+      }
+    } catch {
+      setReactionUsers([]);
+    } finally {
+      setLoadingReactionUsers(false);
+    }
+  };
+
+  const handleCloseReactionPopup = () => {
+    setShowReactionPopup(false);
+    setReactionUsers([]);
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
       {/* Nút X close góc phải */}
@@ -569,14 +598,44 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
       {/* Tổng hợp reaction (emoji + số lượng) - Đặt ngay trên hàng Like/Comment/Save */}
       <div className="flex items-center gap-2 mb-2">
-        {Object.entries(reactionSummary).map(([type, count]) =>
-          Number(count) > 0 ? (
-            <span key={type} className="flex items-center text-sm">
-              {getReactionIcon(type)} <span className="ml-0.5">{Number(count)}</span>
-            </span>
-          ) : null
-        )}
+        <button
+          className="flex items-center gap-2 text-sm hover:underline focus:outline-none"
+          onClick={handleOpenReactionPopup}
+          disabled={totalReactions === 0}
+        >
+          {Object.entries(reactionSummary).map(([type, count]) =>
+            Number(count) > 0 ? (
+              <span key={type} className="flex items-center">
+                {getReactionIcon(type)} <span className="ml-0.5">{Number(count)}</span>
+              </span>
+            ) : null
+          )}
+        </button>
       </div>
+
+      {/* Popup chi tiết reaction */}
+      {showReactionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-black" onClick={handleCloseReactionPopup}>&times;</button>
+            <h3 className="text-lg font-semibold mb-4">All Reaction</h3>
+            {loadingReactionUsers ? (
+              <div className="text-center text-gray-500 py-4">Đang tải...</div>
+            ) : reactionUsers.length === 0 ? (
+              <div className="text-center text-gray-500 py-4">Chưa có ai reaction</div>
+            ) : (
+              <ul className="divide-y divide-gray-200 max-h-72 overflow-y-auto">
+                {reactionUsers.map((u, idx) => (
+                  <li key={u.userName + u.type + idx} className="flex items-center gap-3 py-2">
+                    <span className="font-semibold">{u.userName || 'User'}</span>
+                    <span className="ml-auto text-lg">{getReactionIcon(u.type)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-around text-gray-600 text-sm font-semibold border-b border-gray-200 pb-2 mb-2 relative">
         <div
