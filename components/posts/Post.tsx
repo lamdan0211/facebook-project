@@ -33,7 +33,7 @@ export interface PostProps {
   author: {
     name: string;
     avatar: string;
-    email: string;
+    email: string;   
   };
   timeAgo: string;
   content: string;
