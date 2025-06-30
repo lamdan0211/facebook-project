@@ -455,117 +455,32 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200 relative">
-      {/* Nút X close góc phải */}
-      <div className="flex items-center mb-3 gap-2">
-        <Avatar author={{name:author.name, avatar: author.avatar}} />
-        <div>
-          <div className="flex items-center gap-1">
-            <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
-            
-            {/* Tag people display */}
-            {taggedPeople && taggedPeople.length > 0 && (
-              <span className="text-xs text-gray-500">
-                is with {taggedPeople.slice(0,2).map((p, i) => (
-                  <span key={p.id || (p.name + '-' + i)} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
-                ))}
-                {taggedPeople.length > 2 && (
-                  <>
-                    {' '} and <span className="font-semibold text-blue-600 cursor-pointer" onClick={() => setShowTaggedPeopleModal(true)}>{taggedPeople.length - 2} others</span>
-                  </>
-                )}
-              </span>
-            )}
-          </div>
-          <span className="text-xs text-gray-500 flex items-center">
-            {timeAgo}
-            <span className="mx-1">•</span>
-            <span>🌍</span>
-          </span>
-        </div>
-        {/* Group more (3 dots) và close (X) vào 1 flex container */}
-        <div className="flex items-center gap-1 ml-auto">
-          <div
-            className="text-gray-500 cursor-pointer hover:bg-gray-100 rounded-full p-1 relative"
-            ref={moreBtnRef}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              onClick={() => setShowDropdown((v) => !v)}
-            >
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-            </svg>
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                {user && user.email && author.email && user.email === author.email && (
-                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
-                    <span className="text-lg mr-3">✏️</span>
-                    <span>
-                      <span className="font-semibold">Edit Post</span>
-                      <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
-                    </span>
-                  </button>
-                )}
-                <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm cursor-pointer" onClick={() => { setShowShareModal(true); setShowDropdown(false); }}>
-                  <span className="text-lg mr-3">🔗</span>
-                  <span>
-                    <span className="font-semibold">Share</span>
-                    <div className="text-xs text-gray-500 whitespace-nowrap">Share this post.</div>
-                  </span>
-                </button>
-              </div>
-            )}
-          </div>
-          {/* Chỉ hiện nút xóa khi là bài viết của user hiện tại */}
-          {user && user.email && author.email && user.email === author.email && (
-            <button
-              className="p-1 hover:bg-gray-100 rounded-full"
-              onClick={handleDeletePost}
-              aria-label="Delete post"
-            >
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
+    <div className="bg-white rounded-lg shadow p-4 mb-4">
+      {/* User info + thời gian */}
+      <div className="flex items-center mb-2">
+        <Avatar author={author} />
+        <div className="ml-2">
+          <div className="font-semibold text-gray-900">{author.name}</div>
+          <div className="text-xs text-gray-500">{timeAgo}</div>
         </div>
       </div>
-
-      <div className="mb-3">
-        <p className="text-gray-800 text-sm mb-2">{content}</p>
-        {renderMediaGrid()}
+      {/* Nội dung post */}
+      <div className="mb-2 text-gray-900 whitespace-pre-line">{content}</div>
+      {/* Media nếu có */}
+      {media && media.length > 0 && (
+        <div className="mb-2">{renderMediaGrid()}</div>
+      )}
+      {/* Tổng hợp reaction (emoji + số lượng) - Đặt ở đây */}
+      <div className="flex items-center gap-2 mb-2">
+        {Object.entries(reactions).map(([type, count]) =>
+          count > 0 ? (
+            <span key={type} className="flex items-center text-sm">
+              {getReactionIcon(type)} <span className="ml-0.5">{count}</span>
+            </span>
+          ) : null
+        )}
       </div>
-
-      <div className="flex items-center justify-between text-gray-500 text-xs mb-3 border-b border-gray-200 pb-2">
-        <div className="flex items-center">
-          {currentTotalReactions > 0 && (
-            <div className="flex items-center -space-x-1 mr-1">
-              {Object.entries(safeReactions)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 3)
-                .map(([type, count], index) => {
-                  if (count > 0) {
-                    const emoji = type === 'like' ? '👍' :
-                                  type === 'love' ? '❤️' :
-                                  type === 'haha' ? '😂' :
-                                  type === 'wow' ? '😮' :
-                                  type === 'sad' ? '😢' : '😡';
-                    return <span key={type} className={`z-${index + 1}0`}>{emoji}</span>;
-                  }
-                  return null;  
-                })}
-            </div>
-          )}
-        </div>
-        <div>
-          {comments.length > 0 && <span className="mr-2">{comments.length} comments</span>}
-          {shares > 0 && <span>{shares} shares</span>}
-        </div>
-      </div>
-
+      {/* Hàng nút Like / Comment / Save ... */}
       <div className="flex justify-around text-gray-600 text-sm font-semibold border-b border-gray-200 pb-2 mb-2 relative">
         <div
           className={`flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer flex-1 justify-center group relative ${reactionButtonProps.color}`}
@@ -734,15 +649,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           ↑
         </button>
       )}
-
-      {/* Hiển thị chi tiết từng loại reaction ở vị trí mong muốn */}
-      <div className="flex gap-2 ml-1">
-        {Object.entries(reactionSummary).map(([type, count]) => (
-          <span key={type} className="flex items-center text-xs text-gray-600">
-            {getReactionIcon(type)} {Number(count)}
-          </span>
-        ))}
-      </div>
     </div>
   );
 };
