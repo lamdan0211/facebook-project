@@ -113,10 +113,10 @@ const SentFriendRequests = ({ sentChanged }: SentFriendRequestsProps) => {
                 </Link>
                 <div className="flex gap-2 mt-1">
                   <button
-                    onClick={() => handleCancelRequest(req.receiver.id)}
+                    // onClick={() => handleCancelRequest(req.receiver.id)}
                     className="px-3 py-1 bg-gray-200 text-black rounded-lg text-xs font-semibold hover:bg-gray-300"
                   >
-                    Cancel Request
+                    View Profile
                   </button>
                 </div>
               </div>
