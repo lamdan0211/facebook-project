@@ -20,7 +20,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
     const fetchPosts = async () => {
       setLoading(true);
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/post/news?user=${profileId}&page=1&limit=30`, {
+      const res = await fetch(`http://localhost:3301/backend/post/user?user=${profileId}uúusee=1&limit=30`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -46,10 +46,6 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
             if (reactionSummary[type] !== undefined) reactionSummary[type]++;
             if (user && r.userId === user.id) myReaction = r.type;
           });
-        }
-        // Nếu không xác định được myReaction từ API, lấy từ sessionStorage
-        if (!myReaction) {
-          myReaction = sessionStorage.getItem(`myReaction_post_${item.id}`) || null;
         }
 
         return {
