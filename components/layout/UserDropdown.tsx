@@ -42,13 +42,19 @@ const UserDropdown = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <div className="flex items-center gap-2 focus:outline-none cursor-pointer" onClick={() => setOpen((o) => !o)}>
-       <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname || "User"}} />
+        <Avatar author={{
+          avatar: user?.profilepic || "from-red-600 to-red-300",
+          name: user?.fullname || "User"
+        }} />
         <span className="font-medium md:block hidden">{user.fullname || "No Name"}</span>
       </div>
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-md z-50">
           <Link href="/profile" className="px-4 py-2 border-b border-b-[#f0f0f0] flex items-center gap-2">
-            <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname || "User"}} />
+            <Avatar author={{
+              avatar: user?.profilepic || "from-red-600 to-red-300",
+              name: user?.fullname || "User"
+            }} />
             <div className="flex flex-col">
               <div className="font-bold">{user.fullname || "No Name"}</div>
             </div>

@@ -20,7 +20,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
     const fetchPosts = async () => {
       setLoading(true);
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/post/news?user=${profileId}&page=1&limit=30`, {
+      const res = await fetch(`http://localhost:3301/backend/post/user?user=${profileId}&page=1&limit=30`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -46,10 +46,6 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
             if (reactionSummary[type] !== undefined) reactionSummary[type]++;
             if (user && r.userId === user.id) myReaction = r.type;
           });
-        }
-        // Nếu không xác định được myReaction từ API, lấy từ sessionStorage
-        if (!myReaction) {
-          myReaction = sessionStorage.getItem(`myReaction_post_${item.id}`) || null;
         }
 
         return {
@@ -118,19 +114,19 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
           <div className="flex justify-around border-t border-gray-200 pt-3 -mx-4 px-4">
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                <Image src="/images/icon-video.png" width={20} height={20} alt="Live Video"  className='gap-[10] flex mr-1'/>
                Video
              </button>
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                 <Image src="/images/icon-photo.png" width={20} height={20} alt="Photo/Video"  className='gap-[10] flex mr-1'/>
                 Photo
              </button>
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                 <Image src="/images/icon-flag.png" width={20} height={20} alt="Feeling/Activity"  className='gap-[10] flex mr-1'/>
                 Feeling/Activity
              </button>

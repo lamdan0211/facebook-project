@@ -289,19 +289,19 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
     switch (previewMedia.length) {
       case 1:
         return (
-          <div className="w-full max-w-[500px] mx-auto rounded-lg overflow-hidden cursor-pointer mb-4">
+          <div className="w-full max-w-[500px] mx-auto h-[300px] rounded-lg overflow-auto cursor-pointer mb-4">
             {renderItem(previewMedia[0], 0, '1/1')}
           </div>
         );
       case 2:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] mx-auto rounded-lg overflow-auto mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[500px] h-[300px] mx-auto rounded-lg overflow-auto mb-4">
             {previewMedia.slice(0, 2).map((m, i) => renderItem(m, i, '4/5'))}
           </div>
         );
       case 3:
         return (
-          <div className="grid grid-cols-2 gap-1 w-full max-w-[400px] mx-auto rounded-lg overflow-hidden mb-4">
+          <div className="grid grid-cols-2 gap-1 w-full max-w-[400px] h-[300px] mx-auto rounded-lg overflow-auto mb-4">
             <div className="col-span-1 row-span-2">{renderItem(previewMedia[0], 0, '4/5')}</div>
             <div className="flex flex-col gap-1">
               {previewMedia.slice(1).map((m, i) => renderItem(m, i + 1, '4/5'))}

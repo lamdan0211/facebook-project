@@ -24,7 +24,10 @@ const LeftSidebar = () => {
     <div className="p-4 flex flex-col">
       {/* User Section */}
       <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
-      <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname || "User"}} />
+        <Avatar author={{
+          avatar: user?.profilepic || "from-red-600 to-red-300",
+          name: user?.fullname || "User"
+        }} />
         <span className="font-semibold text-gray-800">{user?.fullname || 'User'}</span>
       </Link>
 

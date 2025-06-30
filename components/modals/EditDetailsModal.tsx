@@ -39,8 +39,13 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
   if (!open) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setForm({ ...form, [name]: checked });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,14 +90,6 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({ open, onClose, onSa
           <div>
             <label className="block text-sm font-medium mb-1">Phone</label>
             <input type="text" name="phone" value={form.phone} onChange={handleChange} className="w-full border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Avatar URL</label>
-            <input type="text" name="profilepic" value={form.profilepic} onChange={handleChange} className="w-full border rounded px-3 py-2" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Cover URL</label>
-            <input type="text" name="coverpic" value={form.coverpic} onChange={handleChange} className="w-full border rounded px-3 py-2" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Bio</label>

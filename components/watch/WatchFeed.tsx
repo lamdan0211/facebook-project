@@ -66,7 +66,7 @@ const WatchFeed = () => {
           return;
         }
         const accessToken = sessionStorage.getItem('accessToken');
-        const res = await fetch(`http://localhost:3301/backend/photo/user?user_id=${userId}&type=1&page=1&limit=30`, {
+        const res = await fetch(`http://localhost:3301/backend/photo/user?type=1&page=1&limit=30`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },

@@ -9,18 +9,19 @@ interface SharePostModalProps {
   };
   content: string;
   imageUrl?: string;
+  postId?: number | string;
 }
 
 const SharePostModal: React.FC<SharePostModalProps> = ({
   onClose,
   author,
   content,
-  imageUrl
+  imageUrl,
+  postId
 }) => {
-  const [shareText, setShareText] = useState('');
-  const [selectedAudience, setSelectedAudience] = useState('Public');
-  const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null); // 👈 Thêm ref
+  const [copied, setCopied] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const postLink = typeof window !== 'undefined' && postId ? `${window.location.origin}/post/${postId}` : '';
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -33,19 +34,12 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
     };
   }, [onClose]);
 
-  const handleShare = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle share logic here
-    onClose();
-  };
-
-  const toggleAudienceDropdown = () => {
-    setIsAudienceDropdownOpen(!isAudienceDropdownOpen);
-  };
-
-  const selectAudience = (audience: string) => {
-    setSelectedAudience(audience);
-    setIsAudienceDropdownOpen(false);
+  const handleCopyLink = async () => {
+    if (postLink) {
+      await navigator.clipboard.writeText(postLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
   };
 
   return (
@@ -64,134 +58,56 @@ const SharePostModal: React.FC<SharePostModalProps> = ({
           </button>
         </div>
 
-        {/* Share Form */}
-        <form onSubmit={handleShare}>
-          <div className="p-4">
-            {/* User Info and Audience Selector */}
-            <div className="flex items-center mb-4">
-              <div className=" rounded-full overflow-hidden mr-3">
+        {/* Share Link Only */}
+        <div className="p-4">
+          {/* Original Post Preview */}
+          <div className="border border-[#dedede] rounded-lg p-3 mb-4">
+            <div className="flex items-center mb-2">
+              <div className="rounded-full overflow-hidden mr-2">
                 <Image
-                  src="https://images.pexels.com/photos/3768166/pexels-photo-3768166.jpeg"
-                  alt="Your Avatar"
-                  width={40}
-                  height={40}
-                  className="object-cover w-10 h-10"
+                  src={author.avatar || '/avatars/default-avatar.png'}
+                  alt={author.name}
+                  width={32}
+                  height={32}
+                  className="object-cover w-8 h-8"
                 />
               </div>
-              <div className="flex-1">
-                <p className="font-semibold">Your Name</p>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleAudienceDropdown}
-                    className="flex items-center space-x-1 text-sm bg-gray-100 px-3 py-1 rounded-md cursor-pointer"
-                  >
-                    <span>{selectedAudience}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  
-                  {isAudienceDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-50">
-                      <div className="py-1">
-                        <button
-                          type="button"
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Public')}
-                        >
-                          🌍 Public
-                        </button>
-                        <button
-                          type="button"
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Friends')}
-                        >
-                          👥 Friends
-                        </button>
-                        <button
-                          type="button"
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                          onClick={() => selectAudience('Only me')}
-                        >
-                          🔒 Only me
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <div>
+                <p className="font-semibold text-sm">{author.name}</p>
               </div>
             </div>
-
-            {/* Share Text Input */}
-            <div className="mb-4">
-              <textarea
-                value={shareText}
-                onChange={(e) => setShareText(e.target.value)}
-                placeholder="What's on your mind?"
-                className="w-full h-24 p-3 border border-[#dedede] rounded-lg resize-none focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Original Post Preview */}
-            <div className="border border-[#dedede] rounded-lg p-3 mb-4">
-              <div className="flex items-center mb-2">
-                <div className="rounded-full overflow-hidden mr-2">
-                  <Image
-                    src={author.avatar || '/avatars/default-avatar.png'}
-                    alt={author.name}
-                    width={32}
-                    height={32}
-                    className="object-cover w-8 h-8"
-                  />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{author.name}</p>
-                </div>
+            <p className="text-sm mb-2">{content}</p>
+            {imageUrl && (
+              <div className="relative w-full h-48">
+                <Image
+                  src={imageUrl}
+                  alt="Post image"
+                  fill
+                  className="object-cover rounded-lg"
+                />
               </div>
-              <p className="text-sm mb-2">{content}</p>
-              {imageUrl && (
-                <div className="relative w-full h-48">
-                  <Image
-                    src={imageUrl}
-                    alt="Post image"
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Share Options
-            <div className="flex items-center space-x-2 mb-4">
-              <button
-                type="button"
-                className="flex items-center space-x-2 px-5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                <span className="text-base">👥</span>
-                <span className="text-md whitespace-nowrap">Share to News Feed</span>
-              </button>
-              <button
-                type="button"
-                className="flex items-center space-x-2 px-5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
-              >
-                <span className="text-base">💬</span>
-                <span className="text-md whitespace-nowrap">Share to Story</span>
-              </button>
-             
-            </div> */}
+            )}
           </div>
 
-          {/* Share Button */}
-          <div className="px-4 py-3">
+          {/* Share Link Section */}
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="text"
+              value={postLink}
+              readOnly
+              className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100"
+              onFocus={e => e.target.select()}
+            />
             <button
-              type="submit"
-              className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200 cursor-pointer"
+              type="button"
+              onClick={handleCopyLink}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
             >
-              Share now
+              Copy link
             </button>
           </div>
-        </form>
+          {copied && <div className="text-green-600 text-sm mb-2">Link copied!</div>}
+        </div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ interface EditAvatarModalProps {
   onClose: () => void;
   userId: number;
   accessToken: string;
-  onUploaded?: () => void;
+  onUploaded?: (newAvatarUrl: string) => void;
 }
 
 const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, accessToken, onUploaded }) => {
@@ -59,7 +59,7 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
       });
       const updateData = await updateRes.json();
       if (onUploaded) {
-        onUploaded();
+        onUploaded(imageUrl);
       }
       onClose();
     } catch (err: any) {
@@ -88,14 +88,14 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
           )}
         </div>
           <button
-          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 mt-4"
+          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 mt-4 cursor-pointer"
           onClick={handleUpload}
           disabled={loading || !file}
           >
           {loading ? 'Đang lưu...' : 'Lưu ảnh đại diện'}
           </button>
           <button
-          className="w-full py-2 mt-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300"
+          className="w-full py-2 mt-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 cursor-pointer"
           onClick={onClose}
           disabled={loading}
           >

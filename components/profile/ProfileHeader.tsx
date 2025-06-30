@@ -16,9 +16,7 @@ enum FriendStatus {
 }
 
 interface ProfileHeaderProps {
-  coverPhotoUrl: string;
-  profilePictureUrl: string;
-  userName: string;
+  profile: any;
   profileId: number;
   currentUserId: number;
   onProfileUpdated?: () => void;
@@ -37,9 +35,7 @@ const defaultDetails: DetailsData = {
 };
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  coverPhotoUrl,
-  profilePictureUrl,
-  userName,
+  profile,
   profileId,
   currentUserId,
   onProfileUpdated,
@@ -47,17 +43,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 }) => {
   const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentUserName, setCurrentUserName] = useState(userName);
-  const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profilePictureUrl);
+  const [currentUserName, setCurrentUserName] = useState(profile?.fullname || profile?.email || '');
+  const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profile?.profilepic || '/avatars/default-avatar.png');
   const [details, setDetails] = useState<DetailsData>({
-    fullname: userName || '',
-    phone: '',
-    profilepic: profilePictureUrl || '',
-    coverpic: coverPhotoUrl || '',
-    bio: '',
-    birthplace: '',
-    workingPlace: '',
-    isActive: true,
+    fullname: profile?.fullname || '',
+    phone: profile?.phone || '',
+    profilepic: profile?.profilepic || '',
+    coverpic: profile?.coverpic || '',
+    bio: profile?.bio || '',
+    birthplace: profile?.birthplace || '',
+    workingPlace: profile?.workingPlace || '',
+    isActive: typeof profile?.isActive !== 'undefined' ? profile.isActive : true,
   });
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
@@ -71,9 +67,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   // Cập nhật state khi props thay đổi
   useEffect(() => {
-    setCurrentUserName(userName);
-    setCurrentProfilePictureUrl(profilePictureUrl);
-  }, [userName, profilePictureUrl]);
+    setCurrentUserName(profile?.fullname || profile?.email || '');
+    setCurrentProfilePictureUrl(profile?.profilepic || '/avatars/default-avatar.png');
+  }, [profile]);
 
   // Check friend status when component mounts or profileId changes
   useEffect(() => {
@@ -109,10 +105,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     } else {
       isFirstRender.current = false;
     }
-  }, [coverPhotoUrl]);
+  }, [profile?.coverpic]);
 
   // Lấy cover photo tạm nếu có
-  let coverPhoto = coverPhotoUrl;
+  let coverPhoto = profile?.coverpic || '/avatars/default-avatar.png';
   if (typeof window !== 'undefined') {
     const temp = localStorage.getItem('temp_cover_photo');
     if (temp) coverPhoto = temp;
@@ -263,7 +259,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
       {/* Cover Photo */}
-      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group">
+      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group cursor-pointer">
         <Image
           src={coverPhoto + '?v=' + coverVersion}
           alt="Cover Photo"
@@ -272,7 +268,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         />
         {isOwner && (
           <button
-            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition"
+            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition cursor-pointer"
             onClick={() => setShowCoverModal(true)}
             title="Cập nhật cover photo"
           >
@@ -283,7 +279,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Profile Info and Buttons */}
       <div className="flex flex-col md:flex-row items-center gap-4 px-6 py-4 mt-[-40px]">
         {/* Profile Picture */}
-        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group">
+        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group cursor-pointer">
           <Image
             src={currentProfilePictureUrl}
             alt="Profile Picture"
@@ -293,7 +289,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
           {isOwner && (
             <button
-              className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-full"
+              className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-full cursor-pointer"
               onClick={() => setShowAvatarModal(true)}
               title="Cập nhật avatar"
             >
@@ -359,14 +355,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }
           }}
           initialData={{
-            fullname: currentUserName || '',
-            phone: '',
-            profilepic: currentProfilePictureUrl || '',
-            coverpic: coverPhotoUrl || '',
-            bio: '',
-            birthplace: '',
-            workingPlace: '',
-            isActive: true,
+            fullname: profile?.fullname || '',
+            phone: profile?.phone || '',
+            profilepic: profile?.profilepic || '',
+            coverpic: profile?.coverpic || '',
+            bio: profile?.bio || '',
+            birthplace: profile?.birthplace || '',
+            workingPlace: profile?.workingPlace || '',
+            isActive: typeof profile?.isActive !== 'undefined' ? profile.isActive : true,
           }}
           userId={profileId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
@@ -376,14 +372,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowAvatarModal(false)}
           userId={currentUserId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
-          onUploaded={() => {
+          onUploaded={(newAvatarUrl: string) => {
             if (typeof onProfileUpdated === 'function') onProfileUpdated();
-            setCurrentProfilePictureUrl(profilePictureUrl + '?v=' + Date.now());
+            setCurrentProfilePictureUrl(newAvatarUrl);
             if (profileId === currentUserId && typeof window !== 'undefined') {
               const userStr = sessionStorage.getItem('user');
               if (userStr) {
                 const userObj = JSON.parse(userStr);
-                userObj.profilepic = profilePictureUrl + '?v=' + Date.now();
+                userObj.profilepic = newAvatarUrl;
                 sessionStorage.setItem('user', JSON.stringify(userObj));
                 updateUser(userObj);
               }

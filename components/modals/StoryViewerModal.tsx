@@ -100,7 +100,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-8 p-1 hover:bg-gray-800 rounded-full z-20"
+          className="absolute right-4 top-8 p-1 hover:bg-gray-800 rounded-full z-20 cursor-pointer"
         >
           <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -133,7 +133,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         {/* Navigation arrows */}
         <button
           onClick={onPrev}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity ${
+          className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity cursor-pointer ${
             currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           disabled={currentIndex === 0}
@@ -144,7 +144,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, currentInd
         </button>
         <button
           onClick={onNext}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity ${
+          className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 z-10 transition-opacity cursor-pointer ${
             currentIndex === stories.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           disabled={currentIndex === stories.length - 1}
