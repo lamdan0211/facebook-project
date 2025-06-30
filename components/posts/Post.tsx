@@ -538,30 +538,27 @@ const Post: React.FC<PostProps & { index?: number }> = ({
             </svg>
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                {user && user.email && author.email && user.email === author.email && (
-                  <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
-                    <span className="text-lg mr-3">✏️</span>
-                    <span>
-                      <span className="font-semibold">Edit Post</span>
-                      <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
-                    </span>
-                  </button>
+                {user && (user.email === author.email || user.id === author.id) && (
+                  <>
+                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm" onClick={() => { setShowEditModal(true); setShowDropdown(false); }}>
+                      <span className="text-lg mr-3">✏️</span>
+                      <span>
+                        <span className="font-semibold">Edit Post</span>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">Edit your post.</div>
+                      </span>
+                    </button>
+                    <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm text-red-600" onClick={() => { handleDeletePost(); setShowDropdown(false); }}>
+                      <span className="text-lg mr-3">🗑️</span>
+                      <span>
+                        <span className="font-semibold">Delete Post</span>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">Delete this post.</div>
+                      </span>
+                    </button>
+                  </>
                 )}
               </div>
             )}
           </div>
-          {/* Chỉ hiện nút xóa khi là bài viết của user hiện tại */}
-          {user && user.email && author.email && user.email === author.email && (
-            <button
-              className="p-1 hover:bg-gray-100 rounded-full"
-              onClick={handleDeletePost}
-              aria-label="Delete post"
-            >
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
         </div>
       </div>
 
