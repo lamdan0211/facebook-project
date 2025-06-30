@@ -376,14 +376,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onClose={() => setShowAvatarModal(false)}
           userId={currentUserId}
           accessToken={typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') || '' : ''}
-          onUploaded={() => {
+          onUploaded={(newAvatarUrl: string) => {
             if (typeof onProfileUpdated === 'function') onProfileUpdated();
-            setCurrentProfilePictureUrl(profilePictureUrl + '?v=' + Date.now());
+            setCurrentProfilePictureUrl(newAvatarUrl);
             if (profileId === currentUserId && typeof window !== 'undefined') {
               const userStr = sessionStorage.getItem('user');
               if (userStr) {
                 const userObj = JSON.parse(userStr);
-                userObj.profilepic = profilePictureUrl + '?v=' + Date.now();
+                userObj.profilepic = newAvatarUrl;
                 sessionStorage.setItem('user', JSON.stringify(userObj));
                 updateUser(userObj);
               }

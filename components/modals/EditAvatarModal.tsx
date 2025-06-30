@@ -5,7 +5,7 @@ interface EditAvatarModalProps {
   onClose: () => void;
   userId: number;
   accessToken: string;
-  onUploaded?: () => void;
+  onUploaded?: (newAvatarUrl: string) => void;
 }
 
 const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, accessToken, onUploaded }) => {
@@ -59,7 +59,7 @@ const EditAvatarModal: React.FC<EditAvatarModalProps> = ({ onClose, userId, acce
       });
       const updateData = await updateRes.json();
       if (onUploaded) {
-        onUploaded();
+        onUploaded(imageUrl);
       }
       onClose();
     } catch (err: any) {
