@@ -23,7 +23,7 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }: ProfileSidebarProps) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [details, setDetails] = useState<DetailsData>(defaultDetails);
   const [showModal, setShowModal] = useState(false);
 
@@ -128,7 +128,9 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated }:
                   if (userStr) {
                     const userObj = JSON.parse(userStr);
                     userObj.fullname = data.fullname;
+                    userObj.profilepic = data.profilepic;
                     sessionStorage.setItem('user', JSON.stringify(userObj));
+                    updateUser(userObj);
                   }
                 }
               }}

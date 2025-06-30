@@ -1,10 +1,11 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { FolderDot, UserPlus, UserCog, UserCheck, UserX, UserMinus } from 'lucide-react';
 import EditDetailsModal, { DetailsData } from '../modals/EditDetailsModal';
 import EditAvatarModal from '../modals/EditAvatarModal';
 import EditCoverPhotoModal from '../modals/EditCoverPhotoModal';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '@/components/auth/AuthContext';
 import { createPortal } from 'react-dom';
 
 enum FriendStatus {
@@ -42,7 +43,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   currentUserId,
   onProfileUpdated,
 }) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentUserName, setCurrentUserName] = useState(userName);
   const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState(profilePictureUrl);
@@ -349,7 +350,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               if (userStr) {
                 const userObj = JSON.parse(userStr);
                 userObj.fullname = data.fullname;
+                userObj.profilepic = data.profilepic;
                 sessionStorage.setItem('user', JSON.stringify(userObj));
+                updateUser(userObj);
               }
             }
           }}
@@ -374,6 +377,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onUploaded={() => {
             if (typeof onProfileUpdated === 'function') onProfileUpdated();
             setCurrentProfilePictureUrl(profilePictureUrl + '?v=' + Date.now());
+            if (profileId === currentUserId && typeof window !== 'undefined') {
+              const userStr = sessionStorage.getItem('user');
+              if (userStr) {
+                const userObj = JSON.parse(userStr);
+                userObj.profilepic = profilePictureUrl + '?v=' + Date.now();
+                sessionStorage.setItem('user', JSON.stringify(userObj));
+                updateUser(userObj);
+              }
+            }
           }}
         />
       )}
