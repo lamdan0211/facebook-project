@@ -5,6 +5,7 @@ import TagPeopleModal from './TagPeopleModal';
 import { PostData } from '@/lib/dummyData';
 import { useAuth } from '../auth/AuthContext';
 import Avatar from '../user/Avatar';
+import { fetchTaggedPeople } from '@/lib/utils/taggedPeople';
 
 interface Person {
   id: string;
@@ -38,7 +39,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTagPeopleModal, setShowTagPeopleModal] = useState(false);
-  const [taggedPeople, setTaggedPeople] = useState<Person[]>([]);
+  const [taggedPeopleState, setTaggedPeople] = useState<Person[]>([]);
   const [previewMedia, setPreviewMedia] = useState<{type: 'image'|'video', url: string, file: File}[]>([]);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -137,7 +138,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         userId: user?.id,
         isType,
         mediaUrl,
-        friends: taggedPeople.map(p => Number(p.id)),
+        friends: taggedPeopleState.map(p => Number(p.id)),
       };
 
       const res = await fetch('http://localhost:3301/backend/post', {
@@ -152,11 +153,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
       const result = await res.json().catch(() => null);
       if (!res.ok) throw new Error(result?.message || 'Đăng bài thất bại');
       
+      let taggedPeople: Person[] = [];
+      if (result.friends && Array.isArray(result.friends) && result.friends.length > 0 && accessToken) {
+        taggedPeople = await fetchTaggedPeople(result.friends, accessToken);
+      } else if (result.taggedPeople && Array.isArray(result.taggedPeople)) {
+        taggedPeople = result.taggedPeople;
+      }
+      
       const mappedPost: PostData = {
         id: result.id,
         author: {
           name: user?.fullname || user?.email || 'User',
-          avatar: user?.profilepic || '/default-avatar.png',
+          avatar: result.user?.profilepic || '/default-avatar.png',
           email: user?.email || '',
         },
         timeAgo: result.createdAt ? new Date(result.createdAt).toLocaleString() : '',
@@ -172,7 +180,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         reactions: result.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
         comments: result.comments || [],
         shares: result.shares || 0,
-        taggedPeople: result.taggedPeople || [],
+        taggedPeople: taggedPeople,
       };
 
       onSubmit(mappedPost);
@@ -394,10 +402,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
             />
 
             {/* Tagged People Display */}
-            {taggedPeople.length > 0 && (
+            {taggedPeopleState.length > 0 && (
               <div className="mb-4">
                 <div className="flex flex-wrap gap-2">
-                  {taggedPeople.map(person => (
+                  {taggedPeopleState.map(person => (
                     <div
                       key={person.id}
                       className="flex items-center bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-sm"

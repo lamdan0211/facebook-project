@@ -164,7 +164,7 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onEdit }) 
         id: result.id,
         author: {
           name: user?.fullname || user?.email || 'User',
-          avatar: user?.profilepic || '/default-avatar.png',
+          avatar: result.user?.profilepic || '/default-avatar.png',
           email: user?.email || '',
         },
         timeAgo: result.createdAt ? new Date(result.createdAt).toLocaleString() : '',

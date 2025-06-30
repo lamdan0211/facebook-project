@@ -16,32 +16,26 @@ export const fetchTaggedPeople = async (friends: number[], accessToken: string):
   }
 
   try {
-    const friendPromises = friends.map(async (friendId: number) => {
-      try {
-        const friendRes = await fetch(`http://localhost:3301/backend/user/${friendId}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        if (friendRes.ok) {
-          const friendData = await friendRes.json();
-          return {
-            id: friendData.id.toString(),
-            name: friendData.fullname || friendData.email || 'User',
-            avatar: friendData.profilepic || '/avatars/default-avatar.png',
-          };
-        }
-        return null;
-      } catch (error) {
-        console.error('Error fetching friend info:', error);
-        return null;
-      }
+    const res = await fetch('http://localhost:3301/backend/user/many', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}` // nếu cần
+      },
+      body: JSON.stringify({ ids: friends })
     });
-    
-    const friendResults = await Promise.all(friendPromises);
-    return friendResults.filter(friend => friend !== null);
+    if (!res.ok) {
+      return [];
+    }
+    const users = await res.json();
+    // users là mảng các user trả về từ backend
+    return users.map((user: any) => ({
+      id: user.id.toString(),
+      name: user.fullname || user.email || 'User',
+      avatar: user.profilepic || '/avatars/default-avatar.png',
+    }));
   } catch (error) {
-    console.error('Error processing tagged people:', error);
+    console.error('Error fetching tagged people:', error);
     return [];
   }
 };
