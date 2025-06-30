@@ -569,10 +569,10 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
       {/* Tổng hợp reaction (emoji + số lượng) - Đặt ngay trên hàng Like/Comment/Save */}
       <div className="flex items-center gap-2 mb-2">
-        {Object.entries(reactions).map(([type, count]) =>
-          count > 0 ? (
+        {Object.entries(reactionSummary).map(([type, count]) =>
+          Number(count) > 0 ? (
             <span key={type} className="flex items-center text-sm">
-              {getReactionIcon(type)} <span className="ml-0.5">{count}</span>
+              {getReactionIcon(type)} <span className="ml-0.5">{Number(count)}</span>
             </span>
           ) : null
         )}
