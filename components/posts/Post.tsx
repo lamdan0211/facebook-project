@@ -92,7 +92,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
   const [showReactionMenu, setShowReactionMenu] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [showShareModal, setShowShareModal] = useState(false);
   const [allComments, setAllComments] = useState<CommentData[]>(comments);
   const { user } = useAuth();
   const [showTaggedPeopleModal, setShowTaggedPeopleModal] = useState(false);
@@ -144,6 +143,14 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem(`myReaction_post_${id}`);
       if (stored) setUserReaction(stored);
+    }
+  }, [id]);
+
+  // Khi mount, ưu tiên lấy trạng thái save từ sessionStorage nếu có
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(`saved_post_${id}`);
+      if (stored === 'true') setIsSaved(true);
     }
   }, [id]);
 
@@ -410,6 +417,7 @@ const Post: React.FC<PostProps & { index?: number }> = ({
 
       if (res.ok) {
         setIsSaved(true);
+        sessionStorage.setItem(`saved_post_${id}`, 'true');
         // Có thể thêm toast/notification ở đây
       } else {
         // Xử lý lỗi
@@ -426,6 +434,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
     if (onUnsave) {
       onUnsave();
     }
+    setIsSaved(false);
+    sessionStorage.removeItem(`saved_post_${id}`);
   };
 
   // Hàm xóa bài post
@@ -537,13 +547,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
                     </span>
                   </button>
                 )}
-                <button className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-left text-sm cursor-pointer" onClick={() => { setShowShareModal(true); setShowDropdown(false); }}>
-                  <span className="text-lg mr-3">🔗</span>
-                  <span>
-                    <span className="font-semibold">Share</span>
-                    <div className="text-xs text-gray-500 whitespace-nowrap">Share this post.</div>
-                  </span>
-                </button>
               </div>
             )}
           </div>
@@ -702,16 +705,6 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           comments={allComments}
           onClose={() => setShowMediaViewer(false)}
           onComment={handleAddComment}
-        />
-      )}
-
-      {/* Share Post Modal */}
-      {showShareModal && (
-        <SharePostModal
-          onClose={() => setShowShareModal(false)}
-          author={{ name: author.name, avatar: author.avatar }}
-          content={content}
-          imageUrl={media && media.length > 0 ? media[0].url : undefined}
         />
       )}
 
