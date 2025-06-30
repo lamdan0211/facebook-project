@@ -175,7 +175,7 @@ const NewsFeed = () => {
   const isSearching = searchQuery.trim() !== '';
 
   return (
-    <div className="space-y-4 max-w-xl mx-auto mt-4">
+    <div className="space-y-4 max-w-2xl mx-auto mt-4">
       
       {!isSearching && (
         <>

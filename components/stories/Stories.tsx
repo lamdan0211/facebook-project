@@ -59,7 +59,7 @@ const Stories = () => {
   }, []); // Empty dependency array means this effect runs once after the initial render
 
   return (
-    <div className="w-full max-w-xl mx-auto mt-4 relative group">
+    <div className="w-full max-w-2xl mx-auto mt-4 relative group">
       {/* Navigation Arrow Left */}
       {canScrollLeft && (
         <div
