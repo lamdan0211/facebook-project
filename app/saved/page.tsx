@@ -67,7 +67,7 @@ const SavedPage = () => {
             ...post,
             author: {
               name: post.user?.fullname || post.user?.email || 'User',
-              avatar: post.user?.profilepic || '/default-avatar.png',
+              avatar: post.user?.profilepic || '/avatars/default-avatar.png',
               email: post.user?.email || '',
             },
             media,
@@ -75,7 +75,6 @@ const SavedPage = () => {
             reactions: post.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
             shares: post.shares || 0,
             timeAgo: post.timeAgo || new Date(post.createdAt).toLocaleDateString(),
-            user: item.user,
           };
         });
         setSavedPosts(extractedPosts);
@@ -117,11 +116,6 @@ const SavedPage = () => {
                 <div key={post.id} className="relative">
                   <Post
                     {...post}
-                    author={{
-                      name: post.user?.fullname || post.user?.email || 'User',
-                      avatar: post.user?.profilepic || '/avatars/default-avatar.png',
-                      email: post.user?.email || '',
-                    }}
                     isOnSavedPage={true}
                     onUnsave={() => handleUnsave(post.id)}
                   />
