@@ -141,7 +141,7 @@ const Header = () => {
          </div>
 
          {/* Right section: User Icons and Menu */}
-         <div className="flex items-center space-x-2 md:space-x-1 flex-grow-0 ml-4">
+         <div className="flex items-center space-x-2 md:space-x-1 flex-grow-0 ml-4 gap-4">
             
             {/* Menu Icon */}
             {/* Notifications Icon */}
@@ -150,6 +150,7 @@ const Header = () => {
                <Bell className="w-6 h-6 hover:text-blue-600 fill-current text-green-500" />
                </div>
                {isNotifOpen && <NotificationDropdown />}
+               <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">3</span>
             </div>
             {/* User Avatar with Dropdown */}
             {user && <UserDropdown />}
