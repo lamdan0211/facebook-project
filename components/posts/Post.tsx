@@ -152,6 +152,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         if (res.ok) {
           setUserReaction(null);
           setUserReactionId(null);
+          // Xóa khỏi sessionStorage
+          sessionStorage.removeItem(`myReaction_post_${id}`);
         }
       } else {
         // Nếu chưa có hoặc khác loại, gọi POST để tạo/cập nhật reaction
@@ -170,6 +172,8 @@ const Post: React.FC<PostProps & { index?: number }> = ({
           const data = await res.json();
           setUserReaction(reactionType);
           setUserReactionId(data.id); // backend trả về reaction mới
+          // Lưu vào sessionStorage
+          sessionStorage.setItem(`myReaction_post_${id}`, reactionType);
         }
       }
     } catch (err) {

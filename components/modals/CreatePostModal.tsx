@@ -389,7 +389,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
             <textarea
               value={postContent}
               onChange={(e) => setPostContent(e.target.value)}
-              placeholder="What's on your mind, Lam?"
+              placeholder="What's on your mind?"
               className="w-full min-h-[80px] text-lg resize-none border-0 focus:outline-none focus:ring-0 p-0"
             />
 

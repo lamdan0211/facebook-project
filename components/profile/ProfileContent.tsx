@@ -37,6 +37,21 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
           taggedPeople = await fetchTaggedPeople(item.friends, accessToken);
         }
 
+        // Tổng hợp reactions
+        const reactionSummary: Record<string, number> = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+        let myReaction = null;
+        if (Array.isArray(item.reactions)) {
+          item.reactions.forEach((r: any) => {
+            const type = String(r.type);
+            if (reactionSummary[type] !== undefined) reactionSummary[type]++;
+            if (user && r.userId === user.id) myReaction = r.type;
+          });
+        }
+        // Nếu không xác định được myReaction từ API, lấy từ sessionStorage
+        if (!myReaction) {
+          myReaction = sessionStorage.getItem(`myReaction_post_${item.id}`) || null;
+        }
+
         return {
           id: item.id,
           author: {
@@ -54,10 +69,11 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
                 return { type, url };
               })
             : [],
-          reactions: item.reactions || { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 },
+          reactions: reactionSummary,
           comments: item.comments || [],
           shares: item.shares || 0,
           taggedPeople: taggedPeople,
+          myReaction: myReaction,
         };
       }));
       
