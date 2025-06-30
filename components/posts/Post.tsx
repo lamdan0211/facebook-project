@@ -10,6 +10,7 @@ import EditPostModal from '../modals/EditPostModal';
 import { usePostContext } from '@/context/PostContext';
 import Avatar from '../user/Avatar';
 import EmojiPicker from 'emoji-picker-react';
+import Link from 'next/link';
 
 
  function getInitials(name: string): string {
@@ -31,6 +32,7 @@ interface Person {
 export interface PostProps {
   id: number;
   author: {
+    id?: string | number;
     name: string;
     avatar: string;
     email: string;   
@@ -530,13 +532,22 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         <Avatar author={{name:author.name, avatar: author.avatar}} />
           <div>
             <div className="flex items-center gap-1">
-              <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+              {author.id ? (
+                <Link href={`/profile/${author.id}`} className="font-semibold text-gray-800 text-sm hover:underline">{author.name}</Link>
+              ) : (
+                <span className="font-semibold text-gray-800 text-sm">{author.name}</span>
+              )}
               
               {/* Tag people display */}
               {taggedPeople && taggedPeople.length > 0 && (
                 <span className="text-xs text-gray-500">
                   is with {taggedPeople.slice(0,2).map((p, i) => (
-                    <span key={p.id || (p.name + '-' + i)} className="font-semibold text-gray-700">{p.name}{i < Math.min(1, taggedPeople.length-1) ? ', ' : ''}</span>
+                    <React.Fragment key={p.id || (p.name + '-' + i)}>
+                      <Link href={`/profile/${p.id}`} className="font-semibold text-gray-700 hover:underline">
+                        {p.name}
+                      </Link>
+                      {i < Math.min(1, taggedPeople.length-1) && ', '}
+                    </React.Fragment>
                   ))}
                   {taggedPeople.length > 2 && (
                     <>
