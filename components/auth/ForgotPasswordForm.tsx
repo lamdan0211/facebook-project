@@ -17,10 +17,18 @@ const ForgotPasswordForm = () => {
     setError(null);
     // TODO: Replace with real API call
     try {
-      // await sendResetEmail(email);
+      const res = await fetch('http://localhost:3301/backend/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to send reset email.');
       setSubmitted(true);
     } catch (err: any) {
-      setError('Failed to send reset email.');
+      setError(err.message || 'Failed to send reset email.');
     } finally {
       setLoading(false);
     }
