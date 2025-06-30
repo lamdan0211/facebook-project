@@ -104,7 +104,7 @@ const Header = () => {
 
          {/* Center section: Navigation Icons */}
          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="flex items-center justify-between w-[240px]">
+            <div className="flex items-center justify-between xl:w-[240px]">
                {/* Navigation Tabs */}
                <Link href="/dashboard"
                  className={`flex items-center justify-center px-2 md:px-9 py-2 md:py-1 rounded-lg cursor-pointer h-[55px] border-b-2 transition-colors duration-200
@@ -141,7 +141,7 @@ const Header = () => {
          </div>
 
          {/* Right section: User Icons and Menu */}
-         <div className="flex items-center space-x-2 md:space-x-1 flex-grow-0 ml-4 gap-4">
+         <div className="flex items-center space-x-2 md:space-x-1 flex-grow-0 ml-4 md:gap-4">
             
             {/* Menu Icon */}
             {/* Notifications Icon */}
