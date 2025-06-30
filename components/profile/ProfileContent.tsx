@@ -125,11 +125,6 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
       {/* Posts Feed section */}
       <div
         className="space-y-4"
-        style={{
-          maxHeight: '70vh',
-          overflowY: 'auto',
-          paddingRight: '4px',
-        }}
       >
         {loading ? (
           <div className="text-center text-gray-400 py-8">Đang tải bài viết...</div>
