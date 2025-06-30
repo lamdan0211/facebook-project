@@ -19,8 +19,8 @@ const CommentList: React.FC<CommentListProps> = ({
     <div className="mt-4">
       {comments.map((comment, index) => (
         <Comment
-          key={index} // Use a unique ID in a real application
-          author={comment.author}
+          key={index}
+          author={comment.author || { name: 'User', avatar: '/avatars/default-avatar.png' }}
           content={comment.content}
           timeAgo={comment.timeAgo}
         />

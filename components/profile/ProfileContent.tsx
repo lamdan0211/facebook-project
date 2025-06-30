@@ -66,7 +66,24 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
               })
             : [],
           reactions: reactionSummary,
-          comments: item.comments || [],
+          comments: Array.isArray(item.comments)
+            ? item.comments.map((c: any) => ({
+                author: c.author
+                  ? {
+                      name: c.author.fullname || c.author.email || 'User',
+                      avatar: c.author.profilepic || '/avatars/default-avatar.png',
+                      email: c.author.email || '',
+                    }
+                  : {
+                      name: 'User',
+                      avatar: '/avatars/default-avatar.png',
+                      email: '',
+                    },
+                content: c.content,
+                timeAgo: c.createdAt ? new Date(c.createdAt).toLocaleString() : '',
+                likes: 0,
+              }))
+            : [],
           shares: item.shares || 0,
           taggedPeople: taggedPeople,
           myReaction: myReaction,

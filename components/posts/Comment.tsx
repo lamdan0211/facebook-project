@@ -22,10 +22,10 @@ const { user } = useAuth();
   return (
     <div className="flex items-start space-x-2 mb-2">
       {/* Author Avatar */}
-      <Avatar author={{avatar: "from-red-600 to-red-300", name: user?.fullname}} />
+      <Avatar author={author} />
       <div className="flex-1">
         <div className="bg-gray-100 p-2 rounded-xl">
-          <p className="text-gray-800 font-semibold text-sm">{user?.fullname}</p>
+          <p className="text-gray-800 font-semibold text-sm">{author.name}</p>
           <p className="text-gray-700 text-sm mt-0.5">{content}</p>
         </div>
          {/* Optional: Time ago and Like/Reply options for comment */}
