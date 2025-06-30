@@ -78,9 +78,6 @@ const RightSidebar = () => {
                       height={32}
                       className="w-full h-full rounded-full object-cover"
                     />
-                    {friend.isOnline && (
-                      <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"></span>
-                    )}
                   </div>
                   <span className="font-medium text-gray-800 text-sm">{friend.fullname}</span>
                 </Link>
