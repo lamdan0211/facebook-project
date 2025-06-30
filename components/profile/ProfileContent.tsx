@@ -118,19 +118,19 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
           <div className="flex justify-around border-t border-gray-200 pt-3 -mx-4 px-4">
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                <Image src="/images/icon-video.png" width={20} height={20} alt="Live Video"  className='gap-[10] flex mr-1'/>
                Video
              </button>
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                 <Image src="/images/icon-photo.png" width={20} height={20} alt="Photo/Video"  className='gap-[10] flex mr-1'/>
                 Photo
              </button>
              <button 
                onClick={handleOpenModal}
-               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold">
+               className="flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded-md text-sm font-semibold cursor-pointer">
                 <Image src="/images/icon-flag.png" width={20} height={20} alt="Feeling/Activity"  className='gap-[10] flex mr-1'/>
                 Feeling/Activity
              </button>
