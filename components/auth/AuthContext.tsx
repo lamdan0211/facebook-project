@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   loginGoogle: (accessToken: string) => Promise<void>;
   updateUser: (userData: any) => void;
+  avatarVersion: number;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   loginGoogle: async () => {},
   updateUser: () => {},
+  avatarVersion: Date.now(),
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -27,6 +29,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const router = useRouter();
 
   useEffect(() => {
@@ -93,6 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
   const updateUser = (userData: any) => {
     setUser(userData);
+    setAvatarVersion(Date.now());
     sessionStorage.setItem('user', JSON.stringify(userData));
   };
   const logout = async () => {
@@ -103,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, login, loginGoogle, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, logout, login, loginGoogle, updateUser, avatarVersion }}>
       {children}
     </AuthContext.Provider>
   );

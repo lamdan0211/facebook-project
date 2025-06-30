@@ -18,7 +18,7 @@ const Header = () => {
    const notifRef = useRef<HTMLDivElement>(null);
    const router = useRouter();
    const pathname = usePathname();
-   const { user } = useAuth();
+   const { user, avatarVersion } = useAuth();
    const { setSearchQuery } = useSearch();
    const [localSearch, setLocalSearch] = useState('');
    const [showMobileSearch, setShowMobileSearch] = useState(false);

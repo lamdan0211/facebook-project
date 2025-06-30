@@ -6,7 +6,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import Avatar from '../user/Avatar';
 
 const LeftSidebar = () => {
-  const { user } = useAuth();
+  const { user, avatarVersion } = useAuth();
   const menuItems = [
     { name: 'Pages', icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@ const LeftSidebar = () => {
       {/* User Section */}
       <Link href="/profile" className="flex items-center p-2 rounded-lg hover:bg-gray-200 cursor-pointer mb-4 -ml-2 -mr-2 gap-[10]">
         <Avatar author={{
-          avatar: user?.profilepic || "from-red-600 to-red-300",
+          avatar: user?.profilepic ? user.profilepic + '?v=' + avatarVersion : "from-red-600 to-red-300",
           name: user?.fullname || "User"
         }} />
         <span className="font-semibold text-gray-800">{user?.fullname || 'User'}</span>
