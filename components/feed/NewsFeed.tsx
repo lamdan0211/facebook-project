@@ -99,7 +99,7 @@ const NewsFeed = () => {
           author: {
             id: item.user?.id,
             name: item.user?.fullname || item.user?.email || 'User',
-            avatar: avatarUrl,
+            avatar: avatarUrl, 
             email: item.user?.email || '',
           },
           timeAgo: item.createdAt ? new Date(item.createdAt).toLocaleString() : '',
