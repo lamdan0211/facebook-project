@@ -99,17 +99,6 @@ const NotificationDropdown = () => {
               </div>
               <div className="text-xs text-gray-500 mt-1">{notif.time}</div>
             </div>
-            {notif.image && (
-              <div className="ml-3 w-12 h-12 rounded-md overflow-hidden flex-shrink-0">
-                <Image
-                  src={notif.image}
-                  alt="Notification preview"
-                  width={48}
-                  height={48}
-                  className="object-cover"
-                />
-              </div>
-            )}
           </div>
         ))}
       </div>
