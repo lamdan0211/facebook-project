@@ -65,7 +65,7 @@ const MediaViewerModal: React.FC<MediaViewerModalProps> = ({ media, initialIndex
           </div>
         </div>
         {/* Comment section */}
-        <div className="w-[350px] flex flex-col bg-white h-full border-l border-gray-200">
+        {/* <div className="w-[350px] flex flex-col bg-white h-full border-l border-gray-200">
           <div className="flex-1 overflow-y-auto p-4">
             <div className="font-semibold mb-2">Comments</div>
             {comments.length === 0 && <div className="text-gray-400 text-sm">No comments yet.</div>}
@@ -90,7 +90,7 @@ const MediaViewerModal: React.FC<MediaViewerModalProps> = ({ media, initialIndex
             />
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-600">Send</button>
           </form>
-        </div>
+        </div> */}
       </div>
     </div>
   );
