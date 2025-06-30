@@ -64,7 +64,11 @@ const ReceivedFriendRequests = () => {
       });
 
       if (res.ok) {
-        setRequests(prevRequests => prevRequests.filter(req => req.sender.id !== senderId));
+        setRequests(prevRequests =>
+          prevRequests.filter(req =>
+            req && req.sender && typeof req.sender.id !== 'undefined' && req.sender.id !== senderId
+          )
+        );
       } else {
         console.error('Failed to respond to friend request');
       }

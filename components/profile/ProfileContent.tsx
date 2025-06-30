@@ -20,7 +20,7 @@ const ProfileContent = ({ profile, currentUserId, profileId }: { profile?: any, 
     const fetchPosts = async () => {
       setLoading(true);
       const accessToken = sessionStorage.getItem('accessToken');
-      const res = await fetch(`http://localhost:3301/backend/post/user?user=${profileId}&page=1&limit=30`, {
+      const res = await fetch(`http://localhost:3301/backend/post/user?user_id=${profileId}&page=1&limit=30`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
