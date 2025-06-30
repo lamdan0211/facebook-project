@@ -221,7 +221,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow duration-300 mb-8">
-      <div className="relative w-full h-64 bg-black">
+      <div className="relative w-full h-[350px] bg-black">
         <video
           ref={videoRef}
           poster={video.thumbnail}
