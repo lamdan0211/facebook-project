@@ -2,6 +2,7 @@ import { PostProps } from '@/components/posts/Post';
 
 export interface CommentData {
   author: {
+    id?: number | string;
     name: string;
     avatar: string;
     email?: string;
@@ -79,7 +80,7 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 100, love: 50, haha: 10, wow: 5, sad: 0, angry: 0 },
     comments: [
-      { author: { name: 'Saved Friend', avatar: 'https://randomuser.me/api/portraits/women/88.jpg', email: 'savedfriend@example.com' }, content: 'I saved this too!', timeAgo: 'Just now', likes: 2 }
+      { author: { name: 'Saved Friend', avatar: 'https://randomuser.me/api/portraits/women/88.jpg', email: '' }, content: 'I saved this too!', timeAgo: 'Just now', likes: 2 }
     ],
     shares: 10,
     taggedPeople: [
@@ -110,8 +111,8 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 15, love: 5, haha: 2, wow: 1, sad: 0, angry: 0 },
     comments: [
-       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'jenny@example.com' }, content: 'Great post!', timeAgo: '1 min ago', likes: 5 },
-       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'tomrusso@example.com' }, content: 'Thanks!', timeAgo: '30 seconds ago', likes: 3 },
+       { author: { name: 'Jenny', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: '' }, content: 'Great post!', timeAgo: '1 min ago', likes: 5 },
+       { author: { name: 'Tom Russo', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: '' }, content: 'Thanks!', timeAgo: '30 seconds ago', likes: 3 },
     ],
     shares: 100,
     taggedPeople: [
@@ -131,7 +132,7 @@ export const initialPosts: PostData[] = [
     ],
     reactions: { like: 50, love: 30, haha: 10, wow: 5, sad: 2, angry: 1 },
     comments: [
-      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: 'dennis@example.com' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
+      { author: { name: 'Dennis Han', avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', email: '' }, content: 'Where is this?', timeAgo: '50 mins ago', likes: 3 },
     ],
     shares: 20,
     taggedPeople: [

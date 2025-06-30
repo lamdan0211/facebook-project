@@ -4,6 +4,7 @@ import Comment from './Comment'; // Import the Comment component
 interface CommentListProps {
   comments: {
     author: {
+      id?: number | string;
       name: string;
       avatar: string;
     };

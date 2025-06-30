@@ -270,15 +270,19 @@ const Post: React.FC<PostProps & { index?: number }> = ({
         });
         const data = await response.json();
         if (response.ok) {
+          const c = data;
+          // Ưu tiên lấy avatar từ backend trả về, nếu không fallback user.profilepic
+          const avatar = c.author?.profilepic || user?.profilepic || '/avatars/default-avatar.png';
           const newComment: CommentData = {
             author: {
-              name: user?.displayName || 'User',
-              avatar: user?.photoURL || "/default-avatar.png",
-              email: user?.email || '',
+              id: c.author?.id || user?.id,
+              name: c.author?.fullname || c.author?.email || user?.fullname || user?.email || 'User',
+              avatar,
+              email: c.author?.email || user?.email || '',
             },
-            content: commentText,
-            timeAgo: 'Just now',
-            likes: 0
+            content: c.content || commentText,
+            timeAgo: c.createdAt ? new Date(c.createdAt).toLocaleString() : 'Just now',
+            likes: 0,
           };
           setAllComments(prev => [newComment, ...prev]);
           setCommentText('');
