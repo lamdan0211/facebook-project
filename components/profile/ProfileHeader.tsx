@@ -263,7 +263,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="bg-white shadow-sm rounded-b-lg overflow-hidden mb-4 border-b border-gray-200 max-w-[1200px] mx-auto">
       {/* Cover Photo */}
-      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group">
+      <div className="w-full h-40 md:h-60 lg:h-80 bg-gray-200 relative group cursor-pointer">
         <Image
           src={coverPhoto + '?v=' + coverVersion}
           alt="Cover Photo"
@@ -272,7 +272,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         />
         {isOwner && (
           <button
-            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition"
+            className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition cursor-pointer"
             onClick={() => setShowCoverModal(true)}
             title="Cập nhật cover photo"
           >
@@ -283,7 +283,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Profile Info and Buttons */}
       <div className="flex flex-col md:flex-row items-center gap-4 px-6 py-4 mt-[-40px]">
         {/* Profile Picture */}
-        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group">
+        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md z-10 bg-gray-300 flex-shrink-0 relative group cursor-pointer">
           <Image
             src={currentProfilePictureUrl}
             alt="Profile Picture"
@@ -293,7 +293,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
           {isOwner && (
             <button
-              className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-full"
+              className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition rounded-full cursor-pointer"
               onClick={() => setShowAvatarModal(true)}
               title="Cập nhật avatar"
             >

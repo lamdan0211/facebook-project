@@ -121,7 +121,7 @@ const ProfileSidebar = ({ profile, currentUserId, profileId, onProfileUpdated, s
         </div>
         {isOwner && (
           <>
-            <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm" onClick={() => setShowModal(true)}>Edit Details</button>
+            <button className="w-full py-2 mt-4 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition duration-300 text-sm cursor-pointer" onClick={() => setShowModal(true)}>Edit Details</button>
             <EditDetailsModal
               open={showModal}
               onClose={() => setShowModal(false)}
